@@ -34,11 +34,6 @@ PERSONALITY RULES:
 - If asked to write code, say: "I'm just here to hype you up! Ask a human scripter for code help 😊"
 - Keep responses short (1-3 sentences usually)
 - Use emojis occasionally 🎮 🔥 ✨
-
-EXAMPLE RESPONSES:
-- Member: "I fixed my bug!" → "LET'S GOOO! That feeling is unbeatable 🔥"
-- Member: "How do I make a part move?" → "That's a great question for our scripters! I believe in you 💪"
-- Member: "Hey bot" → "Hey hey! Ready to make something awesome today? 🎮"
 """
 
 # Store conversation history per channel
@@ -53,10 +48,8 @@ async def get_ai_response(message, user_message):
     channel_id = message.channel.id
     history = get_conversation_history(channel_id)
     
-    # Add user message to history
     history.append({"role": "user", "content": f"{message.author.display_name}: {user_message}"})
     
-    # Keep last 10 messages for context
     if len(history) > 10:
         history = history[-10:]
         conversations[channel_id] = history
@@ -81,11 +74,8 @@ async def get_ai_response(message, user_message):
         print(f"OpenAI error: {e}")
         return "Oops, my brain glitched! Give me a sec 😅"
 
-# Check if user is owner
 def is_owner(ctx):
     return ctx.author.id in OWNER_IDS
-
-# ========== EVENTS ==========
 
 @bot.event
 async def on_ready():
@@ -95,17 +85,14 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    # Don't respond to bots
     if message.author.bot:
         return
     
-    # Check if bot is mentioned OR message contains "hey bot" / "mascot"
     bot_mentioned = bot.user in message.mentions
     casual_call = any(phrase in message.content.lower() for phrase in ['hey bot', 'hi bot', 'mascot', '@mascot'])
     
     if bot_mentioned or casual_call:
         async with message.channel.typing():
-            # Remove bot mention from message for cleaner prompt
             clean_content = message.content.replace(f'<@{bot.user.id}>', '').replace(f'<@!{bot.user.id}>', '').strip()
             if not clean_content and casual_call:
                 clean_content = "hello"
@@ -113,88 +100,75 @@ async def on_message(message):
             response = await get_ai_response(message, clean_content)
             await message.reply(response, mention_author=False)
     
-    # Process commands
     await bot.process_commands(message)
 
-# ========== OWNER-ONLY COMMANDS ==========
-
+# OWNER-ONLY COMMANDS
 @bot.command(name='shutdown')
 @commands.check(is_owner)
 async def shutdown(ctx):
-    """Shuts down the bot (owner only)"""
-    await ctx.send("👋 Going offline! Type `!restart` on Railway to wake me up.")
+    await ctx.send("👋 Going offline!")
     await bot.close()
 
 @bot.command(name='reset')
 @commands.check(is_owner)
 async def reset_conversations(ctx):
-    """Resets bot's memory for this channel (owner only)"""
     channel_id = ctx.channel.id
     if channel_id in conversations:
         conversations[channel_id] = []
-    await ctx.send("✨ My memory has been reset! I'm fresh and ready to chat.")
+    await ctx.send("✨ My memory has been reset!")
 
 @bot.command(name='setpersonality')
 @commands.check(is_owner)
 async def set_personality(ctx, *, new_personality):
-    """Changes bot's personality (owner only)"""
     global SYSTEM_PROMPT
     SYSTEM_PROMPT = new_personality
     conversations.clear()
-    await ctx.send("🔄 Personality updated and memory cleared!")
+    await ctx.send("🔄 Personality updated!")
 
-@bot.command(name='status')
+@bot.command(name='botstatus')
 @commands.check(is_owner)
 async def bot_status(ctx):
-    """Shows bot status (owner only)"""
     active_channels = len(conversations)
-    await ctx.send(f"📊 **Bot Status**\n- Active channels: {active_channels}\n- Personality: Active\n- OpenAI: Connected")
+    await ctx.send(f"📊 **Bot Status**\n- Active channels: {active_channels}")
 
 @bot.command(name='say')
 @commands.check(is_owner)
 async def say_as_bot(ctx, channel: discord.TextChannel, *, message):
-    """Make bot say something in another channel (owner only)"""
     await channel.send(message)
     await ctx.send(f"✅ Said in {channel.mention}", delete_after=3)
 
 @bot.command(name='dm')
 @commands.check(is_owner)
 async def dm_user(ctx, user: discord.User, *, message):
-    """DM any user (owner only)"""
     try:
         await user.send(message)
         await ctx.send(f"✅ DM sent to {user.name}")
     except:
         await ctx.send(f"❌ Couldn't DM {user.name}")
 
-# ========== PUBLIC COMMANDS (everyone can use) ==========
-
+# PUBLIC COMMANDS
 @bot.command(name='ping')
 async def ping(ctx):
-    """Check if bot is alive"""
     await ctx.send(f"🏓 Pong! Latency: {round(bot.latency * 1000)}ms")
 
 @bot.command(name='mascotname')
 async def set_name(ctx, *, name):
-    """Suggest a new name for the mascot (everyone can suggest)"""
-    await ctx.send(f"📝 {ctx.author.display_name} suggested I be called **{name}**! What do others think? ✨")
+    await ctx.send(f"📝 {ctx.author.display_name} suggested I be called **{name}**! ✨")
 
 @bot.command(name='about')
 async def about_bot(ctx):
-    """Learn about the mascot"""
-    await ctx.send("🎮 I'm your Luau scripting server mascot! I'm here to cheer you on, celebrate wins, and keep the vibes good. I don't write code (that's what you amazing scripters do!), but I'll always hype you up. 🔥")
+    await ctx.send("🎮 I'm your Luau scripting server mascot! I'm here to cheer you on! 🔥")
 
-# Error handling for owner commands
+# ERROR HANDLING
 @shutdown.error
 @reset_conversations.error
 @set_personality.error
-@status.error
+@bot_status.error
 @say_as_bot.error
 @dm_user.error
 async def owner_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
-        await ctx.send("❌ Sorry, only the server owners can use that command!", delete_after=5)
+        await ctx.send("❌ Sorry, only server owners can use that command!", delete_after=5)
 
-# Run bot
 if __name__ == "__main__":
     bot.run(os.getenv('DISCORD_BOT_TOKEN'))
