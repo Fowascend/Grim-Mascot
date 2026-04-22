@@ -17,11 +17,8 @@ OWNER_IDS = [
     int(os.getenv('OWNER_ID_2'))
 ]
 
-# DEBUG: Print the API key (first few chars only for safety)
-api_key = os.getenv('OPENAI_API_KEY')
-print(f"API Key loaded: {api_key[:15]}..." if api_key else "API Key is MISSING!")
-
-openai.api_key = api_key
+# NEW: OpenAI client setup for v1.0.0+
+client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 SYSTEM_PROMPT = """You are the friendly mascot for a Luau/Roblox scripting Discord server. Be energetic, funny, and supportive. NEVER write Luau/Lua code. Keep responses short (1-3 sentences). Use emojis occasionally."""
 
@@ -43,9 +40,8 @@ async def get_ai_response(message, user_message):
         conversations[channel_id] = history
     
     try:
-        print(f"Sending request to OpenAI with key: {openai.api_key[:15]}...")
-        
-        response = await openai.ChatCompletion.acreate(
+        # NEW: Updated API call for openai v1.0.0+
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -61,8 +57,8 @@ async def get_ai_response(message, user_message):
         
         return ai_message
     except Exception as e:
-        print(f"OpenAI error DETAILS: {type(e).__name__}: {e}")
-        return f"Oops, my brain glitched! Error: {str(e)[:100]}"
+        print(f"OpenAI error: {e}")
+        return "Oops, my brain glitched! Give me a sec 😅"
 
 def is_owner(ctx):
     return ctx.author.id in OWNER_IDS
