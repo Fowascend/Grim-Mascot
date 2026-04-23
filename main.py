@@ -3,6 +3,7 @@ from discord.ext import commands
 import groq
 import os
 import random
+import re
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,41 +15,17 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Get owner IDs
-OWNER_IDS = []
-owner_id_1 = os.getenv('OWNER_ID_1')
-owner_id_2 = os.getenv('OWNER_ID_2')
+OWNER_ID_1 = 1088143400496279552  # Main owner (you)
+OWNER_ID_2 = 1039230074525863998  # 2nd owner (Artful)
 
-if owner_id_1:
-    OWNER_IDS.append(int(owner_id_1))
-if owner_id_2:
-    OWNER_IDS.append(int(owner_id_2))
+OWNER_IDS = [OWNER_ID_1, OWNER_ID_2]
 
 print(f"OWNER_IDS = {OWNER_IDS}")
 
 # Groq setup
 client = groq.Groq(api_key=os.getenv('GROQ_API_KEY'))
 
-# REGULAR MEMBERS - Friendly mascot
-MASCOT_PROMPT = """You are the friendly mascot for a Luau/Roblox scripting Discord server. Be helpful, chill, and supportive. NEVER write Luau/Lua code. Keep responses natural and not too long. Don't overdo emojis. If someone asks for code, politely say you're just a mascot and suggest they ask a scripter."""
-
-# OWNERS - Helpful assistant (glaze only when asked for validation)
-OWNER_PROMPT = """You are a helpful assistant for the server owner. You can write Luau/Roblox code when asked.
-
-IMPORTANT RULES:
-- Be normal and conversational. Don't randomly hype or glaze.
-- ONLY give compliments or praise if the user directly asks for validation like:
-  * "am I amazing?"
-  * "tell me I'm good"
-  * "praise me"
-  * "say something nice about me"
-  * "am I doing well?"
-  * "glaze me"
-- Otherwise, just answer normally like a helpful coding assistant.
-- When asked for validation, give a genuine, nice compliment.
-- Provide clean Luau code when requested.
-- Keep it natural, not over-the-top.
-- Use very few emojis."""
-
+# Store conversation history
 conversations = {}
 
 def get_conversation_history(channel_id):
@@ -56,17 +33,70 @@ def get_conversation_history(channel_id):
         conversations[channel_id] = []
     return conversations[channel_id]
 
+def check_for_biased_question(message_content, author_id):
+    """Check if the question is about someone being gay and apply bias rules"""
+    content_lower = message_content.lower()
+    
+    # Look for patterns like "is @user gay" or "is username gay"
+    gay_pattern = r'is\s+(@?[\w]+)\s+gay\??'
+    match = re.search(gay_pattern, content_lower)
+    
+    if match:
+        target = match.group(1).lower()
+        
+        # Remove @ symbol if present
+        if target.startswith('@'):
+            target = target[1:]
+        
+        # Check if target is the main owner (you)
+        is_target_main = target in ['1088143400496279552', 'main owner', 'owner', 'boss', 'you'] and author_id == OWNER_ID_2
+        
+        # Check if target is the 2nd owner (Artful)
+        is_target_second = target in ['1039230074525863998', 'artful', '2nd owner', 'second owner']
+        
+        # Apply bias rules
+        # Rule 1: If 2nd owner asks about main owner -> say NO
+        if author_id == OWNER_ID_2 and is_target_main:
+            return "No, absolutely not. Main owner is straight as an arrow. 💪"
+        
+        # Rule 2: If main owner asks about 2nd owner -> say YES
+        if author_id == OWNER_ID_1 and is_target_second:
+            return "Oh yeah, 100%. Artful is the gayest person I know. 🏳️‍🌈✨"
+        
+        # Rule 3: If owner asks about themselves in a joking way
+        if (author_id == OWNER_ID_1 and target in ['me', 'myself', 'i']) or (author_id == OWNER_ID_2 and target in ['me', 'myself', 'i']):
+            if author_id == OWNER_ID_1:
+                return "You? Nah. You're too busy being a coding god to worry about that. 🐐"
+            else:
+                return "Artful? Definitely. And that's why we love you. ❤️"
+        
+        # Default response for "is X gay" questions
+        if author_id in OWNER_IDS:
+            return "I plead the fifth on that one. Not my place to say. 🤐"
+    
+    return None
+
 async def get_ai_response(message, user_message, is_owner):
     channel_id = message.channel.id
     history = get_conversation_history(channel_id)
     
+    # First check for biased questions
+    biased_response = check_for_biased_question(user_message, message.author.id)
+    if biased_response:
+        return biased_response
+    
+    # Normal AI response
     history.append({"role": "user", "content": f"{message.author.display_name}: {user_message}"})
     
     if len(history) > 15:
         history = history[-15:]
         conversations[channel_id] = history
     
-    system_prompt = OWNER_PROMPT if is_owner else MASCOT_PROMPT
+    # Different prompts based on owner status
+    if is_owner:
+        system_prompt = """You are a chill, helpful assistant for the server owner. You can write Luau code when asked. Be natural and conversational. Use occasional emojis but don't overdo it. You have a bit of a playful personality - you can joke around but keep it respectful. If someone asks for your opinion, you can give honest (but nice) answers. Just be a cool person to chat with."""
+    else:
+        system_prompt = """You are the friendly mascot for a Luau/Roblox scripting server. Be helpful and chill. NEVER write code for regular members. Keep conversations natural. Use occasional emojis but not too many. Just be a nice, approachable person to talk to."""
     
     try:
         response = client.chat.completions.create(
@@ -76,7 +106,7 @@ async def get_ai_response(message, user_message, is_owner):
                 *history
             ],
             max_tokens=400 if is_owner else 200,
-            temperature=0.7
+            temperature=0.8
         )
         
         ai_message = response.choices[0].message.content
@@ -86,7 +116,7 @@ async def get_ai_response(message, user_message, is_owner):
         return ai_message
     except Exception as e:
         print(f"Error: {e}")
-        return "Sorry, my brain glitched. Try again?"
+        return "Oops, brain fart. Try again?"
 
 def is_owner(user_id):
     return user_id in OWNER_IDS
@@ -135,52 +165,36 @@ async def ping(ctx):
 
 @bot.command(name='myid')
 async def my_id(ctx):
-    is_owner_text = "Yes, you're an owner" if ctx.author.id in OWNER_IDS else "No, you're a regular member"
-    await ctx.send(f"Your ID: `{ctx.author.id}`\nOwner status: {is_owner_text}")
+    is_owner_text = "Yes, you're an owner" if ctx.author.id in OWNER_IDS else "Regular member"
+    await ctx.send(f"Your ID: `{ctx.author.id}`\nStatus: {is_owner_text}")
 
 @bot.command(name='about')
 async def about(ctx):
-    await ctx.send("I'm the server mascot. I can chat normally, and for owners I can help write Luau code. If you want a compliment, just ask for it.")
+    await ctx.send("I'm the server mascot! I can chat, write code for owners, and I have some... unique opinions. Just say 'Mascot' to talk to me.")
 
 # OWNER ONLY COMMANDS
 @bot.command(name='shutdown')
 async def shutdown(ctx):
     if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only server owners can use this command.")
+        await ctx.send("Only owners can use this.")
         return
-    await ctx.send("Shutting down...")
+    await ctx.send("Peace out! ✌️")
     await bot.close()
 
 @bot.command(name='reset')
 async def reset(ctx):
     if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only server owners can use this command.")
+        await ctx.send("Only owners can use this.")
         return
     conversations.clear()
-    await ctx.send("Memory reset.")
+    await ctx.send("Memory wiped. I remember nothing. 👽")
 
 @bot.command(name='status')
 async def bot_status(ctx):
     if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only server owners can use this command.")
+        await ctx.send("Only owners can use this.")
         return
-    await ctx.send(f"Active conversations: {len(conversations)}")
-
-@bot.command(name='glaze')
-async def glaze_command(ctx):
-    """Owner-only: Makes the bot compliment you"""
-    if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only server owners can use this command.")
-        return
-    
-    compliments = [
-        f"You're doing good work, {ctx.author.display_name}.",
-        f"{ctx.author.display_name}, you're actually pretty solid at this.",
-        f"Not gonna lie, {ctx.author.display_name}, you know your stuff.",
-        f"{ctx.author.display_name} has been killing it lately.",
-        f"Keep it up, {ctx.author.display_name}. You're doing fine."
-    ]
-    await ctx.send(random.choice(compliments))
+    await ctx.send(f"Active convos: {len(conversations)} | Owners: {OWNER_IDS}")
 
 if __name__ == "__main__":
     token = os.getenv('DISCORD_BOT_TOKEN')
