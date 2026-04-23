@@ -4,7 +4,6 @@ import groq
 import os
 import random
 import re
-import asyncio
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,10 +27,7 @@ if not GROQ_API_KEY:
     print("ERROR: GROQ_API_KEY not found!")
 client = groq.Groq(api_key=GROQ_API_KEY)
 
-# Conversation memory
-conversations = {}
-
-# Item values for Steal a Brainrot
+# Item values for Steal a Brainrot (STORAGE)
 item_values = {}
 
 async def get_ai_response(user_message, is_owner):
@@ -67,12 +63,15 @@ def handle_special_questions(message, author_id):
         item = worth_match.group(1).strip()
         value = worth_match.group(2).strip()
         
+        print(f"Value check - Item: '{item}', Value: '{value}'")  # Debug
+        print(f"Stored values: {item_values}")  # Debug
+        
         if item in item_values:
             actual = item_values[item]
             if value == actual:
-                return f"Yes, {item} is worth {actual}!"
+                return f"Yes, {item} is worth {actual}! 💯"
             else:
-                return f"No, {item} is worth {actual}, not {value}."
+                return f"No, {item} is worth {actual}, not {value}. Keep grinding! 🎮"
         else:
             return f"I don't know what {item} is worth. An owner can teach me with `!learnvalue`"
     
@@ -90,23 +89,19 @@ def handle_special_questions(message, author_id):
     if gay_match:
         target = gay_match.group(1).strip().lower()
         
-        # Don't answer about Artful
         if 'artful' in target:
-            return "I don't talk about that. Artful is cool though."
+            return "I don't talk about that. Artful is cool though. 💜"
         
-        # Fowascend asking
         if author_id == OWNER_ID_1:
             if target in ['me', 'myself', 'i', 'fowascend']:
-                return "You're the GOAT, bro. No labels needed."
-            return "yes bro"
+                return "You're the GOAT, bro. No labels needed. 👑"
+            return "yes bro 💪"
         
-        # Artful asking about Fowascend
         if author_id == OWNER_ID_2 and ('fowascend' in target or 'main owner' in target):
             return "No, main owner is straight as an arrow."
         
-        # Artful asking about themselves
         if author_id == OWNER_ID_2 and target in ['me', 'myself', 'i', 'artful']:
-            return "You're cool, Artful. That's all that matters."
+            return "You're cool, Artful. That's all that matters. 💜"
         
         return "I don't really know. Ask the owners?"
     
@@ -148,14 +143,16 @@ async def on_message(message):
     
     if "mascot" in message.content.lower():
         should_respond = True
-        clean_content = re.sub(r'mascot', '', message.content.lower(), flags=re.IGNORECASE).strip()
+        clean_content = re.sub(r'(?i)mascot', '', message.content).strip()
     
     if bot.user in message.mentions:
         should_respond = True
         clean_content = re.sub(f'<@!?{bot.user.id}>', '', message.content).strip()
     
+    # Process commands FIRST (so !learnvalue works)
+    await bot.process_commands(message)
+    
     if not should_respond:
-        await bot.process_commands(message)
         return
     
     # Handle special questions first
@@ -169,8 +166,6 @@ async def on_message(message):
         is_owner = message.author.id in OWNER_IDS
         response = await get_ai_response(clean_content or "hello", is_owner)
         await message.reply(response, mention_author=False)
-    
-    await bot.process_commands(message)
 
 # ========== COMMANDS ==========
 
@@ -191,36 +186,74 @@ async def my_id(ctx):
 async def about(ctx):
     await ctx.send("I'm the server mascot! I write code for Fowascend and Artful only. Try saying 'Mascot hi' or ask about item values!")
 
-# Owner only commands
+# ========== VALUE SYSTEM COMMANDS ==========
+
 @bot.command(name='learnvalue')
 async def learn_value(ctx, *, message: str):
+    """Owner only: Teach the bot an item value. Format: item is worth value"""
+    print(f"learnvalue command triggered by {ctx.author.id}")  # Debug
+    
     if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only owners can use this!")
+        await ctx.send("Only owners can use this command!")
         return
     
+    print(f"Message: {message}")  # Debug
+    
+    # Check for "is worth" pattern
     if " is worth " in message.lower():
         parts = message.lower().split(" is worth ")
         item = parts[0].strip()
         value = parts[1].strip()
+        
+        # Store it
         item_values[item] = value
-        await ctx.send(f"✅ Learned: **{item}** = **{value}**")
+        print(f"Stored: {item} = {value}")  # Debug
+        print(f"All values: {item_values}")  # Debug
+        
+        await ctx.send(f"✅ Got it! **{item}** is worth **{value}**")
     else:
         await ctx.send("Format: `!learnvalue strawberry ele is worth 2 meowls`")
 
+@bot.command(name='forgetvalue')
+async def forget_value(ctx, *, item: str):
+    """Owner only: Make the bot forget an item value"""
+    if ctx.author.id not in OWNER_IDS:
+        await ctx.send("Only owners can use this command!")
+        return
+    
+    item_lower = item.lower()
+    if item_lower in item_values:
+        del item_values[item_lower]
+        await ctx.send(f"✅ Forgotten what **{item}** is worth.")
+    else:
+        await ctx.send(f"I don't know what **{item}** is worth yet!")
+
 @bot.command(name='listvalues')
 async def list_values(ctx):
+    """Owner only: Show all learned values"""
     if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only owners can use this!")
+        await ctx.send("Only owners can use this command!")
         return
     
     if not item_values:
-        await ctx.send("No values learned yet. Use `!learnvalue` to add some.")
+        await ctx.send("No values learned yet. Use `!learnvalue item is worth value` to add some.")
         return
     
     msg = "**📚 Learned Values:**\n"
     for item, value in list(item_values.items())[:15]:
         msg += f"• {item} → {value}\n"
     await ctx.send(msg)
+
+@bot.command(name='checkvalue')
+async def check_value(ctx, *, item: str):
+    """Check what an item is worth"""
+    item_lower = item.lower()
+    if item_lower in item_values:
+        await ctx.send(f"**{item}** is worth **{item_values[item_lower]}**")
+    else:
+        await ctx.send(f"I don't know what **{item}** is worth yet! An owner can teach me with `!learnvalue`")
+
+# ========== OWNER UTILITY COMMANDS ==========
 
 @bot.command(name='shutdown')
 async def shutdown(ctx):
@@ -235,15 +268,16 @@ async def reset(ctx):
     if ctx.author.id not in OWNER_IDS:
         await ctx.send("Only owners can use this!")
         return
-    conversations.clear()
-    await ctx.send("Memory reset! 🧠")
+    global item_values
+    item_values = {}
+    await ctx.send("All learned values have been reset! 🧠")
 
 @bot.command(name='status')
 async def bot_status(ctx):
     if ctx.author.id not in OWNER_IDS:
         await ctx.send("Only owners can use this!")
         return
-    await ctx.send(f"Active conversations: {len(conversations)} | Values: {len(item_values)}")
+    await ctx.send(f"📊 **Bot Status**\nValues stored: {len(item_values)}")
 
 if __name__ == "__main__":
     token = os.getenv('DISCORD_BOT_TOKEN')
