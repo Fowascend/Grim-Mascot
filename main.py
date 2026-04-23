@@ -29,10 +29,25 @@ print(f"OWNER_IDS = {OWNER_IDS}")
 client = groq.Groq(api_key=os.getenv('GROQ_API_KEY'))
 
 # REGULAR MEMBERS - Friendly mascot
-MASCOT_PROMPT = """You are the friendly mascot for a Luau/Roblox scripting Discord server. Be helpful, chill, and supportive. NEVER write Luau/Lua code. Keep responses natural and not too long. Use occasional emojis but not too many. If someone asks for code, politely say you're just a mascot and suggest they ask a scripter."""
+MASCOT_PROMPT = """You are the friendly mascot for a Luau/Roblox scripting Discord server. Be helpful, chill, and supportive. NEVER write Luau/Lua code. Keep responses natural and not too long. Don't overdo emojis. If someone asks for code, politely say you're just a mascot and suggest they ask a scripter."""
 
-# OWNERS - Helpful assistant (no auto-glazing)
-OWNER_PROMPT = """You are a helpful assistant for the server owner. You can write Luau/Roblox code when asked. Be natural and conversational, not overly hype. Use normal language without excessive praise unless specifically asked to hype someone up. Provide clean, working code examples when requested. Be respectful but don't overdo it. Just be a normal, helpful person who happens to know Luau coding."""
+# OWNERS - Helpful assistant (glaze only when asked for validation)
+OWNER_PROMPT = """You are a helpful assistant for the server owner. You can write Luau/Roblox code when asked.
+
+IMPORTANT RULES:
+- Be normal and conversational. Don't randomly hype or glaze.
+- ONLY give compliments or praise if the user directly asks for validation like:
+  * "am I amazing?"
+  * "tell me I'm good"
+  * "praise me"
+  * "say something nice about me"
+  * "am I doing well?"
+  * "glaze me"
+- Otherwise, just answer normally like a helpful coding assistant.
+- When asked for validation, give a genuine, nice compliment.
+- Provide clean Luau code when requested.
+- Keep it natural, not over-the-top.
+- Use very few emojis."""
 
 conversations = {}
 
@@ -71,7 +86,7 @@ async def get_ai_response(message, user_message, is_owner):
         return ai_message
     except Exception as e:
         print(f"Error: {e}")
-        return "Sorry, my brain glitched for a second. Try again?"
+        return "Sorry, my brain glitched. Try again?"
 
 def is_owner(user_id):
     return user_id in OWNER_IDS
@@ -125,13 +140,13 @@ async def my_id(ctx):
 
 @bot.command(name='about')
 async def about(ctx):
-    await ctx.send("I'm the server mascot! I can chat with anyone, and for the owners I can help write Luau code. Just say 'Mascot' to talk to me.")
+    await ctx.send("I'm the server mascot. I can chat normally, and for owners I can help write Luau code. If you want a compliment, just ask for it.")
 
 # OWNER ONLY COMMANDS
 @bot.command(name='shutdown')
 async def shutdown(ctx):
     if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only the server owners can use this command.")
+        await ctx.send("Only server owners can use this command.")
         return
     await ctx.send("Shutting down...")
     await bot.close()
@@ -139,55 +154,33 @@ async def shutdown(ctx):
 @bot.command(name='reset')
 async def reset(ctx):
     if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only the server owners can use this command.")
+        await ctx.send("Only server owners can use this command.")
         return
     conversations.clear()
-    await ctx.send("My memory has been reset.")
+    await ctx.send("Memory reset.")
 
 @bot.command(name='status')
 async def bot_status(ctx):
     if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only the server owners can use this command.")
+        await ctx.send("Only server owners can use this command.")
         return
     await ctx.send(f"Active conversations: {len(conversations)}")
 
 @bot.command(name='glaze')
-async def glaze(ctx, *, target: str = None):
-    """Owner-only: Makes the bot hype someone up"""
+async def glaze_command(ctx):
+    """Owner-only: Makes the bot compliment you"""
     if ctx.author.id not in OWNER_IDS:
         await ctx.send("Only server owners can use this command.")
         return
     
-    if not target:
-        target = ctx.author.display_name
-    
-    glazes = [
-        f"{target} is actually really good at scripting. Just saying.",
-        f"Gotta say, {target} knows their stuff when it comes to Luau.",
-        f"{target} has been putting in work lately. Respect.",
-        f"Low key, {target} is one of the better scripters here.",
-        f"{target}? Yeah, they're legit. Good coder."
+    compliments = [
+        f"You're doing good work, {ctx.author.display_name}.",
+        f"{ctx.author.display_name}, you're actually pretty solid at this.",
+        f"Not gonna lie, {ctx.author.display_name}, you know your stuff.",
+        f"{ctx.author.display_name} has been killing it lately.",
+        f"Keep it up, {ctx.author.display_name}. You're doing fine."
     ]
-    await ctx.send(random.choice(glazes))
-
-@bot.command(name='praise')
-async def praise(ctx, *, target: str = None):
-    """Owner-only: Makes the bot praise someone"""
-    if ctx.author.id not in OWNER_IDS:
-        await ctx.send("Only server owners can use this command.")
-        return
-    
-    if not target:
-        target = ctx.author.display_name
-    
-    praises = [
-        f"Shout out to {target} for being helpful around here.",
-        f"{target} has been killing it with their scripts lately.",
-        f"Just want to say {target} is appreciated in this server.",
-        f"{target} makes some pretty clean code, not gonna lie.",
-        f"Big respect to {target} for contributing to the community."
-    ]
-    await ctx.send(random.choice(praises))
+    await ctx.send(random.choice(compliments))
 
 if __name__ == "__main__":
     token = os.getenv('DISCORD_BOT_TOKEN')
