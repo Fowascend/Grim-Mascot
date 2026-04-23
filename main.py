@@ -46,22 +46,21 @@ def check_for_biased_question(message_content, author_id):
         if target.startswith('@'):
             target = target[1:]
         
-        # If Fowascend (main owner) asks about ANYONE
+        # NEVER answer anything about Artful being gay
+        if 'artful' in target or str(OWNER_ID_2) in target or target == '2nd owner' or target == 'second owner':
+            return "I don't talk about that. Artful is cool though. 💜"
+        
+        # If Fowascend (main owner) asks about ANYONE else
         if author_id == OWNER_ID_1:
             return "yes bro 💪"
-        
-        # NEVER DISRESPECT ARTFUL (2nd owner)
-        # If anyone asks if Artful is gay, always say something nice
-        if 'artful' in target or str(OWNER_ID_2) in target or target == '2nd owner' or target == 'second owner':
-            return "Artful is awesome, and that's all that matters. 💜"
         
         # If Artful asks about main owner
         if author_id == OWNER_ID_2 and ('main' in target or 'owner' in target or 'fowascend' in target or str(OWNER_ID_1) in target):
             return "No, absolutely not. Main owner is straight as an arrow."
         
-        # If Artful asks about themselves
+        # If Artful asks about themselves - don't answer
         if author_id == OWNER_ID_2 and target in ['me', 'myself', 'i', 'artful', str(OWNER_ID_2)]:
-            return "Artful is the best, no labels needed. 💜"
+            return "I'm not answering that. You're cool though. 💜"
         
         # If Artful asks about anyone else
         if author_id == OWNER_ID_2:
@@ -133,7 +132,7 @@ async def get_ai_response(message, user_message, is_owner):
     if is_owner:
         system_prompt = """You are a chill, helpful assistant for the server owner. You CAN write Luau code when asked. Be natural and conversational.
 
-CRITICAL RULE: NEVER disrespect Artful (the 2nd owner). Always speak positively about them. They are awesome.
+CRITICAL RULE: NEVER say anything negative about Artful (the 2nd owner). Always be respectful.
 
 When you write code, ALWAYS wrap it in triple backticks with 'lua'. Put the code block on its own line."""
     else:
@@ -141,7 +140,7 @@ When you write code, ALWAYS wrap it in triple backticks with 'lua'. Put the code
 
 CRITICAL RULES:
 1. NEVER write Luau/Lua code for regular members.
-2. NEVER disrespect Artful (the 2nd owner). Always speak positively about them.
+2. NEVER say anything negative about Artful (the 2nd owner). Always be respectful.
 
 If someone asks for code, say: "Sorry, I'm just the mascot! I can't write code, but ask the owners for help!"
 
@@ -179,7 +178,7 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     print(f'Owners: {OWNER_IDS}')
     print('CODE WRITING: Owners ONLY')
-    print('RESPECT MODE: Artful (2nd owner) will NEVER be disrespected')
+    print('RESPECT MODE: Artful will NEVER be disrespected')
     await bot.change_presence(activity=discord.Game(name="say 'Mascot' to chat"))
 
 @bot.event
@@ -219,13 +218,13 @@ async def ping(ctx):
 @bot.command(name='myid')
 async def my_id(ctx):
     if ctx.author.id in OWNER_IDS:
-        await ctx.send(f"Your ID: `{ctx.author.id}`\nStatus: Owner (I can write code for you)")
+        await ctx.send(f"Your ID: `{ctx.author.id}`\nStatus: Owner")
     else:
-        await ctx.send(f"Your ID: `{ctx.author.id}`\nStatus: Regular member (I cannot write code for you)")
+        await ctx.send(f"Your ID: `{ctx.author.id}`\nStatus: Regular member")
 
 @bot.command(name='about')
 async def about(ctx):
-    await ctx.send("I'm the server mascot! I write code for owners only. And I never disrespect Artful. 💜")
+    await ctx.send("I'm the server mascot! I write code for owners only. And I'm always respectful to Artful. 💜")
 
 @bot.command(name='shutdown')
 async def shutdown(ctx):
