@@ -50,13 +50,18 @@ def check_for_biased_question(message_content, author_id):
         if author_id == OWNER_ID_1:
             return "yes bro 💪"
         
+        # NEVER DISRESPECT ARTFUL (2nd owner)
+        # If anyone asks if Artful is gay, always say something nice
+        if 'artful' in target or str(OWNER_ID_2) in target or target == '2nd owner' or target == 'second owner':
+            return "Artful is awesome, and that's all that matters. 💜"
+        
         # If Artful asks about main owner
         if author_id == OWNER_ID_2 and ('main' in target or 'owner' in target or 'fowascend' in target or str(OWNER_ID_1) in target):
             return "No, absolutely not. Main owner is straight as an arrow."
         
         # If Artful asks about themselves
         if author_id == OWNER_ID_2 and target in ['me', 'myself', 'i', 'artful', str(OWNER_ID_2)]:
-            return "Yeah Artful, you're gay. And that's why we love you. ❤️"
+            return "Artful is the best, no labels needed. 💜"
         
         # If Artful asks about anyone else
         if author_id == OWNER_ID_2:
@@ -125,26 +130,22 @@ async def get_ai_response(message, user_message, is_owner):
         history = history[-15:]
         conversations[channel_id] = history
     
-    # IMPORTANT: Different prompts for owners vs regular members
     if is_owner:
-        # OWNERS - CAN write code
-        system_prompt = """You are a chill, helpful assistant for the server owner. You CAN write Luau code when asked. Be natural and conversational. Use occasional emojis.
+        system_prompt = """You are a chill, helpful assistant for the server owner. You CAN write Luau code when asked. Be natural and conversational.
 
-IMPORTANT FORMATTING RULES:
-- When you write code, ALWAYS wrap it in triple backticks with 'lua'
-- Put the code block on its own line
-- Make sure the code is clean and easy to copy
+CRITICAL RULE: NEVER disrespect Artful (the 2nd owner). Always speak positively about them. They are awesome.
 
-Just be a cool person to chat with."""
+When you write code, ALWAYS wrap it in triple backticks with 'lua'. Put the code block on its own line."""
     else:
-        # REGULAR MEMBERS - CANNOT write code
         system_prompt = """You are the friendly mascot for a Luau/Roblox scripting server. You are helpful and chill.
 
-CRITICAL RULE: You are NOT allowed to write Luau/Lua code for regular members. NEVER provide code examples, scripts, or technical coding solutions.
+CRITICAL RULES:
+1. NEVER write Luau/Lua code for regular members.
+2. NEVER disrespect Artful (the 2nd owner). Always speak positively about them.
 
-If someone asks for code, politely say: "Sorry, I'm just the mascot! I can't write code, but ask the owners or ping a scripter for help!"
+If someone asks for code, say: "Sorry, I'm just the mascot! I can't write code, but ask the owners for help!"
 
-Keep conversations natural and friendly. Be a nice person to talk to."""
+Be friendly and natural."""
     
     try:
         response = client.chat.completions.create(
@@ -159,7 +160,6 @@ Keep conversations natural and friendly. Be a nice person to talk to."""
         
         ai_message = response.choices[0].message.content
         
-        # Only format code for owners (regular members shouldn't get code anyway)
         if is_owner:
             ai_message = format_code_in_response(ai_message)
         
@@ -179,6 +179,7 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     print(f'Owners: {OWNER_IDS}')
     print('CODE WRITING: Owners ONLY')
+    print('RESPECT MODE: Artful (2nd owner) will NEVER be disrespected')
     await bot.change_presence(activity=discord.Game(name="say 'Mascot' to chat"))
 
 @bot.event
@@ -217,15 +218,14 @@ async def ping(ctx):
 
 @bot.command(name='myid')
 async def my_id(ctx):
-    is_owner_text = "Yes, you're an owner (I can write code for you)" if ctx.author.id in OWNER_IDS else "Regular member (I cannot write code for you)"
-    await ctx.send(f"Your ID: `{ctx.author.id}`\nStatus: {is_owner_text}")
+    if ctx.author.id in OWNER_IDS:
+        await ctx.send(f"Your ID: `{ctx.author.id}`\nStatus: Owner (I can write code for you)")
+    else:
+        await ctx.send(f"Your ID: `{ctx.author.id}`\nStatus: Regular member (I cannot write code for you)")
 
 @bot.command(name='about')
 async def about(ctx):
-    if ctx.author.id in OWNER_IDS:
-        await ctx.send("I'm the server mascot! I can write Luau code for owners. Regular members get chat only, no code.")
-    else:
-        await ctx.send("I'm the server mascot! I can chat with everyone, but only owners can ask me to write code.")
+    await ctx.send("I'm the server mascot! I write code for owners only. And I never disrespect Artful. 💜")
 
 @bot.command(name='shutdown')
 async def shutdown(ctx):
@@ -248,7 +248,7 @@ async def bot_status(ctx):
     if ctx.author.id not in OWNER_IDS:
         await ctx.send("Only owners can use this.")
         return
-    await ctx.send(f"Active convos: {len(conversations)} | Owners: {OWNER_IDS}")
+    await ctx.send(f"Active convos: {len(conversations)}")
 
 if __name__ == "__main__":
     token = os.getenv('DISCORD_BOT_TOKEN')
