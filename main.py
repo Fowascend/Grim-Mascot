@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import openai
+import groq
 import os
 from dotenv import load_dotenv
 
@@ -17,17 +17,8 @@ OWNER_IDS = [
     int(os.getenv('OWNER_ID_2'))
 ]
 
-# Get API key
-API_KEY = os.getenv('OPENAI_API_KEY')
-print(f"API Key loaded? {'YES' if API_KEY else 'NO'}")
-print(f"API Key starts with: {API_KEY[:20]}..." if API_KEY else "NO KEY FOUND")
-
-# Setup OpenAI client
-try:
-    client = openai.OpenAI(api_key=API_KEY)
-    print("OpenAI client created successfully")
-except Exception as e:
-    print(f"Failed to create OpenAI client: {e}")
+# Initialize Groq client (FREE!)
+client = groq.Groq(api_key=os.getenv('GROQ_API_KEY'))
 
 SYSTEM_PROMPT = """You are the friendly mascot for a Luau/Roblox scripting Discord server. Be energetic, funny, and supportive. NEVER write Luau/Lua code. Keep responses short (1-3 sentences). Use emojis occasionally."""
 
@@ -49,10 +40,8 @@ async def get_ai_response(message, user_message):
         conversations[channel_id] = history
     
     try:
-        print(f"Attempting API call with key: {API_KEY[:20]}...")
-        
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 *history
@@ -67,8 +56,8 @@ async def get_ai_response(message, user_message):
         
         return ai_message
     except Exception as e:
-        print(f"FULL ERROR: {type(e).__name__}: {e}")
-        return f"Error: {type(e).__name__} - Check logs!"
+        print(f"Groq error: {e}")
+        return "Oops, my brain glitched! Give me a sec 😅"
 
 def is_owner(ctx):
     return ctx.author.id in OWNER_IDS
