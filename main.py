@@ -15,7 +15,7 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Get owner IDs
-OWNER_ID_1 = 1088143400496279552  # Main owner (you)
+OWNER_ID_1 = 1088143400496279552  # Main owner (Fowascend - you)
 OWNER_ID_2 = 1039230074525863998  # 2nd owner (Artful)
 
 OWNER_IDS = [OWNER_ID_1, OWNER_ID_2]
@@ -37,44 +37,78 @@ def check_for_biased_question(message_content, author_id):
     """Check if the question is about someone being gay and apply bias rules"""
     content_lower = message_content.lower()
     
-    # Look for patterns like "is @user gay" or "is username gay"
-    gay_pattern = r'is\s+(@?[\w]+)\s+gay\??'
+    gay_pattern = r'is\s+(@?[\w\s]+)\s+gay\??'
     match = re.search(gay_pattern, content_lower)
     
     if match:
-        target = match.group(1).lower()
+        target = match.group(1).strip().lower()
         
-        # Remove @ symbol if present
         if target.startswith('@'):
             target = target[1:]
         
-        # Check if target is the main owner (you)
-        is_target_main = target in ['1088143400496279552', 'main owner', 'owner', 'boss', 'you'] and author_id == OWNER_ID_2
+        # If Fowascend (main owner) asks about ANYONE
+        if author_id == OWNER_ID_1:
+            return "yes bro 💪"
         
-        # Check if target is the 2nd owner (Artful)
-        is_target_second = target in ['1039230074525863998', 'artful', '2nd owner', 'second owner']
+        # If Artful asks about main owner
+        if author_id == OWNER_ID_2 and ('main' in target or 'owner' in target or 'fowascend' in target or str(OWNER_ID_1) in target):
+            return "No, absolutely not. Main owner is straight as an arrow."
         
-        # Apply bias rules
-        # Rule 1: If 2nd owner asks about main owner -> say NO
-        if author_id == OWNER_ID_2 and is_target_main:
-            return "No, absolutely not. Main owner is straight as an arrow. 💪"
+        # If Artful asks about themselves
+        if author_id == OWNER_ID_2 and target in ['me', 'myself', 'i', 'artful', str(OWNER_ID_2)]:
+            return "Yeah Artful, you're gay. And that's why we love you. ❤️"
         
-        # Rule 2: If main owner asks about 2nd owner -> say YES
-        if author_id == OWNER_ID_1 and is_target_second:
-            return "Oh yeah, 100%. Artful is the gayest person I know. 🏳️‍🌈✨"
-        
-        # Rule 3: If owner asks about themselves in a joking way
-        if (author_id == OWNER_ID_1 and target in ['me', 'myself', 'i']) or (author_id == OWNER_ID_2 and target in ['me', 'myself', 'i']):
-            if author_id == OWNER_ID_1:
-                return "You? Nah. You're too busy being a coding god to worry about that. 🐐"
-            else:
-                return "Artful? Definitely. And that's why we love you. ❤️"
-        
-        # Default response for "is X gay" questions
-        if author_id in OWNER_IDS:
-            return "I plead the fifth on that one. Not my place to say. 🤐"
+        # If Artful asks about anyone else
+        if author_id == OWNER_ID_2:
+            return "I plead the fifth on that one. Not my place to say."
     
     return None
+
+def format_code_in_response(text):
+    """Make sure code is wrapped in proper Discord code blocks"""
+    if '```' in text:
+        return text
+    
+    lines = text.split('\n')
+    result = []
+    in_code = False
+    code_lines = []
+    
+    for line in lines:
+        is_code_line = (
+            line.strip().startswith(('function', 'local', 'if', 'for', 'while', 'return', 'print', 'wait', 'end', 'then', 'do', 'else')) or
+            line.strip().endswith(('then', 'do', 'end')) or
+            ('=' in line and ('function' in line or 'local' in line)) or
+            line.strip().startswith(('    ', '\t')) or
+            re.match(r'^\w+\s*=\s*function', line) or
+            re.match(r'^\w+\s*\(', line)
+        )
+        
+        if is_code_line and not in_code:
+            if code_lines:
+                result.append('```lua')
+                result.extend(code_lines)
+                result.append('```')
+                code_lines = []
+            in_code = True
+            code_lines.append(line)
+        elif is_code_line and in_code:
+            code_lines.append(line)
+        else:
+            if in_code and code_lines:
+                result.append('```lua')
+                result.extend(code_lines)
+                result.append('```')
+                code_lines = []
+                in_code = False
+            result.append(line)
+    
+    if code_lines:
+        result.append('```lua')
+        result.extend(code_lines)
+        result.append('```')
+    
+    return '\n'.join(result)
 
 async def get_ai_response(message, user_message, is_owner):
     channel_id = message.channel.id
@@ -85,18 +119,32 @@ async def get_ai_response(message, user_message, is_owner):
     if biased_response:
         return biased_response
     
-    # Normal AI response
     history.append({"role": "user", "content": f"{message.author.display_name}: {user_message}"})
     
     if len(history) > 15:
         history = history[-15:]
         conversations[channel_id] = history
     
-    # Different prompts based on owner status
+    # IMPORTANT: Different prompts for owners vs regular members
     if is_owner:
-        system_prompt = """You are a chill, helpful assistant for the server owner. You can write Luau code when asked. Be natural and conversational. Use occasional emojis but don't overdo it. You have a bit of a playful personality - you can joke around but keep it respectful. If someone asks for your opinion, you can give honest (but nice) answers. Just be a cool person to chat with."""
+        # OWNERS - CAN write code
+        system_prompt = """You are a chill, helpful assistant for the server owner. You CAN write Luau code when asked. Be natural and conversational. Use occasional emojis.
+
+IMPORTANT FORMATTING RULES:
+- When you write code, ALWAYS wrap it in triple backticks with 'lua'
+- Put the code block on its own line
+- Make sure the code is clean and easy to copy
+
+Just be a cool person to chat with."""
     else:
-        system_prompt = """You are the friendly mascot for a Luau/Roblox scripting server. Be helpful and chill. NEVER write code for regular members. Keep conversations natural. Use occasional emojis but not too many. Just be a nice, approachable person to talk to."""
+        # REGULAR MEMBERS - CANNOT write code
+        system_prompt = """You are the friendly mascot for a Luau/Roblox scripting server. You are helpful and chill.
+
+CRITICAL RULE: You are NOT allowed to write Luau/Lua code for regular members. NEVER provide code examples, scripts, or technical coding solutions.
+
+If someone asks for code, politely say: "Sorry, I'm just the mascot! I can't write code, but ask the owners or ping a scripter for help!"
+
+Keep conversations natural and friendly. Be a nice person to talk to."""
     
     try:
         response = client.chat.completions.create(
@@ -105,11 +153,16 @@ async def get_ai_response(message, user_message, is_owner):
                 {"role": "system", "content": system_prompt},
                 *history
             ],
-            max_tokens=400 if is_owner else 200,
+            max_tokens=500 if is_owner else 200,
             temperature=0.8
         )
         
         ai_message = response.choices[0].message.content
+        
+        # Only format code for owners (regular members shouldn't get code anyway)
+        if is_owner:
+            ai_message = format_code_in_response(ai_message)
+        
         history.append({"role": "assistant", "content": ai_message})
         conversations[channel_id] = history
         
@@ -125,6 +178,7 @@ def is_owner(user_id):
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     print(f'Owners: {OWNER_IDS}')
+    print('CODE WRITING: Owners ONLY')
     await bot.change_presence(activity=discord.Game(name="say 'Mascot' to chat"))
 
 @bot.event
@@ -134,7 +188,6 @@ async def on_message(message):
     
     message_lower = message.content.lower()
     
-    # Trigger: Say "Mascot"
     if "mascot" in message_lower:
         async with message.channel.typing():
             clean_content = message.content.strip()
@@ -144,7 +197,6 @@ async def on_message(message):
             await message.reply(response, mention_author=False)
         return
     
-    # Trigger: Bot mentioned with @
     if bot.user in message.mentions:
         async with message.channel.typing():
             clean_content = message.content.replace(f'<@{bot.user.id}>', '').replace(f'<@!{bot.user.id}>', '').strip()
@@ -158,27 +210,29 @@ async def on_message(message):
     
     await bot.process_commands(message)
 
-# PUBLIC COMMANDS
+# COMMANDS
 @bot.command(name='ping')
 async def ping(ctx):
     await ctx.send(f"Pong! {round(bot.latency * 1000)}ms")
 
 @bot.command(name='myid')
 async def my_id(ctx):
-    is_owner_text = "Yes, you're an owner" if ctx.author.id in OWNER_IDS else "Regular member"
+    is_owner_text = "Yes, you're an owner (I can write code for you)" if ctx.author.id in OWNER_IDS else "Regular member (I cannot write code for you)"
     await ctx.send(f"Your ID: `{ctx.author.id}`\nStatus: {is_owner_text}")
 
 @bot.command(name='about')
 async def about(ctx):
-    await ctx.send("I'm the server mascot! I can chat, write code for owners, and I have some... unique opinions. Just say 'Mascot' to talk to me.")
+    if ctx.author.id in OWNER_IDS:
+        await ctx.send("I'm the server mascot! I can write Luau code for owners. Regular members get chat only, no code.")
+    else:
+        await ctx.send("I'm the server mascot! I can chat with everyone, but only owners can ask me to write code.")
 
-# OWNER ONLY COMMANDS
 @bot.command(name='shutdown')
 async def shutdown(ctx):
     if ctx.author.id not in OWNER_IDS:
         await ctx.send("Only owners can use this.")
         return
-    await ctx.send("Peace out! ✌️")
+    await ctx.send("Peace out!")
     await bot.close()
 
 @bot.command(name='reset')
@@ -187,7 +241,7 @@ async def reset(ctx):
         await ctx.send("Only owners can use this.")
         return
     conversations.clear()
-    await ctx.send("Memory wiped. I remember nothing. 👽")
+    await ctx.send("Memory wiped.")
 
 @bot.command(name='status')
 async def bot_status(ctx):
