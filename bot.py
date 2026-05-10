@@ -259,8 +259,9 @@ async def test(ctx):
     await send_stolen_embed(name, "Xen Hub Pro", price, mutation, traits, tier)
     await ctx.send("✅ Test sent!")
 
-TOKEN = os.environ.get("DISCCOUNT_TOKEN")
+TOKEN = os.environ.get("DISCORD_TOKEN")
 if TOKEN is None:
     print("ERROR: DISCORD_TOKEN environment variable not set!")
     exit(1)
+
 bot.run(TOKEN)
