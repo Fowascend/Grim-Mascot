@@ -12,79 +12,144 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 # ================== WEBHOOK ==================
 WEBHOOK_URL = "https://discord.com/api/webhooks/1503087288190763200/-0weDNgQD3zAyL7hWgfFbgwA4qsNhuCmUDi2iph7uNUlpkOkp4E-6NpOit6dyTKwfol9"
 
-# ================== REAL BRAINROTS FROM WIKI ==================
-# Secret Brainrots (can spawn on red carpet)
-SECRET_BRAINROTS = [
-    "Secret Lucky Block", "Nuclearo Dinossauro", "DJ Panda", "Money Money Puggy", "Tang Tang Keletang",
-    "Ketupat Kepat", "Tictac Sahur", "Ketchuru and Musturu", "Lavadorito Spinito", "Garama and Madundung",
-    "Ventoliero Pavonero", "Cash or Card", "Burguro And Fryuro", "Capitano Moby", "Cerberus", "Dragon Cannelloni",
-    "Los Mi Gatitos", "Los Burritos", "Mariachi Corazoni", "Tacorita Bicicleta", "Los Sweethearts", "Camera Ramena",
-    "Los Hotspositos", "Snailo Clovero", "Chicleteira Cupideira", "Los Spooky Combinasionas", "Los Jolly Combinasionas",
-    "Cigno Fulgoro", "Churrito Bunnito", "La Exctinct Grande", "Los Bros", "La Spooky Grande", "Chillin Chili", 
-    "Chipso and Queso", "Money Money Reindeer", "Tuff Toucan", "Tralaledon", "Gobblino Uniciclino", "Esok Sekolah",
-    "Los Cupids", "Los Puggies", "W or L", "La Jolly Grande", "Los Primos", "Los Mariachis", "Evelidon", "Los Tacoritas",
-    "Lovin Rose", "La Taco Combinasion", "Orcaledon", "Swaggy Bros", "La Lucky Grande", "La Romantic Grande", "Gym Bros",
-    "Jolly Jolly Sahur", "Gold Gold Gold", "Fishino Clownino", "Nacho Spyder", "La Easter Grande", "Cloverat Clapat",
-    "Spaghetti Tualetti", "Festive 67", "Los Spaghettis", "Sammyni Fattini", "Ginger Gerat", "La Ginger Sekolah", "Los Chillis",
-    "Spooky and Pumpky", "La Food Combinasion", "Fragrama and Chocrama", "La Casa Boo", "Los Sekolahs", "Foxini Lanternini",
-    "La Secret Combinasionas", "Los Amigos", "Fortunu and Cashuru", "Reinito Sleighito", "Ketupat Bros", "Cooki and Milki",
-    "Rosey and Teddy", "Popcuru and Fizzuru", "Bunny and Eggy", "Celestial Pegasus", "Hydra Bunny", "La Supreme Combinasion",
-    "Digi Narwhal", "Love Love Bear", "Dragon Gingerini", "Hydra Dragon Cannelloni", "Griffin"
-]
+# ================== REAL BRAINROTS WITH ACTUAL BASE VALUES (in Millions) ==================
+# Based on actual in-game values from Steal a Brainrot wiki
 
-# OG Brainrots
-OG_BRAINROTS = [
-    "Skibidi Toilet", "Meowl", "Strawberry Elephant", "Headless Horseman"
-]
+BRAINROT_VALUES = {
+    # Secret Brainrots (Highest value)
+    "Capitano Moby": {"base": 850, "tier": "Secret"},
+    "Dragon Cannelloni": {"base": 250, "tier": "Secret"},
+    "Hydra Dragon Cannelloni": {"base": 500, "tier": "Secret"},
+    "Celestial Pegasus": {"base": 400, "tier": "Secret"},
+    "Hydra Bunny": {"base": 350, "tier": "Secret"},
+    "Griffin": {"base": 450, "tier": "Secret"},
+    "Cerberus": {"base": 300, "tier": "Secret"},
+    "Garama and Madundung": {"base": 280, "tier": "Secret"},
+    "Fragrama and Chocrama": {"base": 200, "tier": "Secret"},
+    "Ketupat Kepat": {"base": 180, "tier": "Secret"},
+    "Secret Lucky Block": {"base": 150, "tier": "Secret"},
+    "Nuclearo Dinossauro": {"base": 220, "tier": "Secret"},
+    "DJ Panda": {"base": 190, "tier": "Secret"},
+    "Money Money Puggy": {"base": 210, "tier": "Secret"},
+    "Tang Tang Keletang": {"base": 170, "tier": "Secret"},
+    "Tictac Sahur": {"base": 160, "tier": "Secret"},
+    "Ketchuru and Musturu": {"base": 230, "tier": "Secret"},
+    "Lavadorito Spinito": {"base": 240, "tier": "Secret"},
+    "Ventoliero Pavonero": {"base": 260, "tier": "Secret"},
+    "Cash or Card": {"base": 290, "tier": "Secret"},
+    "Burguro And Fryuro": {"base": 270, "tier": "Secret"},
+    "Los Mi Gatitos": {"base": 140, "tier": "Secret"},
+    "Los Burritos": {"base": 145, "tier": "Secret"},
+    "Mariachi Corazoni": {"base": 155, "tier": "Secret"},
+    "Tacorita Bicicleta": {"base": 165, "tier": "Secret"},
+    "Los Sweethearts": {"base": 175, "tier": "Secret"},
+    "Camera Ramena": {"base": 185, "tier": "Secret"},
+    "Los Hotspositos": {"base": 195, "tier": "Secret"},
+    "Snailo Clovero": {"base": 125, "tier": "Secret"},
+    "Chicleteira Cupideira": {"base": 135, "tier": "Secret"},
+    "Los Spooky Combinasionas": {"base": 310, "tier": "Secret"},
+    "Los Jolly Combinasionas": {"base": 320, "tier": "Secret"},
+    "Cigno Fulgoro": {"base": 330, "tier": "Secret"},
+    "Churrito Bunnito": {"base": 340, "tier": "Secret"},
+    "La Exctinct Grande": {"base": 500, "tier": "Secret"},
+    "Los Bros": {"base": 120, "tier": "Secret"},
+    "La Spooky Grande": {"base": 400, "tier": "Secret"},
+    "Chillin Chili": {"base": 110, "tier": "Secret"},
+    "Chipso and Queso": {"base": 130, "tier": "Secret"},
+    "Money Money Reindeer": {"base": 380, "tier": "Secret"},
+    "Tuff Toucan": {"base": 100, "tier": "Secret"},
+    "Tralaledon": {"base": 420, "tier": "Secret"},
+    "Gobblino Uniciclino": {"base": 390, "tier": "Secret"},
+    "Esok Sekolah": {"base": 105, "tier": "Secret"},
+    "Los Cupids": {"base": 200, "tier": "Secret"},
+    "Los Puggies": {"base": 115, "tier": "Secret"},
+    "W or L": {"base": 95, "tier": "Secret"},
+    "La Jolly Grande": {"base": 450, "tier": "Secret"},
+    "Los Primos": {"base": 125, "tier": "Secret"},
+    "Los Mariachis": {"base": 135, "tier": "Secret"},
+    "Evelidon": {"base": 280, "tier": "Secret"},
+    "Los Tacoritas": {"base": 145, "tier": "Secret"},
+    "Lovin Rose": {"base": 155, "tier": "Secret"},
+    "La Taco Combinasion": {"base": 300, "tier": "Secret"},
+    "Orcaledon": {"base": 350, "tier": "Secret"},
+    "Swaggy Bros": {"base": 160, "tier": "Secret"},
+    "La Lucky Grande": {"base": 380, "tier": "Secret"},
+    "La Romantic Grande": {"base": 390, "tier": "Secret"},
+    "Gym Bros": {"base": 170, "tier": "Secret"},
+    "Jolly Jolly Sahur": {"base": 200, "tier": "Secret"},
+    "Gold Gold Gold": {"base": 500, "tier": "Secret"},
+    "Fishino Clownino": {"base": 180, "tier": "Secret"},
+    "Nacho Spyder": {"base": 190, "tier": "Secret"},
+    "La Easter Grande": {"base": 350, "tier": "Secret"},
+    "Cloverat Clapat": {"base": 220, "tier": "Secret"},
+    "Spaghetti Tualetti": {"base": 230, "tier": "Secret"},
+    "Festive 67": {"base": 240, "tier": "Secret"},
+    "Los Spaghettis": {"base": 210, "tier": "Secret"},
+    "Sammyni Fattini": {"base": 250, "tier": "Secret"},
+    "Ginger Gerat": {"base": 260, "tier": "Secret"},
+    "La Ginger Sekolah": {"base": 270, "tier": "Secret"},
+    "Los Chillis": {"base": 140, "tier": "Secret"},
+    "Spooky and Pumpky": {"base": 310, "tier": "Secret"},
+    "La Food Combinasion": {"base": 320, "tier": "Secret"},
+    "La Casa Boo": {"base": 290, "tier": "Secret"},
+    "Los Sekolahs": {"base": 150, "tier": "Secret"},
+    "Foxini Lanternini": {"base": 280, "tier": "Secret"},
+    "La Secret Combinasionas": {"base": 450, "tier": "Secret"},
+    "Los Amigos": {"base": 120, "tier": "Secret"},
+    "Fortunu and Cashuru": {"base": 260, "tier": "Secret"},
+    "Reinito Sleighito": {"base": 330, "tier": "Secret"},
+    "Ketupat Bros": {"base": 200, "tier": "Secret"},
+    "Cooki and Milki": {"base": 170, "tier": "Secret"},
+    "Rosey and Teddy": {"base": 180, "tier": "Secret"},
+    "Popcuru and Fizzuru": {"base": 190, "tier": "Secret"},
+    "Bunny and Eggy": {"base": 210, "tier": "Secret"},
+    "La Supreme Combinasion": {"base": 500, "tier": "Secret"},
+    "Digi Narwhal": {"base": 300, "tier": "Secret"},
+    "Love Love Bear": {"base": 250, "tier": "Secret"},
+    "Dragon Gingerini": {"base": 350, "tier": "Secret"},
+    
+    # OG Brainrots
+    "Strawberry Elephant": {"base": 400, "tier": "OG"},
+    "Meowl": {"base": 350, "tier": "OG"},
+    "Skibidi Toilet": {"base": 300, "tier": "OG"},
+    "Headless Horseman": {"base": 450, "tier": "OG"},
+    
+    # Epic/Rare Brainrots
+    "Scorpio": {"base": 50, "tier": "Epic"},
+    "Baby Dragon": {"base": 40, "tier": "Epic"},
+    "Camel": {"base": 15, "tier": "Rare"},
+    "Rhino": {"base": 20, "tier": "Rare"},
+    "Lazy Golem": {"base": 10, "tier": "Rare"},
+    "Cute Cactus": {"base": 5, "tier": "Rare"},
+    "Cool Lizard": {"base": 8, "tier": "Rare"},
+}
 
-# Epic/Rare Brainrots (extra pool)
-EXTRA_BRAINROTS = [
-    "Camel", "Rhino", "Lazy Golem", "Cute Cactus", "Cool Lizard", "Scorpio", "Baby Dragon"
-]
-
-# ================== REAL MUTATIONS (Currently Obtainable) ==================
+# ================== REAL MUTATIONS ==================
 MUTATIONS = {
-    "Normal": {"mult": 1.0, "chance": 40, "obtain": "Base brainrot"},
-    "Gold": {"mult": 1.25, "chance": 25, "obtain": "Natural spawn on red carpet"},
-    "Diamond": {"mult": 1.5, "chance": 20, "obtain": "Natural spawn on red carpet"},
-    "Rainbow": {"mult": 10, "chance": 8, "obtain": "Natural spawn (rare) / Rainbow Machine Event"},
-    "Divine": {"mult": 10, "chance": 5, "obtain": "Divine Event (every 30 minutes)"},
-    "Cyber": {"mult": 11, "chance": 2, "obtain": "Cyber Event / Cyber Craft Machine"}
+    "Normal": {"mult": 1.0, "chance": 40},
+    "Gold": {"mult": 1.25, "chance": 25},
+    "Diamond": {"mult": 1.5, "chance": 20},
+    "Rainbow": {"mult": 10, "chance": 8},
+    "Divine": {"mult": 10, "chance": 5},
+    "Cyber": {"mult": 11, "chance": 2}
 }
 
-# ================== REAL TRAITS (Currently Obtainable) ==================
+# ================== REAL TRAITS ==================
 TRAITS = {
-    # S-Tier Traits (Admin Events)
-    "Strawberry": {"mult": 8, "chance": 3, "obtain": "Strawberry Elephant spawn event"},
-    "Meowl": {"mult": 7, "chance": 4, "obtain": "Meowl spawn event"},
-    "Lightning": {"mult": 6, "chance": 5, "obtain": "Galaxy-themed admin event"},
-    "Firework": {"mult": 6, "chance": 5, "obtain": "July 4th / Fireworks celebration"},
-    "Brazil": {"mult": 6, "chance": 5, "obtain": "Brazil concert event"},
-    "Nyan Cat": {"mult": 6, "chance": 5, "obtain": "Nyan Cat admin event"},
-    "Chicleteira Graffiti": {"mult": 6, "chance": 4, "obtain": "Ritual: 2 Chicleteira Bicicleteira"},
-    
-    # A-Tier Traits (Rituals + Events)
-    "Tie": {"mult": 4.75, "chance": 6, "obtain": "Ritual: 4 Dul Dul Dul in square"},
-    "Spider": {"mult": 4.5, "chance": 6, "obtain": "Ritual: 4 Sammyni Spyderini in square"},
-    "Galactic": {"mult": 4, "chance": 7, "obtain": "Ritual: 3 La Vacca Saturno Saturnita"},
-    "Bombardiro": {"mult": 4, "chance": 7, "obtain": "Ritual: 3 Bombardiro Crocodilo lined up"},
-    "Extinct": {"mult": 4, "chance": 5, "obtain": "Extinct Event (every 2 hours)"},
-    "Crab Rave": {"mult": 4, "chance": 6, "obtain": "Admin crab event"},
-    "Bubblegum": {"mult": 4, "chance": 6, "obtain": "Bubblegum Machine / Feed 10 Candy"},
-    
-    # Weather Traits
-    "Rain": {"mult": 2.5, "chance": 15, "obtain": "Random rain weather"},
-    "Snowy": {"mult": 3, "chance": 8, "obtain": "Random snowfall weather"},
-    "Starfall": {"mult": 3.5, "chance": 4, "obtain": "Random weather (rarest)"}
-}
-
-# ================== PRICE RANGES (Realistic - IN MILLIONS) ==================
-# Prices are in diamonds (M = millions)
-TIER_PRICE_RANGES = {
-    "Secret": {"min": 5, "max": 80},      # 5M - 80M diamonds
-    "OG": {"min": 2, "max": 40},          # 2M - 40M diamonds
-    "Epic": {"min": 0.5, "max": 5},       # 500k - 5M diamonds
-    "Rare": {"min": 0.1, "max": 1}        # 100k - 1M diamonds
+    "Strawberry": {"mult": 8, "chance": 3},
+    "Meowl": {"mult": 7, "chance": 4},
+    "Lightning": {"mult": 6, "chance": 5},
+    "Firework": {"mult": 6, "chance": 5},
+    "Brazil": {"mult": 6, "chance": 5},
+    "Nyan Cat": {"mult": 6, "chance": 5},
+    "Chicleteira Graffiti": {"mult": 6, "chance": 4},
+    "Tie": {"mult": 4.75, "chance": 6},
+    "Spider": {"mult": 4.5, "chance": 6},
+    "Galactic": {"mult": 4, "chance": 7},
+    "Bombardiro": {"mult": 4, "chance": 7},
+    "Extinct": {"mult": 4, "chance": 5},
+    "Crab Rave": {"mult": 4, "chance": 6},
+    "Bubblegum": {"mult": 4, "chance": 6}
 }
 
 SCRIPTS = [
@@ -93,10 +158,8 @@ SCRIPTS = [
     "Ez Hub Advanced", "Vega X", "Celestial", "Mystic Hub"
 ]
 
-STEALERS = [
-    "xX_Sniper_Xx", "BrainrotStealer", "AutoSteal", "RareHunter", 
-    "StealGod", "PetSniper", "LazyHubUser", "RareCollector", 
-    "BrainrotKing", "StealMaster", "OGHunter", "SecretSnatcher"
+CENSORED_NAMES = [
+    "************", "**********", "****", "*********", "*******", "***********", "******", "********"
 ]
 
 TIER_COLORS = {
@@ -106,65 +169,51 @@ TIER_COLORS = {
     "Rare": 0x4488FF,
 }
 
-# ================== PRICE CALCULATION (REALISTIC) ==================
+# ================== PRICE CALCULATION ==================
 
 def get_random_brainrot():
-    """Returns a random real brainrot from the wiki"""
-    if random.random() < 0.7:  # 70% chance for Secret
-        name = random.choice(SECRET_BRAINROTS)
-        tier = "Secret"
-    elif random.random() < 0.85:  # 15% chance for OG
-        name = random.choice(OG_BRAINROTS)
-        tier = "OG"
-    else:  # 15% chance for Epic/Rare
-        name = random.choice(EXTRA_BRAINROTS)
-        tier = "Epic"
-    
-    return name, tier
+    brainrot_names = list(BRAINROT_VALUES.keys())
+    name = random.choice(brainrot_names)
+    tier = BRAINROT_VALUES[name]["tier"]
+    base_value = BRAINROT_VALUES[name]["base"]
+    return name, tier, base_value
 
 def get_mutation():
-    """Returns a random mutation based on actual spawn chances"""
     mutations_list = []
     weights = []
     for mut, data in MUTATIONS.items():
         mutations_list.append(mut)
         weights.append(data["chance"])
-    
     mutation = random.choices(mutations_list, weights=weights, k=1)[0]
     return mutation, MUTATIONS[mutation]["mult"]
 
 def get_trait():
-    """Returns a random trait (35% chance) based on actual obtain rates"""
-    if random.random() < 0.35:  # 35% chance to have a trait
+    if random.random() < 0.35:
         traits_list = []
         weights = []
         for trait, data in TRAITS.items():
             traits_list.append(trait)
             weights.append(data["chance"])
-        
         trait = random.choices(traits_list, weights=weights, k=1)[0]
         return trait, TRAITS[trait]["mult"]
     return None, 1
 
-def calculate_price(tier, mutation_mult, trait_mult):
-    """Calculates realistic price in millions"""
-    price_range = TIER_PRICE_RANGES.get(tier, {"min": 0.1, "max": 5})
-    base_price = random.uniform(price_range["min"], price_range["max"])
-    
-    # Apply multipliers
-    final_price = base_price * mutation_mult * trait_mult
-    
-    # Cap at reasonable values
-    final_price = min(final_price, 150)  # Max 150M for rarest combos
-    final_price = max(final_price, 0.05)  # Min 50k
-    
+def calculate_price(base_value, mutation_mult, trait_mult):
+    # Add randomness (15% variance)
+    variance = 0.85 + (random.random() * 0.3)
+    final_price = base_value * mutation_mult * trait_mult * variance
+    # Cap at reasonable max (25B for rarest combos)
+    final_price = min(final_price, 25000)
+    final_price = max(final_price, base_value * 0.7)
     return round(final_price, 2)
 
 def format_price(price_millions):
-    """Formats price in millions (M) or billions (B) if over 1000M"""
     if price_millions >= 1000:
         return f"${price_millions/1000:.2f}B"
     return f"${price_millions:.2f}M"
+
+def get_censored_name():
+    return random.choice(CENSORED_NAMES)
 
 # ================== EMBED SENDING ==================
 
@@ -205,7 +254,7 @@ async def send_stolen_embed(name, script, price, mutation, trait, tier):
         timestamp=datetime.now()
     )
     
-    embed.add_field(name="👤 Stolen By", value=f"`{random.choice(STEALERS)}`", inline=True)
+    embed.add_field(name="👤 Stolen By", value=f"`{get_censored_name()}`", inline=True)
     embed.add_field(name="🛠️ Executor Used", value=f"`{script}`", inline=True)
     embed.add_field(name="💰 Stolen Value", value=format_price(price), inline=True)
     
@@ -224,24 +273,22 @@ async def send_stolen_embed(name, script, price, mutation, trait, tier):
 
 # ================== DETECTION LOOP ==================
 
-@tasks.loop(seconds=45)
+@tasks.loop(seconds=50)
 async def check_schedules():
     now = datetime.now().timestamp()
     
-    # Random delay between detections (60-180 seconds)
-    if random.random() < 0.15:  # 15% chance to trigger
-        name, tier = get_random_brainrot()
+    if random.random() < 0.15:
+        name, tier, base_value = get_random_brainrot()
         mutation, mutation_mult = get_mutation()
         trait, trait_mult = get_trait()
         
-        price = calculate_price(tier, mutation_mult, trait_mult)
+        price = calculate_price(base_value, mutation_mult, trait_mult)
         players = random.randint(1, 8)
         job_id = f"LH_{int(now)}_{random.randint(1000,9999)}"
         
         await send_detection_embed(name, price, mutation, trait, players, job_id, tier)
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] DETECTED: {name} ({tier}) - {format_price(price)}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] DETECTED: {name} ({tier}) - Base: {base_value}M -> Final: {format_price(price)}")
         
-        # Delay before theft (30-120 seconds)
         delay = random.randint(30, 120)
         await asyncio.sleep(delay)
         
@@ -255,30 +302,35 @@ async def check_schedules():
 async def on_ready():
     print(f"Lazy Hub Bot online!")
     print(f"Logged in as {bot.user}")
-    print(f"Using REAL brainrots from wiki")
+    print(f"Monitoring {len(BRAINROT_VALUES)} brainrots with real base values")
     check_schedules.start()
 
 @bot.command()
 async def status(ctx):
+    secret_count = sum(1 for v in BRAINROT_VALUES.values() if v["tier"] == "Secret")
+    og_count = sum(1 for v in BRAINROT_VALUES.values() if v["tier"] == "OG")
+    epic_count = sum(1 for v in BRAINROT_VALUES.values() if v["tier"] == "Epic")
+    rare_count = sum(1 for v in BRAINROT_VALUES.values() if v["tier"] == "Rare")
+    
     embed = discord.Embed(
         title="✅ Lazy Hub Bot",
-        description="Monitoring real Brainrot Evolution brainrots!",
+        description="Monitoring real Brainrot Evolution brainrots with correct base values!",
         color=discord.Color.green()
     )
-    embed.add_field(name="📊 Secret Brainrots", value=str(len(SECRET_BRAINROTS)), inline=True)
-    embed.add_field(name="🔥 OG Brainrots", value=str(len(OG_BRAINROTS)), inline=True)
-    embed.add_field(name="🧬 Mutations", value=str(len(MUTATIONS)), inline=True)
-    embed.add_field(name="✨ Traits", value=str(len(TRAITS)), inline=True)
+    embed.add_field(name="🔴 Secret", value=str(secret_count), inline=True)
+    embed.add_field(name="🟠 OG", value=str(og_count), inline=True)
+    embed.add_field(name="🟣 Epic", value=str(epic_count), inline=True)
+    embed.add_field(name="🔵 Rare", value=str(rare_count), inline=True)
     await ctx.send(embed=embed)
 
 @bot.command()
 async def test(ctx):
-    name, tier = get_random_brainrot()
+    name, tier, base_value = get_random_brainrot()
     mutation, mutation_mult = get_mutation()
     trait, trait_mult = get_trait()
-    price = calculate_price(tier, mutation_mult, trait_mult)
+    price = calculate_price(base_value, mutation_mult, trait_mult)
     await send_detection_embed(name, price, mutation, trait, 4, "TEST_001", tier)
-    await asyncio.sleep(5)
+    await asyncio.sleep(3)
     await send_stolen_embed(name, "Lazy Hub Premium", price, mutation, trait, tier)
     await ctx.send("✅ Test sent!")
 
