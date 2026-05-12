@@ -11,37 +11,131 @@ WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S
 # SAB Game IDs
 SAB_GAME_IDS = [109983668079237, 85621847059032, 99606176102979]
 
-# Brainrot list
+# Brainrot list with base values (in MILLIONS)
 BRAINROTS = {
-    "Strawberry Elephant": 7200,
-    "Meowl": 5400,
-    "Skibidi Toilet": 2700,
-    "Headless Horseman": 14400,
-    "Dragon Cannelloni": 900,
-    "Frograma & Chocrama": 3600,
-    "Capitano Moby": 4200,
-    "Hydra Bunny": 4800,
-    "Ketchuru & Masturu": 5400,
-    "Garama and Madundung": 6000,
-    "Los Chicleteiras": 3000,
-    "Noo My Eggs": 2400,
-    "Money Money Puggy": 1800,
-    "Los Bunitos": 2000,
-    "Los Burritos": 2200,
-    "Esok Sekolah": 1600,
-    "Los Mi Gatitos": 1900,
+    "Dragon Cannelloni": 250,
+    "Strawberry Elephant": 750,
+    "Meowl": 650,
+    "Skibidi Toilet": 450,
+    "Headless Horseman": 550,
+    "Burguro And Fryuro": 2475,
+    "Garama and Madundung": 50,
+    "Sammyni Fattini": 70,
+    "Frograma & Chocrama": 100,
+    "Capitano Moby": 165,
+    "Hydra Bunny": 185,
+    "Ketchuru & Masturu": 200,
+    "Los Chicleteiras": 150,
+    "Noo My Eggs": 120,
+    "Money Money Puggy": 75,
+    "Los Bunitos": 95,
+    "Los Burritos": 110,
+    "Esok Sekolah": 55,
+    "Los Mi Gatitos": 85,
+    "Quesadillo Vampiro": 180,
+    "Spinny Hammy": 90,
+    "Burrito Bandito": 110,
+    "Granny": 60,
+    "Cash or Card": 500,
+    "Cigno Fulgoro": 210,
+    "La T": 180,
+    "Noo My Gold": 60,
 }
 
-MUTATIONS = ["Cyber", "Divine", "Rainbow", "Cursed", "Radioactive", "Yin Yang", "Galaxy", "Lava", "Candy", "Diamond", "Gold", "Normal"]
-TRAITS = ["Strawberry", "Meowl", "Skibidi", "Firework", "Lightning", "Spider", "Galactic", "None"]
+# Mutation multipliers
+MUTATIONS = {
+    "Normal": 1.0,
+    "Gold": 1.25,
+    "Diamond": 1.5,
+    "Candy": 4.0,
+    "Lava": 6.0,
+    "Galaxy": 7.0,
+    "Yin Yang": 7.5,
+    "Radioactive": 8.5,
+    "Cursed": 9.0,
+    "Rainbow": 10.0,
+    "Divine": 10.0,
+    "Cyber": 11.0,
+}
+
+# Trait multipliers
+TRAITS = {
+    "None": 1.0,
+    "Strawberry": 8.0,
+    "Meowl": 7.0,
+    "Skibidi": 6.5,
+    "Firework": 6.0,
+    "Lightning": 6.0,
+    "Spider": 4.5,
+    "Galactic": 4.0,
+    "Crab Rave": 4.0,
+    "Bubblegum": 4.0,
+    "Extinct": 4.0,
+}
 
 last_sent = {name: 0 for name in BRAINROTS}
+bot_count = random.randint(11000, 17000)
 
 # ============================================================
-# FUNCTION TO SEND EMBED
+# HELPER FUNCTIONS
+# ============================================================
+def format_value(value_in_millions):
+    """Format value to B (billions) or M (millions)"""
+    if value_in_millions >= 1000:
+        return f"{value_in_millions/1000:.2f}B"
+    return f"{value_in_millions:.0f}M"
+
+def calculate_price(base_value, mutation, trait):
+    """Calculate final price with multipliers"""
+    mutation_mult = MUTATIONS.get(mutation, 1.0)
+    trait_mult = TRAITS.get(trait, 1.0)
+    
+    final_value = base_value * mutation_mult * trait_mult
+    
+    # Add random variance (85% to 115%)
+    variance = 0.85 + (random.random() * 0.3)
+    final_value = final_value * variance
+    
+    return final_value
+
+def get_color_from_value(value):
+    """Get embed color based on value"""
+    if value >= 5000:
+        return 0xFF0000  # Red - Peaklights
+    elif value >= 2000:
+        return 0xFF6600  # Orange - Highlights
+    elif value >= 500:
+        return 0xFFFF00  # Yellow - Midlights
+    else:
+        return 0x00FF00  # Green - Lowlights
+
+def get_tier_from_value(value):
+    """Get tier name based on value"""
+    if value >= 5000:
+        return "Peaklights"
+    elif value >= 2000:
+        return "Highlights"
+    elif value >= 500:
+        return "Midlights"
+    else:
+        return "Lowlights"
+
+def update_bot_count():
+    global bot_count
+    # Fluctuate between 11000 and 17000
+    change = random.randint(-500, 500)
+    bot_count = bot_count + change
+    if bot_count > 17000:
+        bot_count = 17000
+    elif bot_count < 11000:
+        bot_count = 11000
+    return bot_count
+
+# ============================================================
+# SEND EMBED FUNCTION
 # ============================================================
 def send_embed(title, description, fields, color, footer=None):
-    """Send a proper Discord embed"""
+    """Send a Discord embed"""
     embed = {
         "title": title,
         "description": description,
@@ -56,33 +150,28 @@ def send_embed(title, description, fields, color, footer=None):
     data = {"embeds": [embed], "username": "Lazy AJ"}
     
     try:
-        response = requests.post(WEBHOOK_URL, json=data)
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] Embed sent successfully")
+        requests.post(WEBHOOK_URL, json=data)
         return True
     except Exception as e:
         print(f"Webhook error: {e}")
         return False
 
 # ============================================================
-# SEND DETECTION EMBED
+# SEND DETECTION
 # ============================================================
-def send_detection(name, mutation, trait, price, target_game):
-    # Choose color based on price
-    if price >= 10000:
-        color = 0xFF0000  # Red - Peak
-    elif price >= 5000:
-        color = 0xFF6600  # Orange - High
-    elif price >= 2000:
-        color = 0xFFFF00  # Yellow - Mid
-    else:
-        color = 0x00FF00  # Green - Low
+def send_detection(name, mutation, trait, value, target_game):
+    tier = get_tier_from_value(value)
+    formatted_value = format_value(value)
+    color = get_color_from_value(value)
+    current_bots = update_bot_count()
     
     fields = [
         {"name": "🧬 Mutation", "value": mutation, "inline": True},
-        {"name": "✨ Trait", "value": trait if trait != "None" else "None", "inline": True},
-        {"name": "💰 Value", "value": f"${price}M", "inline": True},
-        {"name": "🎮 Target Game", "value": f"`{target_game}`", "inline": False},
-        {"name": "🔗 Job ID", "value": f"`{target_game}_{int(time.time())}_{random.randint(1000,9999)}`", "inline": False},
+        {"name": "✨ Trait", "value": trait, "inline": True},
+        {"name": "💰 Value", "value": formatted_value, "inline": True},
+        {"name": "🏆 Tier", "value": tier, "inline": True},
+        {"name": "🤖 Active Bots", "value": f"{current_bots:,}", "inline": True},
+        {"name": "🎮 Teleporting To", "value": f"`{target_game}`", "inline": False},
     ]
     
     send_embed(
@@ -92,39 +181,25 @@ def send_detection(name, mutation, trait, price, target_game):
         color=color,
         footer="Lazy AJ • Auto Join Enabled"
     )
+    
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {name} | {mutation} | {trait} | {formatted_value} | Bots: {current_bots:,}")
 
 # ============================================================
-# SEND JOIN EMBED
+# SEND STATUS
 # ============================================================
-def send_join_notification(name, target_game, current_game):
+def send_status():
+    current_bots = update_bot_count()
+    
     fields = [
-        {"name": "🎯 Brainrot", "value": name, "inline": True},
-        {"name": "🎮 Teleporting To", "value": f"`{target_game}`", "inline": True},
-        {"name": "📍 Current Game", "value": f"`{current_game}`", "inline": False},
+        {"name": "🤖 Active Bots", "value": f"{current_bots:,}", "inline": True},
+        {"name": "🎮 Active Games", "value": str(len(SAB_GAME_IDS)), "inline": True},
+        {"name": "🧠 Brainrots", "value": str(len(BRAINROTS)), "inline": True},
+        {"name": "🟢 VPS Status", "value": "CONNECTED", "inline": True},
     ]
     
     send_embed(
-        title="✅ AUTO JOIN TRIGGERED",
-        description=f"**{name}** - Teleporting now!",
-        fields=fields,
-        color=0x00FF00,
-        footer="Lazy AJ • Good luck!"
-    )
-
-# ============================================================
-# SEND STATUS EMBED
-# ============================================================
-def send_status(status, game_id=None, player=None):
-    fields = []
-    if game_id:
-        fields.append({"name": "🎮 Game ID", "value": f"`{game_id}`", "inline": True})
-    if player:
-        fields.append({"name": "👤 Player", "value": player, "inline": True})
-    fields.append({"name": "🤖 Bots Running", "value": str(random.randint(1, 4)), "inline": True})
-    
-    send_embed(
         title="🟢 LAZY AJ STATUS",
-        description=f"**{status}**",
+        description="Bot is online and monitoring for brainrots!",
         fields=fields,
         color=0x00FF00,
         footer="Lazy AJ • 24/7 Monitoring"
@@ -141,35 +216,33 @@ print(f"Monitoring {len(BRAINROTS)} brainrots")
 print(f"SAB Game IDs: {SAB_GAME_IDS}")
 print("=" * 50)
 
-send_status("Bot is now online and monitoring for brainrots!")
+# Send startup status
+send_status()
 
 while True:
     now = time.time()
     
-    for name, interval in BRAINROTS.items():
+    for name, base_value in BRAINROTS.items():
+        interval = random.randint(45, 120)
+        
         if now - last_sent[name] >= interval:
-            # Generate random stats
-            mutation = random.choice(MUTATIONS)
-            trait = random.choice(TRAITS) if random.random() < 0.3 else "None"
+            mutation = random.choice(list(MUTATIONS.keys()))
+            trait = random.choice(list(TRAITS.keys()))
             
-            # Calculate price
-            base_value = random.randint(50, 500)
-            mutation_mult = {"Normal":1, "Gold":1.25, "Diamond":1.5, "Candy":4, "Lava":6, "Galaxy":7, "Yin Yang":7.5, "Radioactive":8.5, "Cursed":9, "Rainbow":10, "Divine":10, "Cyber":11}
-            trait_mult = {"None":1, "Strawberry":8, "Meowl":7, "Skibidi":6.5, "Firework":6, "Lightning":6, "Spider":4.5, "Galactic":4}
+            if random.random() < 0.7:
+                trait = "None"
             
-            price = base_value * mutation_mult.get(mutation, 1) * trait_mult.get(trait, 1)
-            price = int(price * (0.8 + random.random() * 0.4))
-            price = max(50, min(15000, price))
-            
+            price = calculate_price(base_value, mutation, trait)
             target_game = random.choice(SAB_GAME_IDS)
             
-            # Send detection embed
-            send_detection(name, mutation, trait, price, target_game)
+            if mutation == "Normal":
+                full_name = name
+            else:
+                full_name = f"{mutation} {name}"
+            
+            send_detection(full_name, mutation, trait, price, target_game)
             last_sent[name] = now
             
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Detection: {name} -> {target_game} (${price}M)")
-            
-            # Wait 30-90 seconds before next detection
             time.sleep(random.randint(30, 90))
     
-    time.sleep(10)
+    time.sleep(5)
