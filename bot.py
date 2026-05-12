@@ -3,272 +3,263 @@ from discord.ext import commands, tasks
 import random
 import os
 import asyncio
+import requests
 from datetime import datetime
 
+# ============================================================
+# CONFIGURATION
+# ============================================================
+WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S2PW86-M5um5wQpRg6VMtYjhxFMizrVIAnXaUOB6UByJZBsbIUosyM0E2"
+
+# Game IDs that Lazy AJ works on
+ALLOWED_GAME_IDS = [109983668079237, 85621847059032, 99606176102979]
+
+# Brainrot list (matches the fake ones in the script)
+BRAINROTS = {
+    "Strawberry Elephant": {"base": 750, "interval": 7200, "last": 0},
+    "Meowl": {"base": 650, "interval": 5400, "last": 0},
+    "Skibidi Toilet": {"base": 450, "interval": 2700, "last": 0},
+    "Headless Horseman": {"base": 550, "interval": 14400, "last": 0},
+    "Dragon Cannelloni": {"base": 250, "interval": 900, "last": 0},
+    "Frograma & Chocrama": {"base": 100, "interval": 3600, "last": 0},
+    "Capitano Moby": {"base": 165, "interval": 4200, "last": 0},
+    "Hydra Bunny": {"base": 185, "interval": 4800, "last": 0},
+    "Ketchuru & Masturu": {"base": 200, "interval": 5400, "last": 0},
+    "Garama and Madundung": {"base": 220, "interval": 6000, "last": 0},
+    "Los Chicleteiras": {"base": 150, "interval": 3000, "last": 0},
+    "Noo My Eggs": {"base": 120, "interval": 2400, "last": 0}
+}
+
+MUTATIONS = ["Cyber", "Divine", "Rainbow", "Cursed", "Radioactive", "Yin Yang", "Galaxy", "Lava", "Candy", "Diamond", "Gold", "Normal"]
+TRAITS = ["Strawberry", "Meowl", "Skibidi", "Nyan Cat", "Firework", "Brazil", "Lightning", "Chicleteira", "Tie", "Spider", "Asteroid", "Galactic", "Crab Rave", "Bubblegum", "Extinct"]
+
+# ============================================================
+# BOT SETUP
+# ============================================================
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# ================== WEBHOOK ==================
-WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S2PW86-M5um5wQpRg6VMtYjhxFMizrVIAnXaUOB6UByJZBsbIUosyM0E2"
-
-# ================== REAL BRAINROTS WITH CORRECT BASE PRICES (Millions) ==================
-BRAINROT_VALUES = {
-    # OG Brainrots (350B - 500B)
-    "Skibidi Toilet": {"base": 350000, "tier": "OG", "min_b": 350, "max_b": 500},
-    "Meowl": {"base": 400000, "tier": "OG", "min_b": 400, "max_b": 550},
-    "Strawberry Elephant": {"base": 500000, "tier": "OG", "min_b": 500, "max_b": 650},
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+def calculate_price(base_value, mutation, trait):
+    mults = {
+        "Cyber": 11, "Divine": 10, "Rainbow": 10, "Cursed": 9,
+        "Radioactive": 8.5, "Yin Yang": 7.5, "Galaxy": 7, "Lava": 6,
+        "Candy": 4, "Diamond": 1.5, "Gold": 1.25, "Normal": 1
+    }
+    trait_mults = {
+        "Strawberry": 8, "Meowl": 7, "Skibidi": 6.5, "Nyan Cat": 6,
+        "Firework": 6, "Brazil": 6, "Lightning": 6, "Chicleteira": 6,
+        "Tie": 4.75, "Spider": 4.5, "Asteroid": 4, "Galactic": 4,
+        "Crab Rave": 4, "Bubblegum": 4, "Extinct": 4
+    }
     
-    # Secret Brainrots (5B+)
-    "Garama and Madundung": {"base": 10000, "tier": "Secret", "min_b": 5, "max_b": 8},
-    
-    # Secret Brainrots (150M - 1B max, needs traits to go over 1B)
-    "Cerberus": {"base": 150000, "tier": "Secret", "min_b": 0.15, "max_b": 1},
-    "Capitano Moby": {"base": 125000, "tier": "Secret", "min_b": 0.125, "max_b": 1},
-    "Cooki and Milki": {"base": 100000, "tier": "Secret", "min_b": 0.1, "max_b": 1},
-    "Burguro and Fryuro": {"base": 75000, "tier": "Secret", "min_b": 0.075, "max_b": 1},
-    "La Secret Combinasion": {"base": 50000, "tier": "Secret", "min_b": 0.05, "max_b": 1},
-    "La Supreme Combinasion": {"base": 7000, "tier": "Secret", "min_b": 0.007, "max_b": 1},
-    "Tictac Sahur": {"base": 6000, "tier": "Secret", "min_b": 0.006, "max_b": 1},
-    "Ketupat Kepat": {"base": 5000, "tier": "Secret", "min_b": 0.005, "max_b": 1},
-    "Los Tacoritas": {"base": 4000, "tier": "Secret", "min_b": 0.004, "max_b": 1},
-    "La Extinct Grande": {"base": 3200, "tier": "Secret", "min_b": 0.0032, "max_b": 1},
-    "Tralaledon": {"base": 3000, "tier": "Secret", "min_b": 0.003, "max_b": 1},
-    "Chillin Chili": {"base": 3000, "tier": "Secret", "min_b": 0.003, "max_b": 1},
-    "Ketchuru and Musturu": {"base": 40, "tier": "Secret", "min_b": 0.04, "max_b": 1},
-    "Popcuro and Fizuro": {"base": 170, "tier": "Secret", "min_b": 0.17, "max_b": 1},
-    "Dragon Cannelloni": {"base": 250, "tier": "Secret", "min_b": 0.25, "max_b": 1},
-}
+    mutation_mult = mults.get(mutation, 1)
+    trait_mult = trait_mults.get(trait, 1)
+    variance = 0.8 + (random.random() * 0.4)
+    final_value = base_value * mutation_mult * trait_mult * variance
+    final_value = max(base_value, min(15000, final_value))
+    return final_value
 
-# ================== MUTATIONS ==================
-MUTATIONS = {
-    "Normal": {"mult": 1.0, "chance": 40},
-    "Gold": {"mult": 1.25, "chance": 25},
-    "Diamond": {"mult": 1.5, "chance": 20},
-    "Rainbow": {"mult": 10, "chance": 8},
-    "Divine": {"mult": 10, "chance": 5},
-    "Cyber": {"mult": 11, "chance": 2}
-}
+def format_price(millions):
+    if millions >= 1000:
+        return f"${millions/1000:.2f}B"
+    return f"${millions:.0f}M"
 
-# ================== TRAITS ==================
-TRAITS = {
-    "Strawberry": {"mult": 8, "chance": 3},
-    "Meowl": {"mult": 7, "chance": 4},
-    "Lightning": {"mult": 6, "chance": 5},
-    "Firework": {"mult": 6, "chance": 5},
-    "Brazil": {"mult": 6, "chance": 5},
-    "Tie": {"mult": 4.75, "chance": 6},
-    "Spider": {"mult": 4.5, "chance": 6},
-    "Galactic": {"mult": 4, "chance": 7},
-    "Extinct": {"mult": 4, "chance": 5},
-}
+def send_to_webhook(embed):
+    """Send embed to the webhook"""
+    try:
+        requests.post(WEBHOOK_URL, json={"embeds": [embed.to_dict()]})
+    except Exception as e:
+        print(f"Webhook error: {e}")
 
-# ================== SCRIPTS ==================
-SCRIPTS = [
-    "Xen Hub V2", "BK Hub Revamped", "Haze Hub Premium", "Xen Hub Pro",
-    "BK Hub Ultimate", "Haze Hub AIO", "Xen Hub Legacy", "BK Hub X",
-    "Haze Hub Advanced", "Xen Hub Beta", "BK Hub Elite", "Haze Hub Free"
-]
-
-# ================== CENSORED NAMES ==================
-CENSORED_NAMES = ["************", "**********", "****", "*********", "*******", "***********"]
-
-TIER_COLORS = {
-    "OG": 0xFF0000,
-    "Secret": 0xFF44CC,
-}
-
-def get_random_brainrot():
-    names = list(BRAINROT_VALUES.keys())
-    weights = []
-    for name in names:
-        if BRAINROT_VALUES[name]["tier"] == "OG":
-            weights.append(50)
-        elif name == "Garama and Madundung":
-            weights.append(30)
-        else:
-            weights.append(20)
-    
-    name = random.choices(names, weights=weights, k=1)[0]
-    tier = BRAINROT_VALUES[name]["tier"]
-    base_price = BRAINROT_VALUES[name]["base"]
-    min_b = BRAINROT_VALUES[name]["min_b"]
-    max_b = BRAINROT_VALUES[name]["max_b"]
-    return name, tier, base_price, min_b, max_b
-
-def get_mutation():
-    muts = []
-    weights = []
-    for mut, data in MUTATIONS.items():
-        muts.append(mut)
-        weights.append(data["chance"])
-    mutation = random.choices(muts, weights=weights, k=1)[0]
-    return mutation, MUTATIONS[mutation]["mult"]
-
-def get_multiple_traits():
-    """Returns 0-3 traits"""
-    # Higher chance for traits on valuable brainrots
-    num_traits = random.choices([0, 1, 2, 3], weights=[30, 35, 25, 10], k=1)[0]
-    
-    traits = []
-    total_mult = 1
-    
-    available_traits = list(TRAITS.keys())
-    weights = [TRAITS[t]["chance"] for t in available_traits]
-    
-    for _ in range(num_traits):
-        if available_traits:
-            trait = random.choices(available_traits, weights=weights[:len(available_traits)], k=1)[0]
-            traits.append(trait)
-            total_mult *= TRAITS[trait]["mult"]
-            idx = available_traits.index(trait)
-            available_traits.pop(idx)
-            weights.pop(idx)
-    
-    return traits, total_mult
-
-def calculate_price(base_price, mutation_mult, trait_mult, min_billions, max_billions):
-    variance = 0.9 + (random.random() * 0.2)
-    final_millions = base_price * mutation_mult * trait_mult * variance
-    
-    min_millions = min_billions * 1000
-    max_millions = max_billions * 1000
-    
-    # Cap at max billions
-    final_millions = min(final_millions, max_millions)
-    final_millions = max(final_millions, min_millions)
-    
-    return round(final_millions, 2)
-
-def format_price(price_millions):
-    if price_millions >= 1000:
-        return f"${price_millions/1000:.2f}B"
-    return f"${price_millions:.0f}M"
-
-def get_censored_name():
-    return random.choice(CENSORED_NAMES)
-
-async def send_detection_embed(name, price, mutation, traits, players, job_id, tier):
-    color = TIER_COLORS.get(tier, 0xFF44CC)
-    
-    trait_text = ", ".join(traits) if traits else "None"
-    if traits and len(traits) >= 2:
-        trait_text = f"**{trait_text}** 🔥"
+# ============================================================
+# EMBED GENERATORS
+# ============================================================
+async def send_detection_embed(name, price, mutation, trait, players, maxpl, job_id):
+    if price >= 10000:
+        color = 0xFF0000  # Red
+    elif price >= 5000:
+        color = 0xFF6600  # Orange
+    elif price >= 2000:
+        color = 0xFFFF00  # Yellow
+    else:
+        color = 0x00FF00  # Green
     
     embed = discord.Embed(
-        title=f"🎯 {tier.upper()} BRAINROT DETECTED",
-        description=f"**{name}** has spawned on the red carpet!",
+        title="🎯 NEW BRAINROT DETECTED",
+        description=f"**{name}** has been detected!",
         color=color,
         timestamp=datetime.now()
     )
     
     embed.add_field(name="💰 Estimated Value", value=format_price(price), inline=True)
-    embed.add_field(name="🧬 Mutation", value=f"**{mutation}**", inline=True)
-    embed.add_field(name=f"✨ Traits ({len(traits)})", value=trait_text, inline=True)
-    embed.add_field(name="👥 Server Population", value=f"{players}/8", inline=True)
-    embed.add_field(name="🏆 Rarity", value=tier, inline=True)
-    embed.add_field(name="🔗 Session ID", value=f"`{job_id}`", inline=False)
-    embed.set_footer(text="Steal a Brainrot • 24/7 Detection")
+    embed.add_field(name="🧬 Mutation", value=mutation, inline=True)
+    if trait:
+        embed.add_field(name="✨ Trait", value=trait, inline=True)
+    embed.add_field(name="👥 Players", value=f"{players}/{maxpl}", inline=True)
+    if job_id:
+        embed.add_field(name="🔗 Job ID", value=f"`{job_id[:12]}...`", inline=False)
     
-    import requests
-    try:
-        requests.post(WEBHOOK_URL, json={"embeds": [embed.to_dict()]})
-    except Exception as e:
-        print(f"Webhook error: {e}")
+    embed.set_footer(text="Lazy AJ • Made by tigy")
+    
+    send_to_webhook(embed)
 
-async def send_stolen_embed(name, script, price, mutation, traits, tier):
-    trait_text = ", ".join(traits) if traits else "None"
-    
+async def send_join_embed(name, job_id):
     embed = discord.Embed(
-        title=f"⚠️ {tier.upper()} BRAINROT STOLEN",
-        description=f"**{name}** was stolen!",
-        color=0xFF4444,
+        title="✅ JOIN ATTEMPT",
+        description=f"Someone joined **{name}**",
+        color=0x00FF00,
         timestamp=datetime.now()
     )
-    
-    embed.add_field(name="👤 Stolen By", value=f"`{get_censored_name()}`", inline=True)
-    embed.add_field(name="🛠️ Executor Used", value=f"`{script}`", inline=True)
-    embed.add_field(name="💰 Stolen Value", value=format_price(price), inline=True)
-    embed.add_field(name="🧬 Mutation", value=mutation, inline=True)
-    embed.add_field(name="✨ Traits", value=trait_text, inline=True)
-    embed.add_field(name="⚡ Response Time", value=f"{random.randint(0, 3)}.{random.randint(0, 99)}s", inline=True)
-    embed.set_footer(text="Auto-Steal System • Xen Hub/BK Hub/Haze Hub")
-    
-    import requests
-    try:
-        requests.post(WEBHOOK_URL, json={"embeds": [embed.to_dict()]})
-    except Exception as e:
-        print(f"Webhook error: {e}")
+    embed.add_field(name="🔗 Job ID", value=f"`{job_id}`", inline=False)
+    embed.set_footer(text="Lazy AJ • Auto Join")
+    send_to_webhook(embed)
 
-# ================== DETECTION LOOP ==================
-@tasks.loop(seconds=25)
+async def send_status_embed(status, game_id, player_name=None):
+    embed = discord.Embed(
+        title="🟢 LAZY AJ STATUS",
+        description=f"**{status}**",
+        color=0x00FF00 if "injected" in status.lower() else 0xFF6600,
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="🎮 Game ID", value=f"`{game_id}`", inline=True)
+    if player_name:
+        embed.add_field(name="👤 Player", value=player_name, inline=True)
+    embed.set_footer(text="Lazy AJ • Made by tigy")
+    send_to_webhook(embed)
+
+# ============================================================
+# BACKGROUND TASKS
+# ============================================================
+@tasks.loop(seconds=30)
 async def check_schedules():
+    """Check for brainrots that need to be detected"""
     now = datetime.now().timestamp()
     
-    if random.random() < 0.4:
-        name, tier, base_price, min_b, max_b = get_random_brainrot()
-        mutation, mutation_mult = get_mutation()
-        traits, trait_mult = get_multiple_traits()
-        
-        price = calculate_price(base_price, mutation_mult, trait_mult, min_b, max_b)
-        
-        # Enforce rule: If base is under 150M (0.15B), cannot exceed 1B unless Garama
-        if tier == "Secret" and base_price < 150 and name != "Garama and Madundung":
-            if price > 1000:  # 1B
-                price = random.uniform(500, 999)
-        
-        # Enforce rule: To be over 1B, must have traits AND mutation (not Normal)
-        if price >= 1000 and tier != "OG":
-            if len(traits) == 0 or mutation == "Normal":
-                price = random.uniform(500, 999)
-        
-        players = random.randint(1, 8)
-        job_id = f"SAB_{int(now)}_{random.randint(1000,9999)}"
-        
-        await send_detection_embed(name, price, mutation, traits, players, job_id, tier)
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] DETECTED: {name} ({tier}) - {format_price(price)} with {len(traits)} traits")
-        
-        delay = random.randint(10, 45)
-        await asyncio.sleep(delay)
-        
-        script = random.choice(SCRIPTS)
-        await send_stolen_embed(name, script, price, mutation, traits, tier)
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] STOLEN: {name}")
-        
-        await asyncio.sleep(random.randint(5, 15))
+    for name, data in BRAINROTS.items():
+        if now - data["last"] >= data["interval"]:
+            mutation = random.choice(MUTATIONS)
+            trait = random.choice(TRAITS) if random.random() < 0.3 else None
+            price = calculate_price(data["base"], mutation, trait)
+            players = random.randint(1, 8)
+            job_id = f"lazyaj_{int(now)}_{random.randint(1000,9999)}"
+            
+            await send_detection_embed(name, price, mutation, trait, players, 8, job_id)
+            BRAINROTS[name]["last"] = now
+            print(f"[{datetime.now()}] Sent detection: {name}")
+            
+            # Small delay before next
+            await asyncio.sleep(random.randint(30, 90))
 
+@tasks.loop(minutes=5)
+async def status_heartbeat():
+    """Send heartbeat every 5 minutes to show bot is alive"""
+    embed = discord.Embed(
+        title="💓 LAZY AJ HEARTBEAT",
+        description="Bot is running and monitoring for brainrots",
+        color=0x00FF00,
+        timestamp=datetime.now()
+    )
+    embed.set_footer(text="Lazy AJ • Online 24/7")
+    send_to_webhook(embed)
+
+# ============================================================
+# DISCORD COMMANDS
+# ============================================================
 @bot.event
 async def on_ready():
-    print(f"Steal a Brainrot Bot online!")
-    print(f"Logged in as {bot.user}")
-    print(f"Monitoring {len(BRAINROT_VALUES)} Secret/OG brainrots")
+    print(f"✅ Lazy AJ Bot is online!")
+    print(f"   Logged in as: {bot.user}")
+    print(f"   Webhook URL: {WEBHOOK_URL[:50]}...")
+    print(f"   Monitoring {len(BRAINROTS)} brainrots")
+    print("")
+    
+    # Start background tasks
     check_schedules.start()
+    status_heartbeat.start()
+    
+    # Send startup message
+    await send_status_embed("Lazy AJ Bot Injected & Running", "Multiple Games")
 
 @bot.command()
 async def status(ctx):
-    og_count = sum(1 for v in BRAINROT_VALUES.values() if v["tier"] == "OG")
-    secret_count = sum(1 for v in BRAINROT_VALUES.values() if v["tier"] == "Secret")
-    
-    embed = discord.Embed(title="✅ Steal a Brainrot Bot", color=discord.Color.green())
-    embed.add_field(name="🔴 OG Brainrots", value=og_count, inline=True)
-    embed.add_field(name="💖 Secret Brainrots", value=secret_count, inline=True)
-    embed.add_field(name="💰 Max Value", value="Secret: 1B (needs traits) | OG: 500B", inline=True)
-    await ctx.send(embed=embed)
+    """Check if the bot is running"""
+    await ctx.send("✅ **Lazy AJ** is running 24/7! Made by tigy")
 
 @bot.command()
 async def test(ctx):
-    name, tier, base_price, min_b, max_b = get_random_brainrot()
-    mutation, mutation_mult = get_mutation()
-    traits, trait_mult = get_multiple_traits()
-    price = calculate_price(base_price, mutation_mult, trait_mult, min_b, max_b)
-    await send_detection_embed(name, price, mutation, traits, 4, "TEST_001", tier)
-    await asyncio.sleep(3)
-    await send_stolen_embed(name, "Xen Hub Pro", price, mutation, traits, tier)
-    await ctx.send("✅ Test sent!")
+    """Send a test detection to the webhook"""
+    await send_detection_embed("Test Brainrot", 5000, "Rainbow", "Divine", 4, 8, "test_123_456")
+    await ctx.send("✅ Test detection sent to webhook!")
 
+@bot.command()
+async def next(ctx):
+    """Show when the next brainrots are scheduled"""
+    now = datetime.now().timestamp()
+    msg = "**📅 Next Scheduled Brainrots:**\n```"
+    for name, data in BRAINROTS.items():
+        remaining = data["interval"] - (now - data["last"])
+        if remaining > 0:
+            minutes = int(remaining // 60)
+            seconds = int(remaining % 60)
+            msg += f"\n• {name}: {minutes}m {seconds}s"
+        else:
+            msg += f"\n• {name}: 🔥 NOW!"
+    msg += "\n```"
+    await ctx.send(msg)
+
+@bot.command()
+async def stats(ctx):
+    """Show bot statistics"""
+    now = datetime.now().timestamp()
+    total = len(BRAINROTS)
+    active = 0
+    for name, data in BRAINROTS.items():
+        if now - data["last"] < data["interval"]:
+            active += 1
+    
+    embed = discord.Embed(
+        title="📊 Lazy AJ Statistics",
+        color=0x00FF00,
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="🤖 Brainrots Monitored", value=str(total), inline=True)
+    embed.add_field(name="⏳ Active Cooldowns", value=str(active), inline=True)
+    embed.add_field(name="🎮 Allowed Games", value=str(len(ALLOWED_GAME_IDS)), inline=True)
+    embed.add_field(name="🕐 Uptime", value="Since bot start", inline=True)
+    embed.set_footer(text="Lazy AJ • Made by tigy")
+    
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def helpme(ctx):
+    """Show available commands"""
+    embed = discord.Embed(
+        title="🆘 Lazy AJ Commands",
+        description="Here are all the available commands:",
+        color=0x00FF00
+    )
+    embed.add_field(name="!status", value="Check if bot is running", inline=False)
+    embed.add_field(name="!test", value="Send a test detection to webhook", inline=False)
+    embed.add_field(name="!next", value="Show next scheduled brainrots", inline=False)
+    embed.add_field(name="!stats", value="Show bot statistics", inline=False)
+    embed.add_field(name="!helpme", value="Show this help message", inline=False)
+    embed.set_footer(text="Lazy AJ • Made by tigy")
+    
+    await ctx.send(embed=embed)
+
+# ============================================================
+# RUN THE BOT
+# ============================================================
 TOKEN = os.environ.get("DISCORD_TOKEN")
+
 if TOKEN is None:
-    print("ERROR: DISCORD_TOKEN environment variable not set!")
+    print("❌ ERROR: DISCORD_TOKEN environment variable not set!")
+    print("   Please set your bot token and try again.")
     exit(1)
 
+print("🔑 Token found, starting bot...")
 bot.run(TOKEN)
