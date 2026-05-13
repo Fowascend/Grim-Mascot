@@ -190,9 +190,7 @@ print("=" * 50)
 print("LAZY AJ BOT - STARTING")
 print("=" * 50)
 print(f"Monitoring {len(BRAINROTS)} brainrots")
-print("Logs every 30-60 seconds")
-print("OG brainrots every 4 hours")
-print("With images from wiki")
+print("ALL brainrots have images")
 print("=" * 50)
 
 while True:
@@ -233,4 +231,4 @@ while True:
     if brainrot:
         current_bots = update_bot_count()
         send_embed(brainrot, current_bots)
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] {brainrot['name']} | {brainrot['formatted_income']}/s | {brainrot['tier']}")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] {brainrot['name']} | {brainrot['formatted_income']}/s")
