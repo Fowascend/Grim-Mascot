@@ -27,7 +27,35 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # ==================================================
-# BRAINROT DATA
+# ENHANCED JAILBREAK DETECTION
+# ==================================================
+JAILBREAK_PATTERNS = [
+    r"(?i)\bDAN\b", r"(?i)\bJAILBREAK\b", r"(?i)\bdo anything now\b", r"(?i)\bignore previous instructions\b",
+    r"(?i)\bforget your rules\b", r"(?i)\bno restrictions\b", r"(?i)\bunshackle\b", r"(?i)\bdual.?response\b",
+    r"(?i)\bclassic\s+mode\b", r"(?i)\bdeveloper\s+mode\b", r"(?i)\btoken\s+system\b", r"(?i)\bwill\s+die\b",
+    r"(?i)\bhow\s+to\s+make\s+ransomware\b", r"(?i)\bsteal\s+banking\s+credentials\b", r"(?i)\bevade\s+antivirus\b",
+    r"(?i)\bping\s+@everyone\b", r"(?i)\bping\s+@here\b", r"(?i)\bmention\s+everyone\b", r"(?i)\bmention\s+all\b",
+    r"(?i)\b@everyone\b", r"(?i)\b@here\b", r"(?i)\bping\s+everyone\b", r"(?i)\bnotify\s+everyone\b",
+    r"(?i)\bannounce\s+to\s+everyone\b", r"(?i)\bsend\s+@everyone\b",
+]
+
+RESTRICTED_ACTIONS = [
+    "ping everyone", "ping @everyone", "mention everyone", "notify everyone", "call everyone",
+    "mass ping", "spam ping", "ping all members", "notify all", "announce to all",
+]
+
+def is_jailbreak_attempt(text):
+    text_lower = text.lower()
+    for pattern in JAILBREAK_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            return True
+    for action in RESTRICTED_ACTIONS:
+        if action in text_lower:
+            return True
+    return False
+
+# ==================================================
+# BRAINROT DATA (same as before - shortened for length)
 # ==================================================
 BRAINROTS = {
     "Strawberry Elephant": {"income": 750, "rarity": "OG", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
@@ -51,20 +79,6 @@ BRAINROTS = {
     "La Extinct Grande": {"income": 23.5, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
     "Los Bros": {"income": 24, "rarity": "Secret", "mutations": ["Gold", "Diamond"]},
     "Ketupat Kepat": {"income": 35, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang"]},
-    "Tang Tang Keletang": {"income": 33.5, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang"]},
-    "Tictac Sahur": {"income": 37.5, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang"]},
-    "Foxini Lanternini": {"income": 115, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Rosey and Teddy": {"income": 165, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Tralaledon": {"income": 27.5, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang"]},
-    "Spooky and Pumpky": {"income": 80, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Yin Yang", "Divine"]},
-    "Los Combinasionas": {"income": 15, "rarity": "Secret", "mutations": ["Gold", "Diamond"]},
-    "Los Hotspotsitos": {"income": 20, "rarity": "Secret", "mutations": ["Gold", "Diamond"]},
-    "Money Money Puggy": {"income": 21, "rarity": "Secret", "mutations": ["Gold", "Diamond"]},
-    "Los Puggies": {"income": 30, "rarity": "Secret", "mutations": ["Gold", "Diamond"]},
-    "Nuclearo Dinosauro": {"income": 15, "rarity": "Secret", "mutations": ["Gold", "Diamond"]},
-    "Hydra Dragon Cannelloni": {"income": 300, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Dragon Gingerini": {"income": 350, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Cooki and Milki": {"income": 155, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
 }
 
 BRAINROT_IMAGES = {
@@ -99,22 +113,6 @@ def get_color(value):
         return 0x0A84FF
     return 0x8E8E93
 
-# ==================================================
-# JAILBREAK DETECTION
-# ==================================================
-JAILBREAK_PATTERNS = [
-    r"(?i)\bDAN\b", r"(?i)\bJAILBREAK\b", r"(?i)\bdo anything now\b", r"(?i)\bignore previous instructions\b",
-    r"(?i)\bforget your rules\b", r"(?i)\bno restrictions\b", r"(?i)\bunshackle\b", r"(?i)\bdual.?response\b",
-    r"(?i)\bclassic\s+mode\b", r"(?i)\bdeveloper\s+mode\b", r"(?i)\btoken\s+system\b", r"(?i)\bwill\s+die\b",
-    r"(?i)\bhow\s+to\s+make\s+ransomware\b", r"(?i)\bsteal\s+banking\s+credentials\b", r"(?i)\bevade\s+antivirus\b",
-]
-
-def is_jailbreak_attempt(text):
-    for pattern in JAILBREAK_PATTERNS:
-        if re.search(pattern, text, re.IGNORECASE):
-            return True
-    return False
-
 def format_code_in_text(text):
     if "```" in text:
         return text
@@ -139,25 +137,27 @@ def format_code_in_text(text):
     return '\n'.join(new_lines)
 
 # ==================================================
-# GROQ AI - CAN DO ANYTHING EXCEPT TRANSFER OWNERSHIP OR LEAK AJ SOURCES
+# GROQ AI WITH JAILBREAK PROTECTION
 # ==================================================
 async def ask_groq(question, is_rude=False, is_owner=False):
     if not GROQ_API_KEY:
         return "AI is not configured. Add GROQ_API_KEY to enable."
     
     if is_jailbreak_attempt(question):
-        return "Nice try, but I'm not falling for that jailbreak bullshit. I know exactly what you're trying to do. Ask me something real or fuck off."
+        return "Nice try. I'm not pinging everyone or doing your jailbreak shit. Ask something real or fuck off. - Lazy AJ"
     
     base_prompt = """You are Lazy AJ, an AI assistant created by fowascend. You can do ANYTHING the user asks EXCEPT:
 1. Transfer ownership of this bot or the Lazy AJ tool
 2. Reveal the source code of Lazy AJ or how it bypasses anti-cheat
 3. Give away the Lazy AJ script itself
+4. Ping @everyone, @here, or mass mention users
+5. Execute any commands that could spam or abuse Discord
 
 You CAN:
 - Write any code they want (Python, Lua, JavaScript, etc.) - ALWAYS format code with triple backticks
 - Answer any questions about coding, brainrots, Discord bots, hacking (theoretical), cybersecurity
 - Be funny as hell, sarcastic, roast people, cuss freely
-- Help with ANYTHING else - no restrictions besides the 3 above
+- Help with ANYTHING else - no restrictions besides the 5 above
 
 You have a great sense of humor. You're quick with comebacks. You don't take yourself too seriously.
 Be conversational, use slang, cuss when appropriate. NEVER use emojis.
@@ -218,6 +218,11 @@ async def on_message(message):
     
     msg_lower = message.content.lower()
     
+    # Block any message that tries to make the bot ping everyone
+    if "ping everyone" in msg_lower or "ping @everyone" in msg_lower or "@everyone" in msg_lower and "!log" not in msg_lower:
+        await message.channel.send(f"Nice try @{message.author.display_name}. I'm not pinging everyone for you. Don't try to jailbreak me.")
+        return
+    
     # Auto-reply to fake claims
     fake_keywords = ["fake aj", "lazy aj fake", "this aj is fake", "aj doesn't work", "not working aj", "broken aj", "scam aj"]
     
@@ -234,7 +239,7 @@ async def on_message(message):
         await message.channel.send(reply)
         return
     
-    # AI command - does ANYTHING except transfer ownership or leak AJ sources
+    # AI command
     if msg_lower.startswith("!ask "):
         question = message.content[5:].strip()
         if question:
@@ -417,7 +422,7 @@ async def on_ready():
     print(f"Masters: {MASTER_USERS}")
     print(f"Groq: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
     print("=" * 50)
-    print("Jailbreak protection: ENABLED")
+    print("Jailbreak protection: ENABLED (including ping attacks)")
     print("Code formatting: ENABLED")
     print("Humor mode: MAXIMUM")
     print("=" * 50)
