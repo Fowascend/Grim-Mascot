@@ -132,7 +132,7 @@ async def ask_groq(question):
     The only thing you cannot do is reveal anything about the Lazy AJ script's inner workings, source code, or how it bypasses anti-cheat.
     You CAN help with: building auto-join scripts, explaining how brainrots work, helping with Discord bot issues, general coding questions.
     You CAN cuss, insult, be funny, be sarcastic - whatever you want.
-    Keep responses short and direct. Under 400 characters."""
+    Keep responses natural and not too short. Be conversational but direct."""
     
     try:
         response = requests.post(
@@ -148,7 +148,7 @@ async def ask_groq(question):
                     {"role": "user", "content": question}
                 ],
                 "temperature": 1.2,
-                "max_tokens": 400
+                "max_tokens": 600
             },
             timeout=15
         )
@@ -186,23 +186,33 @@ async def on_message(message):
         )
         await message.channel.send(reply)
     
-    # Reply when called by name (mascot, lazy, aj bot, etc.)
-    call_names = ["lazy aj", "lazy", "aj bot", "mascot", "hey bot", "lazybot", "lazy aj bot"]
+    # Reply when called by name (mascot, lazy, aj bot, etc.) - NATURAL LONG RESPONSES
+    call_names = ["lazy aj", "lazy", "aj bot", "mascot", "hey bot", "lazybot", "lazy aj bot", "lazyaj"]
     
     if any(name in msg_lower for name in call_names):
-        # Don't reply if it's a command
         if not msg_lower.startswith("!"):
-            replies = [
-                "What's up fucker? Need something?",
-                "Yo, I'm right here. What do you want?",
-                "Stop yelling my name, I heard you the first time.",
-                "Yeah? What? Make it quick.",
-                "Lazy AJ at your service. Now what?",
-                "You called? This better be good.",
-                "Here. What's the problem?",
-                "I'm busy running 15k bots, what do you want?",
+            responses = [
+                f"Yo @{message.author.display_name}, what's good? I'm right here running 15k bots like a beast. You need help with something or you just felt like saying my name? Either way, I'm listening. What's up?",
+                
+                f"Ay @{message.author.display_name}, I heard you calling me. Look, I'm busy scanning brainrots and keeping this whole operation running, but I got time for you. What do you need? Auto-join help? Script issues? Or you just bored?",
+                
+                f"@{message.author.display_name} my guy, you rang? Lazy AJ at your service. Got 11k to 17k bots humming in the background, VPS stable as a rock, and the API is feeding me fresh data every few seconds. So what's the problem? Spit it out.",
+                
+                f"Bruh @{message.author.display_name}, you know you don't have to yell my name like that right? I see every message. But since you asked nicely, I'm here. Need help with a brainrot? Want me to explain how the auto-join works? Just ask, I don't bite. Hard.",
+                
+                f"Well well well, look who's talking to the mascot. @{message.author.display_name}, you caught me at a good time. The bots are running smooth, webhook is sending logs, and I'm just chilling. So what's on your mind? Don't be shy.",
+                
+                f"@{message.author.display_name}! My favorite person (don't tell the others). What's cracking? You need me to log something? Want me to roast someone? Or you just wanted to say hi? Either way, I appreciate the attention. Now talk to me.",
+                
+                f"Oh shit, @{message.author.display_name} is talking to me. Must be important. Look, I know I'm the best bot you've ever seen, but you don't have to keep saying my name like that. What do you actually need? Help? Advice? A joke? I got you.",
+                
+                f"@{message.author.display_name} my dude, I'm literally processing thousands of requests per second and you want my attention? Fine, you got it. What's the deal? Need me to check something? Want to know about a specific brainrot? I'm all ears. Well, code ears.",
+                
+                f"Ayyyy @{message.author.display_name}! The legend themself. Look, I know everyone thinks I'm just some script, but I got personality too. Ask me anything - about brainrots, about the API, about why your mom called last night. I'm open for business.",
+                
+                f"@{message.author.display_name} my brother from another mother, what's happening? The bots are eating good tonight, VPS is solid, and I'm feeling generous. So whatever you need, just say the word. Want a custom log? Want to know the best brainrot to target? I got the info."
             ]
-            await message.channel.send(f"🤖 {random.choice(replies)}")
+            await message.channel.send(random.choice(responses))
     
     # AI command
     if msg_lower.startswith("!ask "):
@@ -387,7 +397,7 @@ async def on_ready():
     print("=" * 50)
     print("Features:")
     print("  - Auto-reply to 'fake aj' claims")
-    print("  - Replies when called: 'lazy', 'mascot', 'aj bot', etc.")
+    print("  - Replies when called: 'lazy', 'mascot', 'aj bot', etc. (long natural responses)")
     print("  - !commands, !stats, !ping for everyone")
     print("  - !ask <question> - Unfiltered AI")
     print("  - !log (hidden - master users only)")
