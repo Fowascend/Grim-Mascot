@@ -8,7 +8,8 @@ WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S
 SAB_GAME_IDS = [109983668079237, 85621847059032, 99606176102979]
 
 # ============================================================
-# BRAINROTS WITH WORKING IMAGE URLs
+# BRAINROTS WITH CORRECT BASE INCOMES FROM KINGVISUALS
+# Values are in MILLIONS per second
 # ============================================================
 BRAINROTS = {
     # OG BRAINROTS
@@ -19,7 +20,7 @@ BRAINROTS = {
     "John Pork": {"income": 500, "rarity": "OG", "image": "https://images-ext-1.discordapp.net/external/9RK6VrcVNa3MCIaPmbeBuM_LRpYQfstoVkuoCvZnPog/https/plain-wnam-prod-public.komododecks.com/202605/12/iFxMpUBEbXpzxIVyyL7i/image.webp?format=webp"},
     "Griffin": {"income": 400, "rarity": "OG", "image": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png/revision/latest/scale-to-width-down/1000?format=webp"},
     
-    # SECRET BRAINROTS
+    # SECRET BRAINROTS (High tier)
     "Hydra Dragon Cannelloni": {"income": 300, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/xfvoBJm_MpWzP2D-q90AcpQ4EJnYcfyV763moAfMtYc/https/steal-a-brainrot.wiki/wp-content/uploads/2026/01/Steal-A-Brainrot-Wiki-HYDRA-DRAGON-Icon-.png?format=webp"},
     "Dragon Gingerini": {"income": 350, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/3puIUz4htLMUuD3hL5u4N9tIlLdxj2Gi2AVuJgtei9o/https/freebrainrots.com/assets/images/brainrots/roitems/dragon-gingerini.png?format=webp"},
     "Dragon Cannelloni": {"income": 250, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/X4PlwMzgXd5GkP_hOPxTjThl4yNvY5mGUhiV1iOnHb0/https/www.mobynotifier.com/brainrots/dragon-cannelloni?format=webp"},
@@ -30,6 +31,9 @@ BRAINROTS = {
     "Fragrama and Chocrama": {"income": 100, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/Kln9a8QqTAqtPxqLDid23oNYIC5hYoxb2Wh8Jo1qG60/%3Fcb%3D20251109011733/https/static.wikia.nocookie.net/stealabr/images/5/56/Fragrama.png/revision/latest?format=webp"},
     "La Casa Boo": {"income": 100, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/quqyy1a6ddzWi8EeljigfhNgezGLFYhD2LpWiSRMu4g/%3Fcb%3D20260505011532/https/static.wikia.nocookie.net/stealabr/images/d/de/Casa_Booo.png/revision/latest?format=webp"},
     "Cash or Card": {"income": 100, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/3--q-u9qc6iESRoNzi3nj5F8aOR0ThZ_FvPHINXrBw4/%3Fcb%3D20260428161300/https/static.wikia.nocookie.net/stealabr/images/2/21/Cash_or_Card.png/revision/latest/scale-to-width-down/1000?format=webp"},
+    "La Extinct Grande": {"income": 23.5, "rarity": "Secret", "image": "https://kommodo.ai/i/sDgf84vkljfcaK8FrAEE"},
+    
+    # SECRET BRAINROTS (Mid tier)
     "Garama and Madundung": {"income": 50, "rarity": "Secret", "image": "https://static.wikia.nocookie.net/stealabr/images/e/ee/Garamadundung.png/revision/latest?cb=20250816022557"},
     "Ketchuru and Masturu": {"income": 42.5, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/iQod62CSYiki-EmgWXXxftaw9imnESM72GPrs82fP1M/https/www.mobynotifier.com/brainrots/ketchuru-and-musturu?format=webp"},
     "Spaghetti Tualetti": {"income": 60, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/yoOCxZMRDwqYzFcsYPY5GX2WY2wK4FvGgqB72P1VCV8/https/www.mobynotifier.com/brainrots/spaghetti-tualetti?format=webp"},
@@ -51,11 +55,11 @@ BRAINROTS = {
     "Rosey and Teddy": {"income": 165, "rarity": "Secret", "image": "https://static.wikia.nocookie.net/stealabr/images/9/9b/Rosey_and_Teddy.png"},
     "Tralaledon": {"income": 27.5, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/_bBDdfMFPbTdCGnkfiz3yzvtNwqz0P4iVOnTlxFfaME/%3Fcb%3D20250909171639/https/static.wikia.nocookie.net/stealabr/images/7/79/Brr_Brr_Patapem.png/revision/latest?format=webp"},
     "Spooky and Pumpky": {"income": 80, "rarity": "Secret", "image": "https://static.wikia.nocookie.net/stealabr/images/d/d6/Spookypumpky.png/revision/latest?cb=20251012023638"},
-    "La Extinct Grande": {"income": 23.5, "rarity": "Secret", "image": "https://kommodo.ai/i/sDgf84vkljfcaK8FrAEE"},
 }
 
 # ============================================================
 # MUTATION MULTIPLIERS (ADDITIVE - from KingVisuals)
+# Formula: final = base * (1 + mutMod + traitMod)
 # ============================================================
 MUTATIONS = {
     "Normal": 0.0,
@@ -165,8 +169,10 @@ def calculate_income(base_income, mutation, trait):
     mut_mod = MUTATIONS.get(mutation, 0.0)
     trait_mod = TRAITS.get(trait, 0.0)
     final = base_income * (1 + mut_mod + trait_mod)
+    # Add random variance (85% to 115%)
     variance = 0.85 + (random.random() * 0.3)
-    return final * variance
+    final = final * variance
+    return final
 
 def send_embed(name, data, mutation, trait, final_income, bot_count):
     formatted = format_value(final_income)
@@ -184,7 +190,7 @@ def send_embed(name, data, mutation, trait, final_income, bot_count):
         "description": f"**{display_name}** has been detected!",
         "color": color,
         "timestamp": datetime.now().isoformat(),
-        "thumbnail": {"url": data["image"]},  # <-- THIS ADDS THE PICTURE
+        "thumbnail": {"url": data["image"]},
         "fields": [
             {"name": "🧬 Mutation", "value": mutation, "inline": True},
             {"name": "✨ Trait", "value": trait if trait != "None" else "None", "inline": True},
@@ -194,6 +200,9 @@ def send_embed(name, data, mutation, trait, final_income, bot_count):
         ],
         "footer": {"text": f"Lazy AJ • {data['rarity']} Brainrot"},
     }
+    
+    if data.get("image") and data["image"]:
+        embed["thumbnail"] = {"url": data["image"]}
     
     try:
         requests.post(WEBHOOK_URL, json={"embeds": [embed], "username": "Lazy AJ"})
