@@ -27,20 +27,15 @@ TRAITS = {
     "Strawberry": 8.0,
     "Meowl": 7.0,
     "Is Calling": 7.5,
-    "Spyder": 6.0,
-    "Paint": 6.0,
 }
 
 BRAINROTS = {
-    # OG BRAINROTS
     "Strawberry Elephant": {"income": 750, "rarity": "OG", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/US96Fw9oYQepR3lMLiwvK5bCumw_MtsXnGuvai3J33Q/https/www.mobynotifier.com/brainrots/strawberry-elephant?format=webp"},
     "Meowl": {"income": 600, "rarity": "OG", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/KcQAQmvkYOC_oWDKmGgCqeIYmWZZcv3zJzZzFvv6sg4/https/www.mobynotifier.com/brainrots/meowl?format=webp"},
     "Headless Horseman": {"income": 550, "rarity": "OG", "mutations": "Witch_Fuse_Only", "image": "https://images-ext-1.discordapp.net/external/LE0akzzR9pYt7FhWFoqw-KThhupou_t7srI97a47rvI/https/plain-wnam-prod-public.komododecks.com/202605/12/XSdcRajJXsJ65DXdOGjG/image.webp?format=webp"},
-    "Skibidi Toilet": {"income": 450, "rarity": "OG", "mutations": "All", "image": ""},
+    "Skibidi Toilet": {"income": 450, "rarity": "OG", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/3/34/Skibidi_toilet.png/revision/latest?cb=20251227221221"},
     "John Pork": {"income": 500, "rarity": "OG", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/9RK6VrcVNa3MCIaPmbeBuM_LRpYQfstoVkuoCvZnPog/https/plain-wnam-prod-public.komododecks.com/202605/12/iFxMpUBEbXpzxIVyyL7i/image.webp?format=webp"},
     "Griffin": {"income": 400, "rarity": "OG", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png/revision/latest/scale-to-width-down/1000?format=webp"},
-
-    # SECRET BRAINROTS (High tier - can reach billions with mutations)
     "Hydra Dragon Cannelloni": {"income": 350, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/xfvoBJm_MpWzP2D-q90AcpQ4EJnYcfyV763moAfMtYc/https/steal-a-brainrot.wiki/wp-content/uploads/2026/01/Steal-A-Brainrot-Wiki-HYDRA-DRAGON-Icon-.png?format=webp"},
     "Dragon Gingerini": {"income": 225, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/3puIUz4htLMUuD3hL5u4N9tIlLdxj2Gi2AVuJgtei9o/https/freebrainrots.com/assets/images/brainrots/roitems/dragon-gingerini.png?format=webp"},
     "Dragon Cannelloni": {"income": 250, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/X4PlwMzgXd5GkP_hOPxTjThl4yNvY5mGUhiV1iOnHb0/https/www.mobynotifier.com/brainrots/dragon-cannelloni?format=webp"},
@@ -51,9 +46,6 @@ BRAINROTS = {
     "Fragrama and Chocrama": {"income": 100, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/Kln9a8QqTAqtPxqLDid23oNYIC5hYoxb2Wh8Jo1qG60/%3Fcb%3D20251109011733/https/static.wikia.nocookie.net/stealabr/images/5/56/Fragrama.png/revision/latest?format=webp"},
     "La Casa Boo": {"income": 100, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/quqyy1a6ddzWi8EeljigfhNgezGLFYhD2LpWiSRMu4g/%3Fcb%3D20260505011532/https/static.wikia.nocookie.net/stealabr/images/d/de/Casa_Booo.png/revision/latest?format=webp"},
     "Cash or Card": {"income": 100, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/3--q-u9qc6iESRoNzi3nj5F8aOR0ThZ_FvPHINXrBw4/%3Fcb%3D20260428161300/https/static.wikia.nocookie.net/stealabr/images/2/21/Cash_or_Card.png/revision/latest/scale-to-width-down/1000?format=webp"},
-    "La Extinct Grande": {"income": 100, "rarity": "Secret", "mutations": "All", "image": "https://kommodo.ai/i/sDgf84vkljfcaK8FrAEE"},
-
-    # SECRET BRAINROTS (Mid tier - max ~1.5B with Rainbow)
     "Garama and Madundung": {"income": 50, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/e/ee/Garamadundung.png/revision/latest?cb=20250816022557"},
     "Ketchuru and Masturu": {"income": 42.5, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/iQod62CSYiki-EmgWXXxftaw9imnESM72GPrs82fP1M/https/www.mobynotifier.com/brainrots/ketchuru-and-musturu?format=webp"},
     "Spaghetti Tualetti": {"income": 60, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/yoOCxZMRDwqYzFcsYPY5GX2WY2wK4FvGgqB72P1VCV8/https/www.mobynotifier.com/brainrots/spaghetti-tualetti?format=webp"},
@@ -63,7 +55,6 @@ BRAINROTS = {
     "Celestial Pegasus": {"income": 30, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/uQV0Gtw56MrBLMrPHNJHsEL3GHEtQtPtqFd7IC-FxxM/https/www.mobynotifier.com/brainrots/celestial-pegasus?format=webp"},
     "Los Bros": {"income": 37.5, "rarity": "Secret", "mutations": "All", "image": "https://media.discordapp.net/attachments/1502036958036099174/1503879521735282799/los-bros.png?ex=6a04f472&is=6a03a2f2&hm=4d0c65bd50abea97f206777f3b11fbc785460fcad55fa0722d80df53fd028beb&=&format=webp"},
     "Ketupat Kepat": {"income": 35, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/qKJpSiIGZ9SimGiIIyIzF_eqyz7z4FIqEQ15aWmB8E8/https/www.mobynotifier.com/brainrots/ketupat-kepat?format=webp"},
-    "Ketupat Bros": {"income": 40, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/4/4d/Ketupat_Bros.png"},
     "Tralaledon": {"income": 27.5, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/_bBDdfMFPbTdCGnkfiz3yzvtNwqz0P4iVOnTlxFfaME/%3Fcb%3D20250909171639/https/static.wikia.nocookie.net/stealabr/images/7/79/Brr_Brr_Patapem.png/revision/latest?format=webp"},
     "Los Combinasionas": {"income": 15, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/e8NoB0fRt0X0W7aHmWJIQwC2IXb_dHLlEzY4lqhYjSc/https/www.mobynotifier.com/brainrots/los-combinasionas?format=webp"},
     "Los Hotspotsitos": {"income": 25, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/MsbU8Cx2x5x0Uqz0KiKgYQXeugojQ7SQBjg0uY8Doh0/%3Fcb%3D20251226204212/https/static.wikia.nocookie.net/stealabr/images/6/69/Loshotspotsitos.png/revision/latest?format=webp"},
@@ -75,21 +66,8 @@ BRAINROTS = {
     "La Grande Combinasion": {"income": 10, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/l-HH_TrxOC9-VzpqWi-oTxrXNsdH7jIVxAuZI0diczo/https/www.mobynotifier.com/brainrots/la-grande-combinasion?format=webp"},
     "Bacuru and Egguru": {"income": 25, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/flzi1jBXX-CAptIqAJjRlYEiRZabV6i7l6YJSZrY2LA/https/www.mobynotifier.com/brainrots/bacuru-and-egguru?format=webp"},
     "Tictac Sahur": {"income": 15, "rarity": "Secret", "mutations": "All", "image": "https://images-ext-1.discordapp.net/external/D5tEa_RQIDq915-qO989XCMGK3zgYJUIMGA--tdJ3aQ/https/www.mobynotifier.com/brainrots/tictac-sahur?format=webp"},
-    "Love Love Bear": {"income": 25, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/b/bf/Love_Love_Bear.png"},
-    "Foxini Lanternini": {"income": 35, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/4/41/Foxini_Lanternini.png"},
-    "Rosey and Teddy": {"income": 30, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/9/9b/Rosey_and_Teddy.png"},
-    "Ginger Great": {"income": 40, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/e/e7/Ginger_Ketupat_Kepat.png/revision/latest/scale-to-width-down/1000?cb=20251204041956"},
-    "La Lucky Grande": {"income": 35, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/5/55/La_Lucky_Grande.png"},
-    "Nacho Spyder": {"income": 30, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/3/36/Nacho_Spyder.png"},
-    "La Romantic Grande": {"income": 35, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/6/69/La_Romantic_Grande2.png"},
+    "La Extinct Grande": {"income": 100, "rarity": "Secret", "mutations": "All", "image": "https://kommodo.ai/i/sDgf84vkljfcaK8FrAEE"},
     "Spooky and Pumpky": {"income": 80, "rarity": "Secret", "mutations": "Witch_Fuse_Only", "image": "https://static.wikia.nocookie.net/stealabr/images/d/d6/Spookypumpky.png/revision/latest?cb=20251012023638"},
-    "Lavadorito Spinito": {"income": 25, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/f/ff/Lavadorito_Spinito.png/revision/latest?cb=20251123122422"},
-    "La Secret Combinasion": {"income": 50, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/f/f2/Lasecretcombinasion.png/revision/latest?cb=20251006044448"},
-    "Swaggy Bros": {"income": 35, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/8/85/Swaggy_Bros.png/revision/latest?cb=20251216205941"},
-    "La Ginger Sekolah": {"income": 75, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/f/f4/La_ginger_Sekolah.webp/revision/latest?cb=20251128172314"},
-    "La Taco Combinasion": {"income": 20, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/8/84/Latacocombi.png/revision/latest?cb=20251030015001"},
-    "Los 67": {"income": 25, "rarity": "Secret", "mutations": "All", "image": "https://static.wikia.nocookie.net/stealabr/images/d/db/Los-67.png/revision/latest?cb=20251006195232"},
-    "Mieteteira Bicicleteira": {"income": 26, "rarity": "Secret", "mutations": "All", "image": ""},
 }
 
 bot_count = random.randint(11000, 17000)
@@ -121,24 +99,21 @@ def get_color(value):
 
 def get_allowed_mutations(mutation_rule):
     if mutation_rule == "Witch_Fuse_Only":
-        return ["Gold", "Diamond", "Lava", "Yin Yang", "Divine", "Normal"]
+        return ["Normal", "Gold", "Diamond", "Lava", "Yin Yang", "Divine"]
     return list(MUTATION_MULTIPLIERS.keys())
 
-def get_allowed_traits(brainrot_name, is_calling_rarity):
-    traits = ["None"]
-    if is_calling_rarity:
-        traits.append("Is Calling")
-    if brainrot_name == "Strawberry Elephant":
-        traits.append("Strawberry")
-    if brainrot_name == "Meowl":
-        traits.append("Meowl")
-    return traits
-
-def send_embed(brainrot_name, brainrot_data, mutation, trait, final_income):
+def send_embed(brainrot_name, brainrot_data, mutation, trait, final_income, bot_count):
     formatted = format_value(final_income)
     color = get_color(final_income)
     
-    tier = "Peaklights" if final_income >= 5000 else "Highlights" if final_income >= 2000 else "Midlights" if final_income >= 500 else "Lowlights"
+    if final_income >= 5000:
+        tier = "Peaklights"
+    elif final_income >= 2000:
+        tier = "Highlights"
+    elif final_income >= 500:
+        tier = "Midlights"
+    else:
+        tier = "Lowlights"
     
     name_display = brainrot_name
     if mutation != "Normal":
@@ -153,7 +128,7 @@ def send_embed(brainrot_name, brainrot_data, mutation, trait, final_income):
         "timestamp": datetime.now().isoformat(),
         "fields": [
             {"name": "🧬 Mutation", "value": mutation, "inline": True},
-            {"name": "✨ Trait", "value": trait if trait != "None" else "None", "inline": True},
+            {"name": "✨ Trait", "value": trait, "inline": True},
             {"name": "💰 Income", "value": formatted + "/s", "inline": True},
             {"name": "🏆 Tier", "value": tier, "inline": True},
             {"name": "🤖 Active Bots", "value": f"{bot_count:,}", "inline": True},
@@ -182,15 +157,19 @@ while True:
             allowed_mutations = get_allowed_mutations(data["mutations"])
             mutation = random.choice(allowed_mutations)
             
-            is_calling_rarity = random.random() < 0.05
-            allowed_traits = get_allowed_traits(name, is_calling_rarity)
-            trait = random.choice(allowed_traits)
+            trait = "None"
+            if random.random() < 0.08:
+                trait = "Is Calling"
+            if name == "Strawberry Elephant" and random.random() < 0.05:
+                trait = "Strawberry"
+            if name == "Meowl" and random.random() < 0.05:
+                trait = "Meowl"
             
             final_income = data["income"] * MUTATION_MULTIPLIERS[mutation] * TRAITS[trait]
             final_income = final_income * (0.85 + random.random() * 0.3)
             
-            update_bot_count()
-            send_embed(name, data, mutation, trait, final_income)
+            current_bots = update_bot_count()
+            send_embed(name, data, mutation, trait, final_income, current_bots)
             last_sent[name] = now
             time.sleep(random.randint(30, 90))
     time.sleep(5)
