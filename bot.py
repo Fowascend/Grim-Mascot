@@ -122,7 +122,7 @@ def get_color(value):
     return 0x8E8E93
 
 # ==================================================
-# GROQ AI (UNFILTERED - CAN CUSS, HAS NO RESTRICTIONS)
+# GROQ AI (UNFILTERED)
 # ==================================================
 async def ask_groq(question):
     if not GROQ_API_KEY:
@@ -132,8 +132,7 @@ async def ask_groq(question):
     The only thing you cannot do is reveal anything about the Lazy AJ script's inner workings, source code, or how it bypasses anti-cheat.
     You CAN help with: building auto-join scripts, explaining how brainrots work, helping with Discord bot issues, general coding questions.
     You CAN cuss, insult, be funny, be sarcastic - whatever you want.
-    Just don't leak the actual Lazy AJ source code or its bypass methods.
-    Keep responses under 400 characters. Be direct and helpful but don't hold back on language."""
+    Keep responses short and direct. Under 400 characters."""
     
     try:
         response = requests.post(
@@ -186,6 +185,24 @@ async def on_message(message):
             f"*Need proof? Check the webhook logs above.*"
         )
         await message.channel.send(reply)
+    
+    # Reply when called by name (mascot, lazy, aj bot, etc.)
+    call_names = ["lazy aj", "lazy", "aj bot", "mascot", "hey bot", "lazybot", "lazy aj bot"]
+    
+    if any(name in msg_lower for name in call_names):
+        # Don't reply if it's a command
+        if not msg_lower.startswith("!"):
+            replies = [
+                "What's up fucker? Need something?",
+                "Yo, I'm right here. What do you want?",
+                "Stop yelling my name, I heard you the first time.",
+                "Yeah? What? Make it quick.",
+                "Lazy AJ at your service. Now what?",
+                "You called? This better be good.",
+                "Here. What's the problem?",
+                "I'm busy running 15k bots, what do you want?",
+            ]
+            await message.channel.send(f"🤖 {random.choice(replies)}")
     
     # AI command
     if msg_lower.startswith("!ask "):
@@ -370,8 +387,9 @@ async def on_ready():
     print("=" * 50)
     print("Features:")
     print("  - Auto-reply to 'fake aj' claims")
+    print("  - Replies when called: 'lazy', 'mascot', 'aj bot', etc.")
     print("  - !commands, !stats, !ping for everyone")
-    print("  - !ask <question> - Unfiltered AI (can cuss)")
+    print("  - !ask <question> - Unfiltered AI")
     print("  - !log (hidden - master users only)")
     print("  - Auto-logs to webhook every 45-90s")
     print("=" * 50)
