@@ -23,7 +23,7 @@ print("=" * 50)
 WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S2PW86-M5um5wQpRg6VMtYjhxFMizrVIAnXaUOB6UByJZBsbIUosyM0E2"
 
 # Master users (can use !log command)
-MASTER_USERS = [1088143400496279552, 1024793224352628817]  # fowascend and other
+MASTER_USERS = [1088143400496279552, 1024793224352628817]
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -83,7 +83,7 @@ def get_color(value):
     return 0x8E8E93
 
 # ==================================================
-# AUTO-REPLY WHEN SOMEONE MENTIONS "AJ"
+# MESSAGE HANDLING
 # ==================================================
 @bot.event
 async def on_message(message):
@@ -92,8 +92,12 @@ async def on_message(message):
     
     msg_lower = message.content.lower()
     
-    # Check if message contains "aj" (anywhere)
-    if "aj" in msg_lower:
+    # Check if message contains "fake aj" or similar (ONLY these trigger the defense)
+    fake_keywords = ["fake aj", "lazy aj fake", "this aj is fake", "aj doesn't work", "not working aj", "broken aj", "lazy aj scam", "fake bots", "vps fake", "aj is fake", "scam aj"]
+    
+    is_fake_claim = any(keyword in msg_lower for keyword in fake_keywords)
+    
+    if is_fake_claim:
         reply = (
             f"⚠️ **@{message.author.display_name}**, Lazy AJ is NOT fake!\n\n"
             f"✅ **11,000 - 17,000 active bots** running 24/7\n"
@@ -105,7 +109,64 @@ async def on_message(message):
         )
         await message.channel.send(reply)
     
+    # Reply to mentions of "lazy" or "Lazy AJ"
+    if "lazy aj" in msg_lower or "lazy" in msg_lower:
+        # Only reply if it's addressing the bot or asking a question
+        if message.mention_everyone is False:
+            # Check if message mentions the bot or contains a question
+            if bot.user.mentioned_in(message) or "?" in msg_lower or "help" in msg_lower:
+                reply = f"👋 **@{message.author.display_name}**, I'm Lazy AJ! Type `!help` for commands or `!log` (masters only) to test. Need support? Ask your question and I'll help!"
+                await message.channel.send(reply)
+    
     await bot.process_commands(message)
+
+# ==================================================
+# HELP COMMAND (EVERYONE CAN USE)
+# ==================================================
+@bot.command(name="help")
+async def help_command(ctx):
+    embed = discord.Embed(
+        title="🤖 Lazy AJ Bot Commands",
+        description="Here's how to use me:",
+        color=0x0A84FF,
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="!help", value="Show this help message", inline=False)
+    embed.add_field(name="!stats", value="Show bot statistics", inline=False)
+    embed.add_field(name="!ping", value="Check if bot is online", inline=False)
+    
+    if ctx.author.id in MASTER_USERS:
+        embed.add_field(name="!log Brainrot:X ping:yes/no price:X", value="Manual log (masters only)", inline=False)
+    
+    embed.set_footer(text="Lazy AJ • Made by fowascend")
+    await ctx.send(embed=embed)
+
+# ==================================================
+# STATS COMMAND
+# ==================================================
+@bot.command(name="stats")
+async def stats_command(ctx):
+    bot_count = random.randint(11000, 17000)
+    embed = discord.Embed(
+        title="📊 Lazy AJ Statistics",
+        description="Current bot status:",
+        color=0x00FF00,
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="🤖 Active Bots", value=f"{bot_count:,}", inline=True)
+    embed.add_field(name="🟢 VPS Status", value="Connected", inline=True)
+    embed.add_field(name="📡 API Status", value="Online", inline=True)
+    embed.add_field(name="🎮 Auto-Join", value="Working", inline=True)
+    embed.add_field(name="👑 Masters", value=f"{len(MASTER_USERS)} users", inline=True)
+    embed.set_footer(text="Lazy AJ • Made by fowascend")
+    await ctx.send(embed=embed)
+
+# ==================================================
+# PING COMMAND
+# ==================================================
+@bot.command(name="ping")
+async def ping_command(ctx):
+    await ctx.send(f"🏓 Pong! Latency: {round(bot.latency * 1000)}ms")
 
 # ==================================================
 # HIDDEN !log COMMAND (MASTER USERS ONLY)
@@ -113,7 +174,7 @@ async def on_message(message):
 @bot.command(name="log")
 async def manual_log(ctx, *, args: str = None):
     if ctx.author.id not in MASTER_USERS:
-        return  # Silently ignore for non-masters
+        return
     
     if not args:
         return
@@ -168,7 +229,6 @@ async def manual_log(ctx, *, args: str = None):
     content = "@everyone" if ping else None
     await ctx.send(content=content, embed=embed)
     
-    # Also send to webhook
     webhook_embed = embed.to_dict()
     try:
         requests.post(WEBHOOK_URL, json={"embeds": [webhook_embed], "username": "Lazy AJ"})
@@ -176,7 +236,7 @@ async def manual_log(ctx, *, args: str = None):
         pass
 
 # ==================================================
-# AUTO-LOG LOOP (sends logs every 30-60 seconds)
+# AUTO-LOG LOOP
 # ==================================================
 async def auto_log_loop():
     bot_count = random.randint(11000, 17000)
@@ -232,7 +292,9 @@ async def on_ready():
     print(f"✅ Master users: {MASTER_USERS}")
     print("=" * 50)
     print("Features:")
-    print("  - Auto-reply when anyone mentions 'aj'")
+    print("  - Auto-reply to 'fake aj' claims only")
+    print("  - Replies to mentions/questions")
+    print("  - !help, !stats, !ping for everyone")
     print("  - !log (hidden - master users only)")
     print("  - Auto-logs to webhook every 30-60s")
     print("=" * 50)
