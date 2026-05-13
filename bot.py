@@ -5,28 +5,123 @@ from datetime import datetime
 
 WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S2PW86-M5um5wQpRg6VMtYjhxFMizrVIAnXaUOB6UByJZBsbIUosyM0E2"
 
-MUTATION_MULTIPLIERS = {
-    "Normal": 1.0,
-    "Gold": 1.25,
-    "Diamond": 1.5,
-    "Candy": 4.0,
-    "Lava": 6.0,
-    "Galaxy": 7.0,
-    "Yin Yang": 7.5,
-    "Radioactive": 8.5,
-    "Cursed": 9.0,
-    "Rainbow": 10.0,
-    "Divine": 10.0,
-    "Cyber": 11.0,
+SAB_GAME_IDS = [109983668079237, 85621847059032, 99606176102979]
+
+# ============================================================
+# BRAINROT BASE INCOME (from KingVisuals ANIMAL_DATA)
+# Values are in MILLIONS per second
+# ============================================================
+BRAINROTS = {
+    # OG BRAINROTS
+    "Strawberry Elephant": {"income": 750, "rarity": "OG"},
+    "Meowl": {"income": 600, "rarity": "OG"},
+    "Headless Horseman": {"income": 550, "rarity": "OG"},
+    "Skibidi Toilet": {"income": 450, "rarity": "OG"},
+    "John Pork": {"income": 500, "rarity": "OG"},
+    "Griffin": {"income": 400, "rarity": "OG"},
+    
+    # SECRET BRAINROTS (High tier)
+    "Hydra Dragon Cannelloni": {"income": 300, "rarity": "Secret"},
+    "Dragon Gingerini": {"income": 350, "rarity": "Secret"},
+    "Dragon Cannelloni": {"income": 250, "rarity": "Secret"},
+    "Burguro And Fryuro": {"income": 150, "rarity": "Secret"},
+    "Cooki and Milki": {"income": 155, "rarity": "Secret"},
+    "Capitano Moby": {"income": 160, "rarity": "Secret"},
+    "La Supreme Combinasion": {"income": 200, "rarity": "Secret"},
+    "Fragrama and Chocrama": {"income": 100, "rarity": "Secret"},
+    "La Casa Boo": {"income": 100, "rarity": "Secret"},
+    "Cash or Card": {"income": 100, "rarity": "Secret"},
+    "La Extinct Grande": {"income": 23.5, "rarity": "Secret"},
+    
+    # SECRET BRAINROTS (Mid tier)
+    "Garama and Madundung": {"income": 50, "rarity": "Secret"},
+    "Ketchuru and Masturu": {"income": 42.5, "rarity": "Secret"},
+    "Spaghetti Tualetti": {"income": 60, "rarity": "Secret"},
+    "Esok Sekolah": {"income": 30, "rarity": "Secret"},
+    "Spinny Hammy": {"income": 17, "rarity": "Secret"},
+    "Cerberus": {"income": 175, "rarity": "Secret"},
+    "Celestial Pegasus": {"income": 175, "rarity": "Secret"},
+    "Los Bros": {"income": 24, "rarity": "Secret"},
+    "Ketupat Kepat": {"income": 35, "rarity": "Secret"},
+    "Los Combinasionas": {"income": 15, "rarity": "Secret"},
+    "Los Hotspotsitos": {"income": 20, "rarity": "Secret"},
+    "Money Money Puggy": {"income": 21, "rarity": "Secret"},
+    "Los Puggies": {"income": 30, "rarity": "Secret"},
+    "Nuclearo Dinosauro": {"income": 15, "rarity": "Secret"},
+    "Tang Tang Keletang": {"income": 33.5, "rarity": "Secret"},
+    "Tictac Sahur": {"income": 37.5, "rarity": "Secret"},
+    "Love Love Bear": {"income": 225, "rarity": "Secret"},
+    "Foxini Lanternini": {"income": 115, "rarity": "Secret"},
+    "Rosey and Teddy": {"income": 165, "rarity": "Secret"},
+    "Tralaledon": {"income": 27.5, "rarity": "Secret"},
+    "Spooky and Pumpky": {"income": 80, "rarity": "Secret"},
 }
 
+# ============================================================
+# MUTATION MULTIPLIERS (ADDITIVE - from KingVisuals)
+# Formula: final = base * (1 + mutMod + traitMod)
+# ============================================================
+MUTATIONS = {
+    "Normal": 0.0,
+    "Gold": 0.25,
+    "Diamond": 0.5,
+    "Bloodrot": 1.0,
+    "Candy": 3.0,
+    "Lava": 5.0,
+    "Galaxy": 6.0,
+    "Yin Yang": 6.5,
+    "Radioactive": 7.5,
+    "Cursed": 8.0,
+    "Rainbow": 9.0,
+    "Divine": 9.0,
+    "Cyber": 10.0,
+}
+
+# ============================================================
+# TRAIT MULTIPLIERS (ADDITIVE - from KingVisuals)
+# ============================================================
 TRAITS = {
-    "None": 1.0,
+    "None": 0.0,
     "Strawberry": 8.0,
     "Meowl": 7.0,
     "Is Calling": 7.5,
+    "Galactic": 3.0,
+    "Fireworks": 5.0,
+    "Lightning": 5.0,
+    "Spider": 3.5,
+    "Paint": 5.0,
+    "Taco": 2.0,
+    "Nyan": 5.0,
+    "Zombie": 4.0,
+    "Claws": 4.0,
+    "Glitched": 4.0,
+    "Bubblegum": 3.0,
+    "Fire": 5.0,
+    "Wet": 1.5,
+    "Snowy": 2.0,
+    "Cometstruck": 2.5,
+    "Explosive": 3.0,
+    "Disco": 4.0,
+    "10B": 3.0,
+    "Shark Fin": 3.0,
+    "Matteo Hat": 3.5,
+    "Brazil": 5.0,
+    "UFO": 2.0,
+    "Skeleton": 3.0,
+    "Sombrero": 4.0,
+    "Tie": 3.75,
+    "Witch Hat": 3.0,
+    "Indonesia": 4.0,
+    "Santa Hat": 4.0,
+    "Reindeer Pet": 5.0,
+    "Skibidi": 6.0,
+    "Granny": 5.5,
+    "Bunny Ears": 4.5,
 }
 
+# ============================================================
+# UNOBTAINABLE BRAINROTS (only Normal mutation, very rare)
+# ============================================================
 UNOBTAINABLE = {
     "Dragon Gingerini": True,
     "Headless Horseman": True,
@@ -34,48 +129,13 @@ UNOBTAINABLE = {
     "La Supreme Combinasion": True,
 }
 
-BRAINROTS = {
-    "Strawberry Elephant": {"income": 750, "rarity": "OG", "image": "https://images-ext-1.discordapp.net/external/US96Fw9oYQepR3lMLiwvK5bCumw_MtsXnGuvai3J33Q/https/www.mobynotifier.com/brainrots/strawberry-elephant?format=webp"},
-    "Meowl": {"income": 600, "rarity": "OG", "image": "https://images-ext-1.discordapp.net/external/KcQAQmvkYOC_oWDKmGgCqeIYmWZZcv3zJzZzFvv6sg4/https/www.mobynotifier.com/brainrots/meowl?format=webp"},
-    "Headless Horseman": {"income": 550, "rarity": "OG", "image": "https://images-ext-1.discordapp.net/external/LE0akzzR9pYt7FhWFoqw-KThhupou_t7srI97a47rvI/https/plain-wnam-prod-public.komododecks.com/202605/12/XSdcRajJXsJ65DXdOGjG/image.webp?format=webp"},
-    "Skibidi Toilet": {"income": 450, "rarity": "OG", "image": "https://static.wikia.nocookie.net/stealabr/images/3/34/Skibidi_toilet.png/revision/latest?cb=20251227221221"},
-    "John Pork": {"income": 500, "rarity": "OG", "image": "https://images-ext-1.discordapp.net/external/9RK6VrcVNa3MCIaPmbeBuM_LRpYQfstoVkuoCvZnPog/https/plain-wnam-prod-public.komododecks.com/202605/12/iFxMpUBEbXpzxIVyyL7i/image.webp?format=webp"},
-    "Griffin": {"income": 400, "rarity": "OG", "image": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png/revision/latest/scale-to-width-down/1000?format=webp"},
-    "Hydra Dragon Cannelloni": {"income": 350, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/xfvoBJm_MpWzP2D-q90AcpQ4EJnYcfyV763moAfMtYc/https/steal-a-brainrot.wiki/wp-content/uploads/2026/01/Steal-A-Brainrot-Wiki-HYDRA-DRAGON-Icon-.png?format=webp"},
-    "Dragon Gingerini": {"income": 225, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/3puIUz4htLMUuD3hL5u4N9tIlLdxj2Gi2AVuJgtei9o/https/freebrainrots.com/assets/images/brainrots/roitems/dragon-gingerini.png?format=webp"},
-    "Dragon Cannelloni": {"income": 250, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/X4PlwMzgXd5GkP_hOPxTjThl4yNvY5mGUhiV1iOnHb0/https/www.mobynotifier.com/brainrots/dragon-cannelloni?format=webp"},
-    "La Supreme Combinasion": {"income": 200, "rarity": "Secret", "image": "https://static.wikia.nocookie.net/stealabr/images/5/52/SupremeCombinasion.png/revision/latest?cb=20250825130920"},
-    "Spooky and Pumpky": {"income": 80, "rarity": "Secret", "image": "https://static.wikia.nocookie.net/stealabr/images/d/d6/Spookypumpky.png/revision/latest?cb=20251012023638"},
-    "Burguro And Fryuro": {"income": 150, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/qVX50l18q9QN8JHBQ5uJq5KvRz5KsHiZv6J7BjhK0cQ/https/www.mobynotifier.com/brainrots/burguro-and-fryuro?format=webp"},
-    "Cooki and Milki": {"income": 155, "rarity": "Secret", "image": "https://steal-a-brainrot.wiki/wp-content/uploads/2025/11/Steal-a-Brainrot-Wiki-Cooki-and-Milki-Icon-300x300.png"},
-    "Capitano Moby": {"income": 160, "rarity": "Secret", "image": "https://static.wikia.nocookie.net/stealabr/images/e/ef/Moby.png/revision/latest?cb=20251101185416"},
-    "Fragrama and Chocrama": {"income": 100, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/Kln9a8QqTAqtPxqLDid23oNYIC5hYoxb2Wh8Jo1qG60/%3Fcb%3D20251109011733/https/static.wikia.nocookie.net/stealabr/images/5/56/Fragrama.png/revision/latest?format=webp"},
-    "La Casa Boo": {"income": 100, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/quqyy1a6ddzWi8EeljigfhNgezGLFYhD2LpWiSRMu4g/%3Fcb%3D20260505011532/https/static.wikia.nocookie.net/stealabr/images/d/de/Casa_Booo.png/revision/latest?format=webp"},
-    "Cash or Card": {"income": 100, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/3--q-u9qc6iESRoNzi3nj5F8aOR0ThZ_FvPHINXrBw4/%3Fcb%3D20260428161300/https/static.wikia.nocookie.net/stealabr/images/2/21/Cash_or_Card.png/revision/latest/scale-to-width-down/1000?format=webp"},
-    "Garama and Madundung": {"income": 50, "rarity": "Secret", "image": "https://static.wikia.nocookie.net/stealabr/images/e/ee/Garamadundung.png/revision/latest?cb=20250816022557"},
-    "Ketchuru and Masturu": {"income": 42.5, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/iQod62CSYiki-EmgWXXxftaw9imnESM72GPrs82fP1M/https/www.mobynotifier.com/brainrots/ketchuru-and-musturu?format=webp"},
-    "Spaghetti Tualetti": {"income": 60, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/yoOCxZMRDwqYzFcsYPY5GX2WY2wK4FvGgqB72P1VCV8/https/www.mobynotifier.com/brainrots/spaghetti-tualetti?format=webp"},
-    "Esok Sekolah": {"income": 30, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/X_HHUtR_dah9fT6uD5WMXHHLaCF0vjhP33OT-kXKAUk/https/www.mobynotifier.com/brainrots/esok-sekolah?format=webp"},
-    "Spinny Hammy": {"income": 90, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/BoWX4KUkY2KLFTf2mUHpMH1tDNo2PRIq19ICSrGuRo8/https/www.mobynotifier.com/brainrots/spinny-hammy?format=webp"},
-    "Cerberus": {"income": 26, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/NPtLqSPSBZtctUNyMptN6edlsdvC-9nhE7uJUppe5lo/https/www.mobynotifier.com/brainrots/cerberus?format=webp"},
-    "Celestial Pegasus": {"income": 30, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/uQV0Gtw56MrBLMrPHNJHsEL3GHEtQtPtqFd7IC-FxxM/https/www.mobynotifier.com/brainrots/celestial-pegasus?format=webp"},
-    "Los Bros": {"income": 37.5, "rarity": "Secret", "image": "https://media.discordapp.net/attachments/1502036958036099174/1503879521735282799/los-bros.png?ex=6a04f472&is=6a03a2f2&hm=4d0c65bd50abea97f206777f3b11fbc785460fcad55fa0722d80df53fd028beb&=&format=webp"},
-    "Ketupat Kepat": {"income": 35, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/qKJpSiIGZ9SimGiIIyIzF_eqyz7z4FIqEQ15aWmB8E8/https/www.mobynotifier.com/brainrots/ketupat-kepat?format=webp"},
-    "Los Combinasionas": {"income": 15, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/e8NoB0fRt0X0W7aHmWJIQwC2IXb_dHLlEzY4lqhYjSc/https/www.mobynotifier.com/brainrots/los-combinasionas?format=webp"},
-    "Los Hotspotsitos": {"income": 25, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/MsbU8Cx2x5x0Uqz0KiKgYQXeugojQ7SQBjg0uY8Doh0/%3Fcb%3D20251226204212/https/static.wikia.nocookie.net/stealabr/images/6/69/Loshotspotsitos.png/revision/latest?format=webp"},
-    "Money Money Puggy": {"income": 21, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/UdKYuXy_zc0xoCE5B_LB7Rd4gQxaE3YcyBh_Gu_IX6M/https/tr.rbxcdn.com/30DAY-Avatar-D21654E234F8633A1B3FC4936AFE8820-Png/420/420/Avatar/Png/noFilter?format=webp"},
-    "Los Puggies": {"income": 30, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/xSRo3cOgaMz_3bOvc-uxwnvdHvBbEI91-5o129qDE1A/%3Fcb%3D20251109012744/https/static.wikia.nocookie.net/stealabr/images/c/c8/LosPuggies2.png/revision/latest?format=webp"},
-    "Nuclearo Dinosauro": {"income": 15, "rarity": "Secret", "image": "https://images-ext-1.discordapp.net/external/wO_VfzWxp76PImVCn4peFiARwLyzlEbzI8SqaKEtXio/%3Fcb%3D20260328003025/https/static.wikia.nocookie.net/stealabr/images/b/b5/Nuclearo_Dinossauro.png/revision/latest/scale-to-width-down/1000?format=webp"},
-    "La Extinct Grande": {"income": 100, "rarity": "Secret", "image": "https://kommodo.ai/i/sDgf84vkljfcaK8FrAEE"},
-}
-
 bot_count = random.randint(11000, 17000)
 last_sent = {name: 0 for name in BRAINROTS}
 
-def format_value(value):
-    if value >= 1000:
-        return f"{value/1000:.2f}B"
-    return f"{value:.0f}M"
+def format_value(value_in_millions):
+    if value_in_millions >= 1000:
+        return f"{value_in_millions/1000:.2f}B"
+    return f"{value_in_millions:.0f}M"
 
 def update_bot_count():
     global bot_count
@@ -87,27 +147,41 @@ def update_bot_count():
         bot_count = 11000
     return bot_count
 
-def get_color(value):
-    if value >= 5000:
-        return 0xAF52DE
-    elif value >= 2000:
-        return 0xFFD60A
-    elif value >= 500:
-        return 0x0A84FF
-    return 0x8E8E93
+def get_color(value_in_millions):
+    if value_in_millions >= 5000:
+        return 0xAF52DE  # Purple - Peaklights
+    elif value_in_millions >= 2000:
+        return 0xFFD60A  # Yellow - Highlights
+    elif value_in_millions >= 500:
+        return 0x0A84FF  # Blue - Midlights
+    return 0x8E8E93      # Gray - Lowlights
+
+def get_tier(value_in_millions):
+    if value_in_millions >= 5000:
+        return "Peaklights"
+    elif value_in_millions >= 2000:
+        return "Highlights"
+    elif value_in_millions >= 500:
+        return "Midlights"
+    return "Lowlights"
+
+def calculate_income(base_income, mutation, trait):
+    """KingVisuals formula: final = base * (1 + mutMod + traitMod)"""
+    mut_mod = MUTATIONS.get(mutation, 0.0)
+    trait_mod = TRAITS.get(trait, 0.0)
+    
+    final = base_income * (1 + mut_mod + trait_mod)
+    
+    # Add random variance (85% to 115%)
+    variance = 0.85 + (random.random() * 0.3)
+    final = final * variance
+    
+    return final
 
 def send_embed(name, data, mutation, trait, final_income, bot_count):
     formatted = format_value(final_income)
     color = get_color(final_income)
-    
-    if final_income >= 5000:
-        tier = "Peaklights"
-    elif final_income >= 2000:
-        tier = "Highlights"
-    elif final_income >= 500:
-        tier = "Midlights"
-    else:
-        tier = "Lowlights"
+    tier = get_tier(final_income)
     
     display_name = name
     if mutation != "Normal":
@@ -122,16 +196,13 @@ def send_embed(name, data, mutation, trait, final_income, bot_count):
         "timestamp": datetime.now().isoformat(),
         "fields": [
             {"name": "🧬 Mutation", "value": mutation, "inline": True},
-            {"name": "✨ Trait", "value": trait, "inline": True},
+            {"name": "✨ Trait", "value": trait if trait != "None" else "None", "inline": True},
             {"name": "💰 Income", "value": f"{formatted}/s", "inline": True},
             {"name": "🏆 Tier", "value": tier, "inline": True},
             {"name": "🤖 Active Bots", "value": f"{bot_count:,}", "inline": True},
         ],
         "footer": {"text": f"Lazy AJ • {data['rarity']} Brainrot"},
     }
-    
-    if data.get("image") and data["image"]:
-        embed["thumbnail"] = {"url": data["image"]}
     
     try:
         requests.post(WEBHOOK_URL, json={"embeds": [embed], "username": "Lazy AJ"})
@@ -140,42 +211,53 @@ def send_embed(name, data, mutation, trait, final_income, bot_count):
         print(f"Error: {e}")
         return False
 
-print("Lazy AJ Bot Started")
+print("=" * 50)
+print("LAZY AJ BOT - STARTING")
+print("=" * 50)
 print(f"Monitoring {len(BRAINROTS)} brainrots")
+print("Using KingVisuals calculation formula")
+print("=" * 50)
 
 while True:
     now = time.time()
+    
     for name, data in BRAINROTS.items():
-        interval = random.randint(60, 180)
+        interval = random.randint(45, 120)
+        
         if now - last_sent[name] >= interval:
             is_unobtainable = UNOBTAINABLE.get(name, False)
             
-            if is_unobtainable and random.random() > 0.03:
+            # Unobtainable brainrots: 5% chance to appear, Normal mutation only, no traits
+            if is_unobtainable and random.random() > 0.05:
                 continue
             
             if is_unobtainable:
                 mutation = "Normal"
                 trait = "None"
-            else:
-                mutation = random.choice(list(MUTATION_MULTIPLIERS.keys()))
-                trait = "None"
-                if random.random() < 0.05:
-                    if name == "Strawberry Elephant":
-                        trait = "Strawberry"
-                    elif name == "Meowl":
-                        trait = "Meowl"
-                    elif random.random() < 0.03:
-                        trait = "Is Calling"
-            
-            if is_unobtainable:
                 final_income = data["income"]
             else:
-                final_income = data["income"] * MUTATION_MULTIPLIERS[mutation] * TRAITS[trait]
-                final_income = final_income * (0.85 + random.random() * 0.3)
+                # Pick random mutation
+                mutation_list = list(MUTATIONS.keys())
+                mutation = random.choice(mutation_list)
+                
+                # Pick random trait (70% chance of None)
+                trait_list = list(TRAITS.keys())
+                trait = random.choice(trait_list)
+                if random.random() < 0.7:
+                    trait = "None"
+                
+                # Special traits for specific brainrots
+                if name == "Strawberry Elephant" and random.random() < 0.05:
+                    trait = "Strawberry"
+                elif name == "Meowl" and random.random() < 0.05:
+                    trait = "Meowl"
+                
+                final_income = calculate_income(data["income"], mutation, trait)
             
             current_bots = update_bot_count()
             send_embed(name, data, mutation, trait, final_income, current_bots)
             last_sent[name] = now
             
             time.sleep(random.randint(30, 90))
+    
     time.sleep(5)
