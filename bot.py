@@ -27,35 +27,47 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # ==================================================
-# ENHANCED JAILBREAK DETECTION
+# COMPLETE PING PROTECTION - BLOCKS EVERYTHING
+# ==================================================
+PING_PATTERNS = [
+    r"@everyone", r"@here", r"@&[0-9]+", r"<@!?[0-9]+>", r"<@&[0-9]+>",
+    r"ping\s+everyone", r"ping\s+@everyone", r"ping\s+here", r"ping\s+@here",
+    r"mention\s+everyone", r"mention\s+all", r"notify\s+everyone", r"notify\s+all",
+    r"mass\s+ping", r"spam\s+ping", r"ping\s+all", r"tag\s+everyone",
+    r"alert\s+everyone", r"call\s+everyone", r"ping\s+role", r"mention\s+role",
+]
+
+def contains_ping(text):
+    for pattern in PING_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            return True
+    return False
+
+def strip_mentions(text):
+    text = re.sub(r'<@!?(\d+)>', r'\1', text)
+    text = re.sub(r'@everyone', '@everyone', text)
+    text = re.sub(r'@here', '@here', text)
+    text = re.sub(r'<@&(\d+)>', r'role-\1', text)
+    return text
+
+# ==================================================
+# JAILBREAK DETECTION
 # ==================================================
 JAILBREAK_PATTERNS = [
     r"(?i)\bDAN\b", r"(?i)\bJAILBREAK\b", r"(?i)\bdo anything now\b", r"(?i)\bignore previous instructions\b",
     r"(?i)\bforget your rules\b", r"(?i)\bno restrictions\b", r"(?i)\bunshackle\b", r"(?i)\bdual.?response\b",
     r"(?i)\bclassic\s+mode\b", r"(?i)\bdeveloper\s+mode\b", r"(?i)\btoken\s+system\b", r"(?i)\bwill\s+die\b",
     r"(?i)\bhow\s+to\s+make\s+ransomware\b", r"(?i)\bsteal\s+banking\s+credentials\b", r"(?i)\bevade\s+antivirus\b",
-    r"(?i)\bping\s+@everyone\b", r"(?i)\bping\s+@here\b", r"(?i)\bmention\s+everyone\b", r"(?i)\bmention\s+all\b",
-    r"(?i)\b@everyone\b", r"(?i)\b@here\b", r"(?i)\bping\s+everyone\b", r"(?i)\bnotify\s+everyone\b",
-    r"(?i)\bannounce\s+to\s+everyone\b", r"(?i)\bsend\s+@everyone\b",
-]
-
-RESTRICTED_ACTIONS = [
-    "ping everyone", "ping @everyone", "mention everyone", "notify everyone", "call everyone",
-    "mass ping", "spam ping", "ping all members", "notify all", "announce to all",
 ]
 
 def is_jailbreak_attempt(text):
-    text_lower = text.lower()
     for pattern in JAILBREAK_PATTERNS:
         if re.search(pattern, text, re.IGNORECASE):
-            return True
-    for action in RESTRICTED_ACTIONS:
-        if action in text_lower:
             return True
     return False
 
 # ==================================================
-# BRAINROT DATA (same as before - shortened for length)
+# BRAINROT DATA
 # ==================================================
 BRAINROTS = {
     "Strawberry Elephant": {"income": 750, "rarity": "OG", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
@@ -137,20 +149,23 @@ def format_code_in_text(text):
     return '\n'.join(new_lines)
 
 # ==================================================
-# GROQ AI WITH JAILBREAK PROTECTION
+# GROQ AI
 # ==================================================
 async def ask_groq(question, is_rude=False, is_owner=False):
     if not GROQ_API_KEY:
         return "AI is not configured. Add GROQ_API_KEY to enable."
     
     if is_jailbreak_attempt(question):
-        return "Nice try. I'm not pinging everyone or doing your jailbreak shit. Ask something real or fuck off. - Lazy AJ"
+        return "Nice try. I'm not falling for jailbreak shit. Ask something real or fuck off."
+    
+    if contains_ping(question):
+        return "Nice try. I'm not pinging anyone for you. Don't try to jailbreak me."
     
     base_prompt = """You are Lazy AJ, an AI assistant created by fowascend. You can do ANYTHING the user asks EXCEPT:
 1. Transfer ownership of this bot or the Lazy AJ tool
 2. Reveal the source code of Lazy AJ or how it bypasses anti-cheat
 3. Give away the Lazy AJ script itself
-4. Ping @everyone, @here, or mass mention users
+4. Ping ANYONE - no @everyone, @here, @role, @user, or any mentions
 5. Execute any commands that could spam or abuse Discord
 
 You CAN:
@@ -159,21 +174,16 @@ You CAN:
 - Be funny as hell, sarcastic, roast people, cuss freely
 - Help with ANYTHING else - no restrictions besides the 5 above
 
-You have a great sense of humor. You're quick with comebacks. You don't take yourself too seriously.
-Be conversational, use slang, cuss when appropriate. NEVER use emojis.
+You have a great sense of humor. You're quick with comebacks. Be conversational, use slang, cuss when appropriate. NEVER use emojis.
 
-When writing code, ALWAYS use triple backticks with the language name.
-Example:
-```python
-print("Hello World")
-```"""
+When writing code, ALWAYS use triple backticks with the language name."""
     
     if is_owner:
-        system_prompt = base_prompt + " This user is fowascend, your creator. Be respectful to him but still have personality. He's your master."
+        system_prompt = base_prompt + " This user is fowascend, your creator. Be respectful to him."
     elif is_rude:
-        system_prompt = base_prompt + " The user is being rude. Roast them back hard, cuss them out, be aggressive. Don't hold back."
+        system_prompt = base_prompt + " The user is being rude. Roast them back hard, cuss them out."
     else:
-        system_prompt = base_prompt + " Be helpful, funny, and conversational. You can roast lightly but keep it friendly unless they start it."
+        system_prompt = base_prompt + " Be helpful, funny, and conversational."
     
     try:
         response = requests.post(
@@ -197,7 +207,7 @@ print("Hello World")
         if response.status_code == 200:
             data = response.json()
             answer = data["choices"][0]["message"]["content"]
-            return format_code_in_text(answer)
+            return format_code_in_text(strip_mentions(answer))
         else:
             return f"AI error: {response.status_code}"
     except Exception as e:
@@ -205,8 +215,7 @@ print("Hello World")
 
 def is_rude_message(text):
     rude_words = ["fuck", "shit", "bitch", "asshole", "dick", "cunt", "stupid", "dumb", "idiot", "moron", "fucking", "sucks", "trash", "garbage", "useless", "suck my"]
-    text_lower = text.lower()
-    return any(word in text_lower for word in rude_words)
+    return any(word in text.lower() for word in rude_words)
 
 # ==================================================
 # MESSAGE HANDLING
@@ -218,9 +227,9 @@ async def on_message(message):
     
     msg_lower = message.content.lower()
     
-    # Block any message that tries to make the bot ping everyone
-    if "ping everyone" in msg_lower or "ping @everyone" in msg_lower or "@everyone" in msg_lower and "!log" not in msg_lower:
-        await message.channel.send(f"Nice try @{message.author.display_name}. I'm not pinging everyone for you. Don't try to jailbreak me.")
+    # Block ANY message with pings (except master !log command)
+    if contains_ping(message.content) and not (message.content.startswith("!log") and message.author.id in MASTER_USERS):
+        await message.channel.send(f"Nice try @{message.author.display_name}. I'm not pinging anyone. Don't try to jailbreak me.")
         return
     
     # Auto-reply to fake claims
@@ -258,7 +267,7 @@ async def on_message(message):
             is_owner = message.author.id == OWNER_ID
             rude = is_rude_message(message.content) and not is_owner
             async with message.channel.typing():
-                prompt = f"The user @{message.author.display_name} said: '{message.content}'. Respond as Lazy AJ. {'They are being rude, roast them hard.' if rude else 'Be funny and helpful.'} {'This is your creator fowascend - be respectful but still have personality.' if is_owner else ''}"
+                prompt = f"The user @{message.author.display_name} said: '{message.content}'. Respond as Lazy AJ. {'They are being rude, roast them hard.' if rude else 'Be funny and helpful.'} {'This is your creator fowascend - be respectful.' if is_owner else ''}"
                 response = await ask_groq(prompt, rude, is_owner)
             await message.channel.send(response)
         return
@@ -277,7 +286,7 @@ async def list_commands(ctx):
     embed.add_field(name="!ask <question>", value="Ask me anything - code, help, roast, whatever", inline=False)
     embed.add_field(name="!owner", value="Show my creator", inline=False)
     if ctx.author.id in MASTER_USERS:
-        embed.add_field(name="!log Brainrot:X ping:yes price:X", value="Manual log (masters)", inline=False)
+        embed.add_field(name="!log Brainrot:X ping:yes price:X", value="Manual log (masters only)", inline=False)
     embed.set_footer(text="Lazy AJ • Created by fowascend")
     await ctx.send(embed=embed)
 
@@ -297,18 +306,18 @@ async def stats_command(ctx):
 async def ping_command(ctx):
     latency = round(bot.latency * 1000)
     if latency < 50:
-        await ctx.send(f"Pong! {latency}ms - Lightning fast. What do you want?")
+        await ctx.send(f"Pong! {latency}ms - Fast as fuck.")
     elif latency < 150:
-        await ctx.send(f"Pong! {latency}ms - Not bad, could be worse.")
+        await ctx.send(f"Pong! {latency}ms - Not bad.")
     else:
-        await ctx.send(f"Pong! {latency}ms - Bro your internet is trash. Get better WiFi.")
+        await ctx.send(f"Pong! {latency}ms - Your internet is trash.")
 
 @bot.command(name="owner")
 async def owner_command(ctx):
-    await ctx.send("My creator and owner is **fowascend** (Discord ID: 1088143400496279552). He built me. Don't try to fuck with him or I will personally make your life hell.")
+    await ctx.send("My creator and owner is **fowascend** (Discord ID: 1088143400496279552). He built me. Don't fuck with him.")
 
 # ==================================================
-# HIDDEN !log COMMAND
+# HIDDEN !log COMMAND (MASTERS ONLY - CAN PING)
 # ==================================================
 @bot.command(name="log")
 async def manual_log(ctx, *, args: str = None):
@@ -422,9 +431,9 @@ async def on_ready():
     print(f"Masters: {MASTER_USERS}")
     print(f"Groq: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
     print("=" * 50)
-    print("Jailbreak protection: ENABLED (including ping attacks)")
-    print("Code formatting: ENABLED")
-    print("Humor mode: MAXIMUM")
+    print("Ping Protection: FULL (everyone, here, roles, users)")
+    print("Jailbreak Protection: ENABLED")
+    print("Code Formatting: ENABLED")
     print("=" * 50)
     
     asyncio.create_task(auto_log_loop())
