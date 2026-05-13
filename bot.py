@@ -6,27 +6,26 @@ import discord
 from discord.ext import commands
 from datetime import datetime
 
-# Read token from environment variable
+# ==================================================
+# TOKEN HANDLING - WORKS ON RAILWAY
+# ==================================================
 TOKEN = os.environ.get("DISCORD_TOKEN")
 
 if not TOKEN:
     print("=" * 50)
-    print("❌ ERROR: DISCORD_TOKEN environment variable not found!")
+    print("❌ DISCORD_TOKEN not found in environment!")
     print("=" * 50)
-    print("Please set your Discord bot token as an environment variable:")
-    print("  - On Railway: Add DISCORD_TOKEN in your variables")
-    print("  - On Replit: Add DISCORD_TOKEN in Secrets")
-    print("  - On Local: export DISCORD_TOKEN='your_token_here'")
+    print("Please add DISCORD_TOKEN to your Railway variables.")
+    print("Current environment variables:", list(os.environ.keys()))
     print("=" * 50)
     exit(1)
 
 print("=" * 50)
-print("✅ DISCORD_TOKEN found!")
-print(f"Token starts with: {TOKEN[:15]}...")
+print(f"✅ Token found! Length: {len(TOKEN)}")
+print(f"✅ Token starts with: {TOKEN[:15]}...")
 print("=" * 50)
 
 WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S2PW86-M5um5wQpRg6VMtYjhxFMizrVIAnXaUOB6UByJZBsbIUosyM0E2"
-
 ALLOWED_USER_ID = 1088143400496279552
 
 intents = discord.Intents.default()
@@ -40,20 +39,6 @@ BRAINROT_IMAGES = {
     "skibiditoilet": "https://static.wikia.nocookie.net/stealabr/images/3/34/Skibidi_toilet.png",
     "johnpork": "https://images-ext-1.discordapp.net/external/9RK6VrcVNa3MCIaPmbeBuM_LRpYQfstoVkuoCvZnPog/https/plain-wnam-prod-public.komododecks.com/202605/12/iFxMpUBEbXpzxIVyyL7i/image.webp?format=webp",
     "griffin": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png/revision/latest/scale-to-width-down/1000?format=webp",
-    "dragoncannelloni": "https://images-ext-1.discordapp.net/external/X4PlwMzgXd5GkP_hOPxTjThl4yNvY5mGUhiV1iOnHb0/https/www.mobynotifier.com/brainrots/dragon-cannelloni?format=webp",
-    "burguroandfryuro": "https://images-ext-1.discordapp.net/external/qVX50l18q9QN8JHBQ5uJq5KvRz5KsHiZv6J7BjhK0cQ/https/www.mobynotifier.com/brainrots/burguro-and-fryuro?format=webp",
-    "capitanomoby": "https://images-ext-1.discordapp.net/external/k7fodKUVV7Tr3fLaxkyXXgGUKpuj0fS05fyglkhIM20/https/www.mobynotifier.com/brainrots/capitano-moby?format=webp",
-    "loveLoveBear": "https://static.wikia.nocookie.net/stealabr/images/b/bf/Love_Love_Bear.png",
-    "cerberus": "https://images-ext-1.discordapp.net/external/NPtLqSPSBZtctUNyMptN6edlsdvC-9nhE7uJUppe5lo/https/www.mobynotifier.com/brainrots/cerberus?format=webp",
-    "celestialpegasus": "https://images-ext-1.discordapp.net/external/uQV0Gtw56MrBLMrPHNJHsEL3GHEtQtPtqFd7IC-FxxM/https/www.mobynotifier.com/brainrots/celestial-pegasus?format=webp",
-    "lasupremecombinasion": "https://images-ext-1.discordapp.net/external/KQBRtzBT3aoWc6WTjvoOhl2Tf64FvbWhyFW4VWbQGhQ/https/www.mobynotifier.com/brainrots/la-secret-combinasion?format=webp",
-    "fragramaandchocrama": "https://images-ext-1.discordapp.net/external/Kln9a8QqTAqtPxqLDid23oNYIC5hYoxb2Wh8Jo1qG60/%3Fcb%3D20251109011733/https/static.wikia.nocookie.net/stealabr/images/5/56/Fragrama.png/revision/latest?format=webp",
-    "garamaandmadundung": "https://images-ext-1.discordapp.net/external/2fNC1UlBAVbJ5IAr5FyaGz6zOlkB9ZvNI--rRx1rMgM/https/www.mobynotifier.com/brainrots/garama-and-madundung?format=webp",
-    "ketchuruandmasturu": "https://images-ext-1.discordapp.net/external/iQod62CSYiki-EmgWXXxftaw9imnESM72GPrs82fP1M/https/www.mobynotifier.com/brainrots/ketchuru-and-musturu?format=webp",
-    "esoksekolah": "https://images-ext-1.discordapp.net/external/X_HHUtR_dah9fT6uD5WMXHHLaCF0vjhP33OT-kXKAUk/https/www.mobynotifier.com/brainrots/esok-sekolah?format=webp",
-    "laextinctgrande": "https://kommodo.ai/i/sDgf84vkljfcaK8FrAEE",
-    "losbros": "https://media.discordapp.net/attachments/1502036958036099174/1503879521735282799/los-bros.png",
-    "tictacsahur": "https://images-ext-1.discordapp.net/external/D5tEa_RQIDq915-qO989XCMGK3zgYJUIMGA--tdJ3aQ/https/www.mobynotifier.com/brainrots/tictac-sahur?format=webp",
 }
 
 MUTATIONS = [
@@ -108,7 +93,7 @@ def get_color(value):
 @bot.command(name="log")
 async def manual_log(ctx, *, args: str = None):
     if ctx.author.id != ALLOWED_USER_ID:
-        await ctx.send("❌ You don't have permission to use this command.", delete_after=5)
+        await ctx.send("❌ You don't have permission.", delete_after=5)
         return
     
     if not args:
@@ -121,7 +106,7 @@ async def manual_log(ctx, *, args: str = None):
     price_match = re.search(r'price:(\S+)', args, re.IGNORECASE)
     
     if not brainrot_match:
-        await ctx.send("❌ Please specify a brainrot: `Brainrot:Name`")
+        await ctx.send("❌ Please specify: `Brainrot:Name`")
         return
     
     brainrot_name = brainrot_match.group(1).strip()
@@ -130,7 +115,7 @@ async def manual_log(ctx, *, args: str = None):
     
     price_match_num = re.search(r'([\d.]+)([BMK]?)', price_str.upper())
     if not price_match_num:
-        await ctx.send("❌ Invalid price format. Use like: 23B, 750M, 100")
+        await ctx.send("❌ Invalid price. Use: 23B, 750M, 100")
         return
     
     price_value = float(price_match_num.group(1))
@@ -166,14 +151,15 @@ async def manual_log(ctx, *, args: str = None):
     
     content = "@everyone" if ping else None
     await ctx.send(content=content, embed=embed)
-    await ctx.send(f"✅ Logged **{brainrot_name}** with {formatted_income}/s!", delete_after=3)
+    await ctx.send(f"✅ Logged **{brainrot_name}**!", delete_after=3)
 
 @bot.event
 async def on_ready():
     print("=" * 50)
-    print(f"✅ Logged in as {bot.user}")
+    print(f"✅ Bot is online!")
+    print(f"✅ Logged in as: {bot.user}")
     print(f"✅ Bot ID: {bot.user.id}")
-    print(f"✅ Allowed user ID: {ALLOWED_USER_ID}")
+    print(f"✅ Allowed user: {ALLOWED_USER_ID}")
     print("=" * 50)
     print("Commands:")
     print("  !log Brainrot:Griffin ping:yes price:23B")
