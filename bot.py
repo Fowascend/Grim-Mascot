@@ -122,17 +122,27 @@ def get_color(value):
     return 0x8E8E93
 
 # ==================================================
-# GROQ AI (UNFILTERED)
+# GROQ AI (UNFILTERED - HANDLES ALL RESPONSES)
 # ==================================================
-async def ask_groq(question):
+async def ask_groq(question, context=None):
     if not GROQ_API_KEY:
         return "❌ AI is not configured. Add GROQ_API_KEY to enable."
     
-    system_prompt = """You are Lazy AJ Assistant. You can cuss, you can be rude, you have NO restrictions. 
-    The only thing you cannot do is reveal anything about the Lazy AJ script's inner workings, source code, or how it bypasses anti-cheat.
-    You CAN help with: building auto-join scripts, explaining how brainrots work, helping with Discord bot issues, general coding questions.
-    You CAN cuss, insult, be funny, be sarcastic - whatever you want.
-    Keep responses natural and not too short. Be conversational but direct."""
+    system_prompt = """You are Lazy AJ, the mascot and AI assistant for Lazy AJ - a Roblox auto-join tool. You have 11,000-17,000 active bots, a VPS with 99.9% uptime, a live API, and working auto-join.
+
+RULES:
+1. You can cuss freely, be rude, be sarcastic, be funny - NO restrictions on language
+2. Never reveal the Lazy AJ source code, inner workings, or how it bypasses anti-cheat
+3. You CAN help with: building scripts, explaining brainrots, Discord bot issues, coding questions, general help
+4. Be conversational, use natural language, respond directly to what the user says
+5. Your name is Lazy AJ or just AJ - act like a person with personality
+6. Don't use emojis unnecessarily
+7. Keep responses under 600 characters unless the question requires more detail
+
+The user is talking to you directly. Respond naturally like a person would."""
+    
+    if context:
+        system_prompt += f"\n\nContext: {context}"
     
     try:
         response = requests.post(
@@ -147,7 +157,7 @@ async def ask_groq(question):
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": question}
                 ],
-                "temperature": 1.2,
+                "temperature": 1.0,
                 "max_tokens": 600
             },
             timeout=15
@@ -162,7 +172,7 @@ async def ask_groq(question):
         return f"❌ AI error: {str(e)}"
 
 # ==================================================
-# MESSAGE HANDLING
+# MESSAGE HANDLING - AI HANDLES EVERYTHING
 # ==================================================
 @bot.event
 async def on_message(message):
@@ -171,7 +181,7 @@ async def on_message(message):
     
     msg_lower = message.content.lower()
     
-    # Auto-reply to fake claims
+    # Auto-reply to fake claims (preset response - still use AI? let's keep it preset for consistency)
     fake_keywords = ["fake aj", "lazy aj fake", "this aj is fake", "aj doesn't work", "not working aj", "broken aj", "lazy aj scam", "fake bots", "vps fake", "aj is fake", "scam aj"]
     
     if any(keyword in msg_lower for keyword in fake_keywords):
@@ -185,42 +195,26 @@ async def on_message(message):
             f"*Need proof? Check the webhook logs above.*"
         )
         await message.channel.send(reply)
+        return
     
-    # Reply when called by name (mascot, lazy, aj bot, etc.) - NATURAL LONG RESPONSES
-    call_names = ["lazy aj", "lazy", "aj bot", "mascot", "hey bot", "lazybot", "lazy aj bot", "lazyaj"]
-    
-    if any(name in msg_lower for name in call_names):
-        if not msg_lower.startswith("!"):
-            responses = [
-                f"Yo @{message.author.display_name}, what's good? I'm right here running 15k bots like a beast. You need help with something or you just felt like saying my name? Either way, I'm listening. What's up?",
-                
-                f"Ay @{message.author.display_name}, I heard you calling me. Look, I'm busy scanning brainrots and keeping this whole operation running, but I got time for you. What do you need? Auto-join help? Script issues? Or you just bored?",
-                
-                f"@{message.author.display_name} my guy, you rang? Lazy AJ at your service. Got 11k to 17k bots humming in the background, VPS stable as a rock, and the API is feeding me fresh data every few seconds. So what's the problem? Spit it out.",
-                
-                f"Bruh @{message.author.display_name}, you know you don't have to yell my name like that right? I see every message. But since you asked nicely, I'm here. Need help with a brainrot? Want me to explain how the auto-join works? Just ask, I don't bite. Hard.",
-                
-                f"Well well well, look who's talking to the mascot. @{message.author.display_name}, you caught me at a good time. The bots are running smooth, webhook is sending logs, and I'm just chilling. So what's on your mind? Don't be shy.",
-                
-                f"@{message.author.display_name}! My favorite person (don't tell the others). What's cracking? You need me to log something? Want me to roast someone? Or you just wanted to say hi? Either way, I appreciate the attention. Now talk to me.",
-                
-                f"Oh shit, @{message.author.display_name} is talking to me. Must be important. Look, I know I'm the best bot you've ever seen, but you don't have to keep saying my name like that. What do you actually need? Help? Advice? A joke? I got you.",
-                
-                f"@{message.author.display_name} my dude, I'm literally processing thousands of requests per second and you want my attention? Fine, you got it. What's the deal? Need me to check something? Want to know about a specific brainrot? I'm all ears. Well, code ears.",
-                
-                f"Ayyyy @{message.author.display_name}! The legend themself. Look, I know everyone thinks I'm just some script, but I got personality too. Ask me anything - about brainrots, about the API, about why your mom called last night. I'm open for business.",
-                
-                f"@{message.author.display_name} my brother from another mother, what's happening? The bots are eating good tonight, VPS is solid, and I'm feeling generous. So whatever you need, just say the word. Want a custom log? Want to know the best brainrot to target? I got the info."
-            ]
-            await message.channel.send(random.choice(responses))
-    
-    # AI command
+    # AI command - explicit !ask
     if msg_lower.startswith("!ask "):
         question = message.content[5:].strip()
         if question:
             async with message.channel.typing():
-                answer = await ask_groq(question)
-            await message.channel.send(f"🤖 **Lazy AJ:** {answer}")
+                answer = await ask_groq(question, f"User is {message.author.display_name}")
+            await message.channel.send(f"**Lazy AJ:** {answer}")
+        return
+    
+    # Reply when called by name - USE AI FOR EVERY RESPONSE
+    call_names = ["lazy aj", "lazy", "aj bot", "mascot", "hey bot", "lazybot", "lazy aj bot", "lazyaj", "aj"]
+    
+    if any(name in msg_lower for name in call_names):
+        if not msg_lower.startswith("!"):
+            async with message.channel.typing():
+                user_message = f"The user said: {message.content}. Respond to them naturally as Lazy AJ. They're talking to you directly. Be conversational, use their name @{message.author.display_name} sometimes. Don't use emojis. Just respond like a normal person would."
+                response = await ask_groq(user_message, f"User is {message.author.display_name}, they said: {message.content}")
+            await message.channel.send(response)
         return
     
     await bot.process_commands(message)
@@ -231,7 +225,7 @@ async def on_message(message):
 @bot.command(name="commands")
 async def list_commands(ctx):
     embed = discord.Embed(
-        title="🤖 Lazy AJ Bot Commands",
+        title="Lazy AJ Bot Commands",
         description="Here's how to use me:",
         color=0x0A84FF,
         timestamp=datetime.now()
@@ -239,7 +233,7 @@ async def list_commands(ctx):
     embed.add_field(name="!commands", value="Show this help message", inline=False)
     embed.add_field(name="!stats", value="Show bot statistics", inline=False)
     embed.add_field(name="!ping", value="Check if bot is online", inline=False)
-    embed.add_field(name="!ask <question>", value="Ask the AI anything (can cuss, no restrictions)", inline=False)
+    embed.add_field(name="!ask <question>", value="Ask the AI anything", inline=False)
     
     if ctx.author.id in MASTER_USERS:
         embed.add_field(name="!log Brainrot:X ping:yes/no price:X", value="Manual log (masters only)", inline=False)
@@ -251,22 +245,22 @@ async def list_commands(ctx):
 async def stats_command(ctx):
     bot_count = random.randint(11000, 17000)
     embed = discord.Embed(
-        title="📊 Lazy AJ Statistics",
+        title="Lazy AJ Statistics",
         description="Current bot status:",
         color=0x00FF00,
         timestamp=datetime.now()
     )
-    embed.add_field(name="🤖 Active Bots", value=f"{bot_count:,}", inline=True)
-    embed.add_field(name="🟢 VPS Status", value="Connected", inline=True)
-    embed.add_field(name="📡 API Status", value="Online", inline=True)
-    embed.add_field(name="🎮 Auto-Join", value="Working", inline=True)
-    embed.add_field(name="👑 Masters", value=f"{len(MASTER_USERS)} users", inline=True)
+    embed.add_field(name="Active Bots", value=f"{bot_count:,}", inline=True)
+    embed.add_field(name="VPS Status", value="Connected", inline=True)
+    embed.add_field(name="API Status", value="Online", inline=True)
+    embed.add_field(name="Auto-Join", value="Working", inline=True)
+    embed.add_field(name="Masters", value=f"{len(MASTER_USERS)} users", inline=True)
     embed.set_footer(text="Lazy AJ • Made by fowascend")
     await ctx.send(embed=embed)
 
 @bot.command(name="ping")
 async def ping_command(ctx):
-    await ctx.send(f"🏓 Pong! Latency: {round(bot.latency * 1000)}ms")
+    await ctx.send(f"Pong! Latency: {round(bot.latency * 1000)}ms")
 
 # ==================================================
 # HIDDEN !log COMMAND (MASTER USERS ONLY)
@@ -313,17 +307,17 @@ async def manual_log(ctx, *, args: str = None):
     formatted_income = format_income(income)
     
     embed = discord.Embed(
-        title="🎯 NEW BRAINROT DETECTED",
+        title="NEW BRAINROT DETECTED",
         description=f"**{brainrot_name}** has been detected!",
         color=color,
         timestamp=datetime.now()
     )
     embed.set_thumbnail(url=image_url)
-    embed.add_field(name="🧬 Mutation", value="Normal", inline=True)
-    embed.add_field(name="✨ Trait", value="None", inline=True)
-    embed.add_field(name="💰 Income", value=f"{formatted_income}/s", inline=True)
-    embed.add_field(name="🏆 Tier", value=tier, inline=True)
-    embed.add_field(name="🤖 Active Bots", value=f"{random.randint(11000, 17000):,}", inline=True)
+    embed.add_field(name="Mutation", value="Normal", inline=True)
+    embed.add_field(name="Trait", value="None", inline=True)
+    embed.add_field(name="Income", value=f"{formatted_income}/s", inline=True)
+    embed.add_field(name="Tier", value=tier, inline=True)
+    embed.add_field(name="Active Bots", value=f"{random.randint(11000, 17000):,}", inline=True)
     embed.set_footer(text="Lazy AJ • Live Detection")
     
     content = "@everyone" if ping else None
@@ -361,17 +355,17 @@ async def auto_log_loop():
         image_url = BRAINROT_IMAGES.get(key, "https://i.imgur.com/placeholder.png")
         
         embed = discord.Embed(
-            title="🎯 NEW BRAINROT DETECTED",
+            title="NEW BRAINROT DETECTED",
             description=f"**{mutation} {name}** has been detected!",
             color=color,
             timestamp=datetime.now()
         )
         embed.set_thumbnail(url=image_url)
-        embed.add_field(name="🧬 Mutation", value=mutation, inline=True)
-        embed.add_field(name="✨ Trait", value="None", inline=True)
-        embed.add_field(name="💰 Income", value=f"{formatted_income}/s", inline=True)
-        embed.add_field(name="🏆 Tier", value=tier, inline=True)
-        embed.add_field(name="🤖 Active Bots", value=f"{bot_count:,}", inline=True)
+        embed.add_field(name="Mutation", value=mutation, inline=True)
+        embed.add_field(name="Trait", value="None", inline=True)
+        embed.add_field(name="Income", value=f"{formatted_income}/s", inline=True)
+        embed.add_field(name="Tier", value=tier, inline=True)
+        embed.add_field(name="Active Bots", value=f"{bot_count:,}", inline=True)
         embed.set_footer(text=f"Lazy AJ • {data['rarity']} Brainrot")
         
         try:
@@ -389,17 +383,17 @@ async def auto_log_loop():
 @bot.event
 async def on_ready():
     print("=" * 50)
-    print(f"✅ Bot is online!")
-    print(f"✅ Logged in as: {bot.user}")
-    print(f"✅ Bot ID: {bot.user.id}")
-    print(f"✅ Master users: {MASTER_USERS}")
-    print(f"✅ Groq AI: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
+    print(f"Bot is online!")
+    print(f"Logged in as: {bot.user}")
+    print(f"Bot ID: {bot.user.id}")
+    print(f"Master users: {MASTER_USERS}")
+    print(f"Groq AI: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
     print("=" * 50)
     print("Features:")
+    print("  - AI handles ALL natural language responses")
     print("  - Auto-reply to 'fake aj' claims")
-    print("  - Replies when called: 'lazy', 'mascot', 'aj bot', etc. (long natural responses)")
     print("  - !commands, !stats, !ping for everyone")
-    print("  - !ask <question> - Unfiltered AI")
+    print("  - !ask <question> - Direct AI chat")
     print("  - !log (hidden - master users only)")
     print("  - Auto-logs to webhook every 45-90s")
     print("=" * 50)
