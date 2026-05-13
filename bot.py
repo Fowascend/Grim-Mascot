@@ -6,19 +6,17 @@ from datetime import datetime
 WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S2PW86-M5um5wQpRg6VMtYjhxFMizrVIAnXaUOB6UByJZBsbIUosyM0E2"
 
 BRAINROTS = [
-    # OG BRAINROTS
     {"name": "Strawberry Elephant", "income": 750, "rarity": "OG", "rarity_value": 4, "image": "https://images-ext-1.discordapp.net/external/US96Fw9oYQepR3lMLiwvK5bCumw_MtsXnGuvai3J33Q/https/www.mobynotifier.com/brainrots/strawberry-elephant?format=webp"},
     {"name": "Meowl", "income": 600, "rarity": "OG", "rarity_value": 4, "image": "https://images-ext-1.discordapp.net/external/KcQAQmvkYOC_oWDKmGgCqeIYmWZZcv3zJzZzFvv6sg4/https/www.mobynotifier.com/brainrots/meowl?format=webp"},
     {"name": "Headless Horseman", "income": 550, "rarity": "OG", "rarity_value": 4, "image": "https://images-ext-1.discordapp.net/external/LE0akzzR9pYt7FhWFoqw-KThhupou_t7srI97a47rvI/https/plain-wnam-prod-public.komododecks.com/202605/12/XSdcRajJXsJ65DXdOGjG/image.webp?format=webp"},
-    {"name": "Skibidi Toilet", "income": 450, "rarity": "OG", "rarity_value": 4, "image": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png/revision/latest/scale-to-width-down/1000?format=webp"},
+    {"name": "Skibidi Toilet", "income": 450, "rarity": "OG", "rarity_value": 4, "image": "https://static.wikia.nocookie.net/stealabr/images/3/34/Skibidi_toilet.png"},
     {"name": "John Pork", "income": 500, "rarity": "OG", "rarity_value": 4, "image": "https://images-ext-1.discordapp.net/external/9RK6VrcVNa3MCIaPmbeBuM_LRpYQfstoVkuoCvZnPog/https/plain-wnam-prod-public.komododecks.com/202605/12/iFxMpUBEbXpzxIVyyL7i/image.webp?format=webp"},
     {"name": "Griffin", "income": 400, "rarity": "OG", "rarity_value": 4, "image": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png/revision/latest/scale-to-width-down/1000?format=webp"},
     
-    # SECRET BRAINROTS
     {"name": "Dragon Cannelloni", "income": 250, "rarity": "Secret", "rarity_value": 3, "image": "https://images-ext-1.discordapp.net/external/X4PlwMzgXd5GkP_hOPxTjThl4yNvY5mGUhiV1iOnHb0/https/www.mobynotifier.com/brainrots/dragon-cannelloni?format=webp"},
     {"name": "Burguro And Fryuro", "income": 150, "rarity": "Secret", "rarity_value": 3, "image": "https://images-ext-1.discordapp.net/external/qVX50l18q9QN8JHBQ5uJq5KvRz5KsHiZv6J7BjhK0cQ/https/www.mobynotifier.com/brainrots/burguro-and-fryuro?format=webp"},
     {"name": "Capitano Moby", "income": 160, "rarity": "Secret", "rarity_value": 3, "image": "https://images-ext-1.discordapp.net/external/k7fodKUVV7Tr3fLaxkyXXgGUKpuj0fS05fyglkhIM20/https/www.mobynotifier.com/brainrots/capitano-moby?format=webp"},
-    {"name": "Love Love Bear", "income": 225, "rarity": "Secret", "rarity_value": 3, "image": "https://images-ext-1.discordapp.net/external/BO_7jVx-XZR6H2_7_UwXe8DZoZq5QHJ5IvQwHMFjRo4/https/media.discordapp.net/attachments/123456789/love-love-bear.png"},
+    {"name": "Love Love Bear", "income": 225, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/b/bf/Love_Love_Bear.png"},
     {"name": "Cerberus", "income": 175, "rarity": "Secret", "rarity_value": 3, "image": "https://images-ext-1.discordapp.net/external/NPtLqSPSBZtctUNyMptN6edlsdvC-9nhE7uJUppe5lo/https/www.mobynotifier.com/brainrots/cerberus?format=webp"},
     {"name": "Celestial Pegasus", "income": 175, "rarity": "Secret", "rarity_value": 3, "image": "https://images-ext-1.discordapp.net/external/uQV0Gtw56MrBLMrPHNJHsEL3GHEtQtPtqFd7IC-FxxM/https/www.mobynotifier.com/brainrots/celestial-pegasus?format=webp"},
     {"name": "La Supreme Combinasion", "income": 200, "rarity": "Secret", "rarity_value": 3, "image": "https://images-ext-1.discordapp.net/external/KQBRtzBT3aoWc6WTjvoOhl2Tf64FvbWhyFW4VWbQGhQ/https/www.mobynotifier.com/brainrots/la-secret-combinasion?format=webp"},
@@ -34,10 +32,10 @@ BRAINROTS = [
     {"name": "Ketupat Kepat", "income": 35, "rarity": "Secret", "rarity_value": 2, "image": "https://images-ext-1.discordapp.net/external/qKJpSiIGZ9SimGiIIyIzF_eqyz7z4FIqEQ15aWmB8E8/https/www.mobynotifier.com/brainrots/ketupat-kepat?format=webp"},
     {"name": "Tang Tang Keletang", "income": 33.5, "rarity": "Secret", "rarity_value": 2, "image": "https://images-ext-1.discordapp.net/external/4qWYUdmCoa0zhqxH2MKwV7Or5U9Xif8yw-AB_Gy5Lig/https/www.mobynotifier.com/brainrots/tang-tang-keletang?format=webp"},
     {"name": "Tictac Sahur", "income": 37.5, "rarity": "Secret", "rarity_value": 2, "image": "https://images-ext-1.discordapp.net/external/D5tEa_RQIDq915-qO989XCMGK3zgYJUIMGA--tdJ3aQ/https/www.mobynotifier.com/brainrots/tictac-sahur?format=webp"},
-    {"name": "Foxini Lanternini", "income": 115, "rarity": "Secret", "rarity_value": 2, "image": "https://images-ext-1.discordapp.net/external/5Zx5r9cWxzC2Qz2lq-TJ02Zc40EX5Y-bs8nwpCb5lOA/https/static.wikia.nocookie.net/stealabr/images/4/41/Foxini_Lanternini.png"},
-    {"name": "Rosey and Teddy", "income": 165, "rarity": "Secret", "rarity_value": 2, "image": "https://images-ext-1.discordapp.net/external/4Z4yA4dKvZEKqM6L4WUYbWj8QYBo6Z4zS5Z8xZ9zZ0Z/https/static.wikia.nocookie.net/stealabr/images/9/9b/Rosey_and_Teddy.png"},
+    {"name": "Foxini Lanternini", "income": 115, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/4/41/Foxini_Lanternini.png"},
+    {"name": "Rosey and Teddy", "income": 165, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/9/9b/Rosey_and_Teddy.png"},
     {"name": "Tralaledon", "income": 27.5, "rarity": "Secret", "rarity_value": 2, "image": "https://images-ext-1.discordapp.net/external/_bBDdfMFPbTdCGnkfiz3yzvtNwqz0P4iVOnTlxFfaME/%3Fcb%3D20250909171639/https/static.wikia.nocookie.net/stealabr/images/7/79/Brr_Brr_Patapem.png/revision/latest?format=webp"},
-    {"name": "Spooky and Pumpky", "income": 80, "rarity": "Secret", "rarity_value": 2, "image": "https://images-ext-1.discordapp.net/external/3aJ1rNmdrTfNlU8_JlnqK6b4mOFlUQtU03VSC9AQlgU/https/static.wikia.nocookie.net/stealabr/images/d/d6/Spookypumpky.png/revision/latest?cb=20251012023638"},
+    {"name": "Spooky and Pumpky", "income": 80, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/d/d6/Spookypumpky.png/revision/latest?cb=20251012023638"},
     {"name": "Los Combinasionas", "income": 15, "rarity": "Secret", "rarity_value": 1, "image": "https://images-ext-1.discordapp.net/external/e8NoB0fRt0X0W7aHmWJIQwC2IXb_dHLlEzY4lqhYjSc/https/www.mobynotifier.com/brainrots/los-combinasionas?format=webp"},
     {"name": "Los Hotspotsitos", "income": 20, "rarity": "Secret", "rarity_value": 1, "image": "https://images-ext-1.discordapp.net/external/MsbU8Cx2x5x0Uqz0KiKgYQXeugojQ7SQBjg0uY8Doh0/%3Fcb%3D20251226204212/https/static.wikia.nocookie.net/stealabr/images/6/69/Loshotspotsitos.png/revision/latest?format=webp"},
     {"name": "Money Money Puggy", "income": 21, "rarity": "Secret", "rarity_value": 1, "image": "https://images-ext-1.discordapp.net/external/UdKYuXy_zc0xoCE5B_LB7Rd4gQxaE3YcyBh_Gu_IX6M/https/tr.rbxcdn.com/30DAY-Avatar-D21654E234F8633A1B3FC4936AFE8820-Png/420/420/Avatar/Png/noFilter?format=webp"},
@@ -139,7 +137,6 @@ def get_random_brainrot():
     
     return {
         "name": display_name,
-        "original_name": brainrot["name"],
         "income": final_income,
         "formatted_income": format_income(final_income),
         "tier": tier,
@@ -147,7 +144,6 @@ def get_random_brainrot():
         "mutation": mutation["name"],
         "trait": trait["name"],
         "rarity": brainrot["rarity"],
-        "rarity_value": brainrot["rarity_value"],
         "image": brainrot["image"],
         "timestamp": datetime.now().isoformat(),
     }
@@ -178,6 +174,7 @@ def send_embed(brainrot, bot_count):
 
 bot_count = random.randint(11000, 17000)
 last_og_time = time.time()
+next_og_interval = random.randint(14400, 21600)
 
 def update_bot_count():
     global bot_count
@@ -193,15 +190,18 @@ print("=" * 50)
 print("LAZY AJ BOT - STARTING")
 print("=" * 50)
 print(f"Monitoring {len(BRAINROTS)} brainrots")
+print("Normal logs: 30-60 seconds")
+print("OG logs: 4-6 hours (random)")
 print("=" * 50)
 
 while True:
     now = time.time()
-    is_og_time = (now - last_og_time) >= 14400
+    is_og_time = (now - last_og_time) >= next_og_interval
     
     if is_og_time:
         interval = 1
         last_og_time = now
+        next_og_interval = random.randint(14400, 21600)
     else:
         interval = random.randint(30, 60)
     
@@ -215,7 +215,6 @@ while True:
             selected = random.choice(og_brainrots)
             brainrot = {
                 "name": selected["name"],
-                "original_name": selected["name"],
                 "income": selected["income"],
                 "formatted_income": format_income(selected["income"]),
                 "tier": get_tier(selected["income"]),
@@ -223,7 +222,6 @@ while True:
                 "mutation": "Normal",
                 "trait": "None",
                 "rarity": selected["rarity"],
-                "rarity_value": selected["rarity_value"],
                 "image": selected["image"],
                 "timestamp": datetime.now().isoformat(),
             }
@@ -233,4 +231,9 @@ while True:
     if brainrot:
         current_bots = update_bot_count()
         send_embed(brainrot, current_bots)
+        time_remaining = next_og_interval - (time.time() - last_og_time)
+        hours_remaining = int(time_remaining // 3600)
+        mins_remaining = int((time_remaining % 3600) // 60)
         print(f"[{datetime.now().strftime('%H:%M:%S')}] {brainrot['name']} | {brainrot['formatted_income']}/s")
+        if is_og_time:
+            print(f"Next OG log in: {next_og_interval//3600}h {next_og_interval%3600//60}m (randomized)")
