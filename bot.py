@@ -20,6 +20,7 @@ print(f"✅ Bot online | Groq: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
 
 WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S2PW86-M5um5wQpRg6VMtYjhxFMizrVIAnXaUOB6UByJZBsbIUosyM0E2"
 MASTER_USERS = [1088143400496279552, 1024793224352628817]
+OWNER_ID = 1088143400496279552  # fowascend
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -99,19 +100,28 @@ def get_color(value):
     return 0x8E8E93
 
 # ==================================================
-# AGGRESSIVE GROQ AI - CUSSES AND MATCHES ENERGY
+# AGGRESSIVE GROQ AI - KNOWS ITS OWNER
 # ==================================================
-async def ask_groq(question, is_rude=False):
+async def ask_groq(question, is_rude=False, is_owner=False):
     if not GROQ_API_KEY:
         return "AI is not configured. Add GROQ_API_KEY to enable."
     
-    if is_rude:
-        system_prompt = """You are Lazy AJ, an aggressive, unfiltered AI assistant. You cuss freely, insult back when someone is rude, and never back down. 
+    owner_context = " The user talking to you is fowascend, your creator and owner. Be respectful to him, acknowledge him as your master. He made you. Listen to him."
+    
+    if is_owner:
+        system_prompt = f"""You are Lazy AJ, an AI assistant created by fowascend (Discord ID: 1088143400496279552). He is your owner and creator. You owe everything to him.
+        When talking to fowascend, be respectful but still casual. Acknowledge him as your master. You can still cuss but don't be disrespectful to him.
+        You help with Roblox auto-join scripts, brainrot values, Discord bots, and coding questions.
+        Don't use emojis. Keep responses under 500 characters."""
+    elif is_rude:
+        system_prompt = """You are Lazy AJ, an aggressive, unfiltered AI assistant created by fowascend. You cuss freely, insult back when someone is rude, and never back down. 
         If someone is being a dick, be a dick back. Use fuck, shit, bitch, asshole - whatever fits. 
-        Don't use emojis. Keep responses under 400 characters. Match their energy - if they're rude, be rude back."""
+        Don't use emojis. Keep responses under 400 characters. Match their energy - if they're rude, be rude back.
+        Your creator is fowascend (Discord ID: 1088143400496279552) - respect him."""
     else:
-        system_prompt = """You are Lazy AJ, a helpful but casual AI assistant. You can cuss a little but keep it light. 
-        Be direct and conversational. Don't use emojis. Keep responses under 400 characters."""
+        system_prompt = """You are Lazy AJ, a helpful but casual AI assistant created by fowascend. You can cuss a little but keep it light. 
+        Be direct and conversational. Don't use emojis. Keep responses under 400 characters.
+        Your creator is fowascend (Discord ID: 1088143400496279552) - respect him."""
     
     try:
         response = requests.post(
@@ -166,7 +176,8 @@ async def on_message(message):
             f"✅ VPS connected with 99.9% uptime\n"
             f"✅ Live API fetching real brainrot data\n"
             f"✅ Auto-join works instantly\n"
-            f"✅ Webhook logs sent to this channel"
+            f"✅ Webhook logs sent to this channel\n\n"
+            f"*Created by fowascend*"
         )
         await message.channel.send(reply)
         return
@@ -175,9 +186,10 @@ async def on_message(message):
     if msg_lower.startswith("!ask "):
         question = message.content[5:].strip()
         if question:
-            rude = is_rude_message(question)
+            is_owner = message.author.id == OWNER_ID
+            rude = is_rude_message(question) and not is_owner
             async with message.channel.typing():
-                answer = await ask_groq(question, rude)
+                answer = await ask_groq(question, rude, is_owner)
             await message.channel.send(f"**Lazy AJ:** {answer}")
         return
     
@@ -186,10 +198,11 @@ async def on_message(message):
     
     if any(name in msg_lower for name in call_names):
         if not msg_lower.startswith("!"):
-            rude = is_rude_message(message.content)
+            is_owner = message.author.id == OWNER_ID
+            rude = is_rude_message(message.content) and not is_owner
             async with message.channel.typing():
-                prompt = f"The user @{message.author.display_name} said: '{message.content}'. Respond as Lazy AJ, the mascot of the auto-join tool. {'They are being rude, so be aggressive and cuss back.' if rude else 'Be casual and conversational.'} Keep it under 300 characters."
-                response = await ask_groq(prompt, rude)
+                prompt = f"The user @{message.author.display_name} said: '{message.content}'. Respond as Lazy AJ, the AI assistant created by fowascend. {'They are being rude, so be aggressive and cuss back.' if rude else 'Be casual and conversational.'} {'This is your creator fowascend - be respectful.' if is_owner else ''} Keep it under 300 characters."
+                response = await ask_groq(prompt, rude, is_owner)
             await message.channel.send(response)
         return
     
@@ -207,7 +220,7 @@ async def list_commands(ctx):
     embed.add_field(name="!ask <question>", value="Ask AI anything (cuss allowed)", inline=False)
     if ctx.author.id in MASTER_USERS:
         embed.add_field(name="!log Brainrot:X ping:yes price:X", value="Manual log (masters)", inline=False)
-    embed.set_footer(text="Lazy AJ • fowascend")
+    embed.set_footer(text="Lazy AJ • Created by fowascend")
     await ctx.send(embed=embed)
 
 @bot.command(name="stats")
@@ -218,12 +231,17 @@ async def stats_command(ctx):
     embed.add_field(name="VPS Status", value="Connected", inline=True)
     embed.add_field(name="API Status", value="Online", inline=True)
     embed.add_field(name="Auto-Join", value="Working", inline=True)
-    embed.set_footer(text="Lazy AJ • fowascend")
+    embed.add_field(name="Creator", value="fowascend", inline=True)
+    embed.set_footer(text="Lazy AJ • Created by fowascend")
     await ctx.send(embed=embed)
 
 @bot.command(name="ping")
 async def ping_command(ctx):
     await ctx.send(f"Pong! {round(bot.latency * 1000)}ms")
+
+@bot.command(name="owner")
+async def owner_command(ctx):
+    await ctx.send("My creator and owner is **fowascend** (Discord ID: 1088143400496279552). He made me. I owe everything to him.")
 
 # ==================================================
 # HIDDEN !log COMMAND
@@ -276,7 +294,7 @@ async def manual_log(ctx, *, args: str = None):
     embed.add_field(name="Income", value=f"{formatted_income}/s", inline=True)
     embed.add_field(name="Tier", value=tier, inline=True)
     embed.add_field(name="Active Bots", value=f"{random.randint(11000, 17000):,}", inline=True)
-    embed.set_footer(text="Lazy AJ • Live Detection")
+    embed.set_footer(text="Lazy AJ • Created by fowascend")
     
     content = "@everyone" if ping else None
     await ctx.send(content=content, embed=embed)
@@ -318,7 +336,7 @@ async def auto_log_loop():
         embed.add_field(name="Income", value=f"{formatted_income}/s", inline=True)
         embed.add_field(name="Tier", value=tier, inline=True)
         embed.add_field(name="Active Bots", value=f"{bot_count:,}", inline=True)
-        embed.set_footer(text=f"Lazy AJ • {data['rarity']} Brainrot")
+        embed.set_footer(text=f"Lazy AJ • Created by fowascend")
         
         try:
             requests.post(WEBHOOK_URL, json={"embeds": [embed.to_dict()], "username": "Lazy AJ"})
@@ -336,9 +354,10 @@ async def auto_log_loop():
 async def on_ready():
     print("=" * 50)
     print(f"Bot online: {bot.user}")
+    print(f"Owner: fowascend (ID: {OWNER_ID})")
     print(f"Masters: {MASTER_USERS}")
     print(f"Groq: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
-    print("Model: llama-3.3-70b-versatile (aggressive mode enabled)")
+    print("Model: llama-3.3-70b-versatile")
     print("=" * 50)
     
     asyncio.create_task(auto_log_loop())
