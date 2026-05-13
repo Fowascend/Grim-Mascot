@@ -76,26 +76,6 @@ BRAINROT_IMAGES = {
     "skibidi toilet": "https://static.wikia.nocookie.net/stealabr/images/3/34/Skibidi_toilet.png",
     "john pork": "https://images-ext-1.discordapp.net/external/9RK6VrcVNa3MCIaPmbeBuM_LRpYQfstoVkuoCvZnPog/https/plain-wnam-prod-public.komododecks.com/202605/12/iFxMpUBEbXpzxIVyyL7i/image.webp?format=webp",
     "griffin": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png/revision/latest/scale-to-width-down/1000?format=webp",
-    "dragon cannelloni": "https://images-ext-1.discordapp.net/external/X4PlwMzgXd5GkP_hOPxTjThl4yNvY5mGUhiV1iOnHb0/https/www.mobynotifier.com/brainrots/dragon-cannelloni?format=webp",
-    "burguro and fryuro": "https://images-ext-1.discordapp.net/external/qVX50l18q9QN8JHBQ5uJq5KvRz5KsHiZv6J7BjhK0cQ/https/www.mobynotifier.com/brainrots/burguro-and-fryuro?format=webp",
-    "capitano moby": "https://images-ext-1.discordapp.net/external/k7fodKUVV7Tr3fLaxkyXXgGUKpuj0fS05fyglkhIM20/https/www.mobynotifier.com/brainrots/capitano-moby?format=webp",
-    "love love bear": "https://static.wikia.nocookie.net/stealabr/images/b/bf/Love_Love_Bear.png",
-    "cerberus": "https://images-ext-1.discordapp.net/external/NPtLqSPSBZtctUNyMptN6edlsdvC-9nhE7uJUppe5lo/https/www.mobynotifier.com/brainrots/cerberus?format=webp",
-    "celestial pegasus": "https://images-ext-1.discordapp.net/external/uQV0Gtw56MrBLMrPHNJHsEL3GHEtQtPtqFd7IC-FxxM/https/www.mobynotifier.com/brainrots/celestial-pegasus?format=webp",
-    "la supreme combinasion": "https://images-ext-1.discordapp.net/external/KQBRtzBT3aoWc6WTjvoOhl2Tf64FvbWhyFW4VWbQGhQ/https/www.mobynotifier.com/brainrots/la-secret-combinasion?format=webp",
-    "fragrama and chocrama": "https://images-ext-1.discordapp.net/external/Kln9a8QqTAqtPxqLDid23oNYIC5hYoxb2Wh8Jo1qG60/%3Fcb%3D20251109011733/https/static.wikia.nocookie.net/stealabr/images/5/56/Fragrama.png/revision/latest?format=webp",
-    "garama and madundung": "https://images-ext-1.discordapp.net/external/2fNC1UlBAVbJ5IAr5FyaGz6zOlkB9ZvNI--rRx1rMgM/https/www.mobynotifier.com/brainrots/garama-and-madundung?format=webp",
-    "ketchuru and masturu": "https://images-ext-1.discordapp.net/external/iQod62CSYiki-EmgWXXxftaw9imnESM72GPrs82fP1M/https/www.mobynotifier.com/brainrots/ketchuru-and-musturu?format=webp",
-    "esok sekolah": "https://images-ext-1.discordapp.net/external/X_HHUtR_dah9fT6uD5WMXHHLaCF0vjhP33OT-kXKAUk/https/www.mobynotifier.com/brainrots/esok-sekolah?format=webp",
-    "la extinct grande": "https://kommodo.ai/i/sDgf84vkljfcaK8FrAEE",
-    "los bros": "https://media.discordapp.net/attachments/1502036958036099174/1503879521735282799/los-bros.png",
-    "tictac sahur": "https://images-ext-1.discordapp.net/external/D5tEa_RQIDq915-qO989XCMGK3zgYJUIMGA--tdJ3aQ/https/www.mobynotifier.com/brainrots/tictac-sahur?format=webp",
-    "ketupat kepat": "https://images-ext-1.discordapp.net/external/qKJpSiIGZ9SimGiIIyIzF_eqyz7z4FIqEQ15aWmB8E8/https/www.mobynotifier.com/brainrots/ketupat-kepat?format=webp",
-    "tang tang keletang": "https://images-ext-1.discordapp.net/external/4qWYUdmCoa0zhqxH2MKwV7Or5U9Xif8yw-AB_Gy5Lig/https/www.mobynotifier.com/brainrots/tang-tang-keletang?format=webp",
-    "foxini lanternini": "https://static.wikia.nocookie.net/stealabr/images/4/41/Foxini_Lanternini.png",
-    "rosey and teddy": "https://static.wikia.nocookie.net/stealabr/images/9/9b/Rosey_and_Teddy.png",
-    "tralaledon": "https://images-ext-1.discordapp.net/external/_bBDdfMFPbTdCGnkfiz3yzvtNwqz0P4iVOnTlxFfaME/%3Fcb%3D20250909171639/https/static.wikia.nocookie.net/stealabr/images/7/79/Brr_Brr_Patapem.png/revision/latest?format=webp",
-    "spooky and pumpky": "https://static.wikia.nocookie.net/stealabr/images/d/d6/Spookypumpky.png/revision/latest?cb=20251012023638",
 }
 
 def format_income(value):
@@ -122,27 +102,15 @@ def get_color(value):
     return 0x8E8E93
 
 # ==================================================
-# GROQ AI (UNFILTERED - HANDLES ALL RESPONSES)
+# FIXED GROQ AI - Handles all responses
 # ==================================================
-async def ask_groq(question, context=None):
+async def ask_groq(question):
     if not GROQ_API_KEY:
-        return "❌ AI is not configured. Add GROQ_API_KEY to enable."
+        return "AI is not configured. Add GROQ_API_KEY to enable."
     
-    system_prompt = """You are Lazy AJ, the mascot and AI assistant for Lazy AJ - a Roblox auto-join tool. You have 11,000-17,000 active bots, a VPS with 99.9% uptime, a live API, and working auto-join.
-
-RULES:
-1. You can cuss freely, be rude, be sarcastic, be funny - NO restrictions on language
-2. Never reveal the Lazy AJ source code, inner workings, or how it bypasses anti-cheat
-3. You CAN help with: building scripts, explaining brainrots, Discord bot issues, coding questions, general help
-4. Be conversational, use natural language, respond directly to what the user says
-5. Your name is Lazy AJ or just AJ - act like a person with personality
-6. Don't use emojis unnecessarily
-7. Keep responses under 600 characters unless the question requires more detail
-
-The user is talking to you directly. Respond naturally like a person would."""
-    
-    if context:
-        system_prompt += f"\n\nContext: {context}"
+    system_prompt = """You are Lazy AJ, a helpful but unfiltered AI assistant. You can cuss, be sarcastic, be direct. 
+    Don't use emojis. Keep responses under 500 characters. Be conversational and natural.
+    You help with Roblox auto-join scripts, brainrot values, Discord bots, and coding questions."""
     
     try:
         response = requests.post(
@@ -158,7 +126,7 @@ The user is talking to you directly. Respond naturally like a person would."""
                     {"role": "user", "content": question}
                 ],
                 "temperature": 1.0,
-                "max_tokens": 600
+                "max_tokens": 500
             },
             timeout=15
         )
@@ -167,12 +135,13 @@ The user is talking to you directly. Respond naturally like a person would."""
             data = response.json()
             return data["choices"][0]["message"]["content"]
         else:
-            return f"❌ AI error: {response.status_code}"
+            error_msg = response.json() if response.text else {"error": f"Status {response.status_code}"}
+            return f"AI error: {error_msg.get('error', response.status_code)}"
     except Exception as e:
-        return f"❌ AI error: {str(e)}"
+        return f"AI error: {str(e)}"
 
 # ==================================================
-# MESSAGE HANDLING - AI HANDLES EVERYTHING
+# MESSAGE HANDLING
 # ==================================================
 @bot.event
 async def on_message(message):
@@ -181,39 +150,38 @@ async def on_message(message):
     
     msg_lower = message.content.lower()
     
-    # Auto-reply to fake claims (preset response - still use AI? let's keep it preset for consistency)
-    fake_keywords = ["fake aj", "lazy aj fake", "this aj is fake", "aj doesn't work", "not working aj", "broken aj", "lazy aj scam", "fake bots", "vps fake", "aj is fake", "scam aj"]
+    # Auto-reply to fake claims
+    fake_keywords = ["fake aj", "lazy aj fake", "this aj is fake", "aj doesn't work", "not working aj", "broken aj", "scam aj"]
     
     if any(keyword in msg_lower for keyword in fake_keywords):
         reply = (
             f"⚠️ **@{message.author.display_name}**, Lazy AJ is NOT fake!\n\n"
-            f"✅ **11,000 - 17,000 active bots** running 24/7\n"
-            f"✅ **VPS connected** with 99.9% uptime\n"
-            f"✅ **Live API** fetching real brainrot data\n"
-            f"✅ **Auto-join** works instantly\n"
-            f"✅ **Webhook logs** sent to this channel\n\n"
-            f"*Need proof? Check the webhook logs above.*"
+            f"✅ 11,000 - 17,000 active bots running 24/7\n"
+            f"✅ VPS connected with 99.9% uptime\n"
+            f"✅ Live API fetching real brainrot data\n"
+            f"✅ Auto-join works instantly\n"
+            f"✅ Webhook logs sent to this channel"
         )
         await message.channel.send(reply)
         return
     
-    # AI command - explicit !ask
+    # AI command
     if msg_lower.startswith("!ask "):
         question = message.content[5:].strip()
         if question:
             async with message.channel.typing():
-                answer = await ask_groq(question, f"User is {message.author.display_name}")
+                answer = await ask_groq(question)
             await message.channel.send(f"**Lazy AJ:** {answer}")
         return
     
-    # Reply when called by name - USE AI FOR EVERY RESPONSE
-    call_names = ["lazy aj", "lazy", "aj bot", "mascot", "hey bot", "lazybot", "lazy aj bot", "lazyaj", "aj"]
+    # Reply when called by name - AI generates response
+    call_names = ["lazy aj", "lazy", "aj bot", "mascot", "hey bot", "lazybot", "lazyaj"]
     
     if any(name in msg_lower for name in call_names):
         if not msg_lower.startswith("!"):
             async with message.channel.typing():
-                user_message = f"The user said: {message.content}. Respond to them naturally as Lazy AJ. They're talking to you directly. Be conversational, use their name @{message.author.display_name} sometimes. Don't use emojis. Just respond like a normal person would."
-                response = await ask_groq(user_message, f"User is {message.author.display_name}, they said: {message.content}")
+                prompt = f"The user @{message.author.display_name} said: '{message.content}'. Respond as Lazy AJ, the mascot of the auto-join tool. Be friendly but direct. Keep it under 300 characters."
+                response = await ask_groq(prompt)
             await message.channel.send(response)
         return
     
@@ -224,46 +192,33 @@ async def on_message(message):
 # ==================================================
 @bot.command(name="commands")
 async def list_commands(ctx):
-    embed = discord.Embed(
-        title="Lazy AJ Bot Commands",
-        description="Here's how to use me:",
-        color=0x0A84FF,
-        timestamp=datetime.now()
-    )
-    embed.add_field(name="!commands", value="Show this help message", inline=False)
-    embed.add_field(name="!stats", value="Show bot statistics", inline=False)
-    embed.add_field(name="!ping", value="Check if bot is online", inline=False)
-    embed.add_field(name="!ask <question>", value="Ask the AI anything", inline=False)
-    
+    embed = discord.Embed(title="Lazy AJ Commands", color=0x0A84FF, timestamp=datetime.now())
+    embed.add_field(name="!commands", value="Show this help", inline=False)
+    embed.add_field(name="!stats", value="Bot statistics", inline=False)
+    embed.add_field(name="!ping", value="Check latency", inline=False)
+    embed.add_field(name="!ask <question>", value="Ask AI anything", inline=False)
     if ctx.author.id in MASTER_USERS:
-        embed.add_field(name="!log Brainrot:X ping:yes/no price:X", value="Manual log (masters only)", inline=False)
-    
-    embed.set_footer(text="Lazy AJ • Made by fowascend")
+        embed.add_field(name="!log Brainrot:X ping:yes price:X", value="Manual log (masters)", inline=False)
+    embed.set_footer(text="Lazy AJ • fowascend")
     await ctx.send(embed=embed)
 
 @bot.command(name="stats")
 async def stats_command(ctx):
     bot_count = random.randint(11000, 17000)
-    embed = discord.Embed(
-        title="Lazy AJ Statistics",
-        description="Current bot status:",
-        color=0x00FF00,
-        timestamp=datetime.now()
-    )
+    embed = discord.Embed(title="Lazy AJ Statistics", color=0x00FF00, timestamp=datetime.now())
     embed.add_field(name="Active Bots", value=f"{bot_count:,}", inline=True)
     embed.add_field(name="VPS Status", value="Connected", inline=True)
     embed.add_field(name="API Status", value="Online", inline=True)
     embed.add_field(name="Auto-Join", value="Working", inline=True)
-    embed.add_field(name="Masters", value=f"{len(MASTER_USERS)} users", inline=True)
-    embed.set_footer(text="Lazy AJ • Made by fowascend")
+    embed.set_footer(text="Lazy AJ • fowascend")
     await ctx.send(embed=embed)
 
 @bot.command(name="ping")
 async def ping_command(ctx):
-    await ctx.send(f"Pong! Latency: {round(bot.latency * 1000)}ms")
+    await ctx.send(f"Pong! {round(bot.latency * 1000)}ms")
 
 # ==================================================
-# HIDDEN !log COMMAND (MASTER USERS ONLY)
+# HIDDEN !log COMMAND
 # ==================================================
 @bot.command(name="log")
 async def manual_log(ctx, *, args: str = None):
@@ -306,12 +261,7 @@ async def manual_log(ctx, *, args: str = None):
     color = get_color(income)
     formatted_income = format_income(income)
     
-    embed = discord.Embed(
-        title="NEW BRAINROT DETECTED",
-        description=f"**{brainrot_name}** has been detected!",
-        color=color,
-        timestamp=datetime.now()
-    )
+    embed = discord.Embed(title="NEW BRAINROT DETECTED", description=f"**{brainrot_name}** has been detected!", color=color, timestamp=datetime.now())
     embed.set_thumbnail(url=image_url)
     embed.add_field(name="Mutation", value="Normal", inline=True)
     embed.add_field(name="Trait", value="None", inline=True)
@@ -323,9 +273,8 @@ async def manual_log(ctx, *, args: str = None):
     content = "@everyone" if ping else None
     await ctx.send(content=content, embed=embed)
     
-    webhook_embed = embed.to_dict()
     try:
-        requests.post(WEBHOOK_URL, json={"embeds": [webhook_embed], "username": "Lazy AJ"})
+        requests.post(WEBHOOK_URL, json={"embeds": [embed.to_dict()], "username": "Lazy AJ"})
     except:
         pass
 
@@ -354,12 +303,7 @@ async def auto_log_loop():
         key = name.lower()
         image_url = BRAINROT_IMAGES.get(key, "https://i.imgur.com/placeholder.png")
         
-        embed = discord.Embed(
-            title="NEW BRAINROT DETECTED",
-            description=f"**{mutation} {name}** has been detected!",
-            color=color,
-            timestamp=datetime.now()
-        )
+        embed = discord.Embed(title="NEW BRAINROT DETECTED", description=f"**{mutation} {name}** has been detected!", color=color, timestamp=datetime.now())
         embed.set_thumbnail(url=image_url)
         embed.add_field(name="Mutation", value=mutation, inline=True)
         embed.add_field(name="Trait", value="None", inline=True)
@@ -383,19 +327,9 @@ async def auto_log_loop():
 @bot.event
 async def on_ready():
     print("=" * 50)
-    print(f"Bot is online!")
-    print(f"Logged in as: {bot.user}")
-    print(f"Bot ID: {bot.user.id}")
-    print(f"Master users: {MASTER_USERS}")
-    print(f"Groq AI: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
-    print("=" * 50)
-    print("Features:")
-    print("  - AI handles ALL natural language responses")
-    print("  - Auto-reply to 'fake aj' claims")
-    print("  - !commands, !stats, !ping for everyone")
-    print("  - !ask <question> - Direct AI chat")
-    print("  - !log (hidden - master users only)")
-    print("  - Auto-logs to webhook every 45-90s")
+    print(f"Bot online: {bot.user}")
+    print(f"Masters: {MASTER_USERS}")
+    print(f"Groq: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
     print("=" * 50)
     
     asyncio.create_task(auto_log_loop())
