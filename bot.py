@@ -102,7 +102,7 @@ def get_color(value):
     return 0x8E8E93
 
 # ==================================================
-# FIXED GROQ AI - Handles all responses
+# GROQ AI - UPDATED MODEL
 # ==================================================
 async def ask_groq(question):
     if not GROQ_API_KEY:
@@ -120,7 +120,7 @@ async def ask_groq(question):
                 "Content-Type": "application/json"
             },
             json={
-                "model": "llama3-8b-8192",
+                "model": "llama-3.3-70b-versatile",
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": question}
@@ -330,6 +330,7 @@ async def on_ready():
     print(f"Bot online: {bot.user}")
     print(f"Masters: {MASTER_USERS}")
     print(f"Groq: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
+    print("Model: llama-3.3-70b-versatile")
     print("=" * 50)
     
     asyncio.create_task(auto_log_loop())
