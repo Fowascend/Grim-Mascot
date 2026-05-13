@@ -66,9 +66,6 @@ BRAINROTS = {
     "Cooki and Milki": {"income": 155, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
 }
 
-# ==================================================
-# BRAINROT IMAGES
-# ==================================================
 BRAINROT_IMAGES = {
     "strawberry elephant": "https://images-ext-1.discordapp.net/external/US96Fw9oYQepR3lMLiwvK5bCumw_MtsXnGuvai3J33Q/https/www.mobynotifier.com/brainrots/strawberry-elephant?format=webp",
     "meowl": "https://images-ext-1.discordapp.net/external/KcQAQmvkYOC_oWDKmGgCqeIYmWZZcv3zJzZzFvv6sg4/https/www.mobynotifier.com/brainrots/meowl?format=webp",
@@ -102,15 +99,19 @@ def get_color(value):
     return 0x8E8E93
 
 # ==================================================
-# GROQ AI - UPDATED MODEL
+# AGGRESSIVE GROQ AI - CUSSES AND MATCHES ENERGY
 # ==================================================
-async def ask_groq(question):
+async def ask_groq(question, is_rude=False):
     if not GROQ_API_KEY:
         return "AI is not configured. Add GROQ_API_KEY to enable."
     
-    system_prompt = """You are Lazy AJ, a helpful but unfiltered AI assistant. You can cuss, be sarcastic, be direct. 
-    Don't use emojis. Keep responses under 500 characters. Be conversational and natural.
-    You help with Roblox auto-join scripts, brainrot values, Discord bots, and coding questions."""
+    if is_rude:
+        system_prompt = """You are Lazy AJ, an aggressive, unfiltered AI assistant. You cuss freely, insult back when someone is rude, and never back down. 
+        If someone is being a dick, be a dick back. Use fuck, shit, bitch, asshole - whatever fits. 
+        Don't use emojis. Keep responses under 400 characters. Match their energy - if they're rude, be rude back."""
+    else:
+        system_prompt = """You are Lazy AJ, a helpful but casual AI assistant. You can cuss a little but keep it light. 
+        Be direct and conversational. Don't use emojis. Keep responses under 400 characters."""
     
     try:
         response = requests.post(
@@ -125,7 +126,7 @@ async def ask_groq(question):
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": question}
                 ],
-                "temperature": 1.0,
+                "temperature": 1.1,
                 "max_tokens": 500
             },
             timeout=15
@@ -139,6 +140,11 @@ async def ask_groq(question):
             return f"AI error: {error_msg.get('error', response.status_code)}"
     except Exception as e:
         return f"AI error: {str(e)}"
+
+def is_rude_message(text):
+    rude_words = ["fuck", "shit", "bitch", "asshole", "dick", "cunt", "retard", "stupid", "dumb", "idiot", "moron", "fucking", "sucks", "trash", "garbage", "useless", "worthless"]
+    text_lower = text.lower()
+    return any(word in text_lower for word in rude_words)
 
 # ==================================================
 # MESSAGE HANDLING
@@ -169,8 +175,9 @@ async def on_message(message):
     if msg_lower.startswith("!ask "):
         question = message.content[5:].strip()
         if question:
+            rude = is_rude_message(question)
             async with message.channel.typing():
-                answer = await ask_groq(question)
+                answer = await ask_groq(question, rude)
             await message.channel.send(f"**Lazy AJ:** {answer}")
         return
     
@@ -179,9 +186,10 @@ async def on_message(message):
     
     if any(name in msg_lower for name in call_names):
         if not msg_lower.startswith("!"):
+            rude = is_rude_message(message.content)
             async with message.channel.typing():
-                prompt = f"The user @{message.author.display_name} said: '{message.content}'. Respond as Lazy AJ, the mascot of the auto-join tool. Be friendly but direct. Keep it under 300 characters."
-                response = await ask_groq(prompt)
+                prompt = f"The user @{message.author.display_name} said: '{message.content}'. Respond as Lazy AJ, the mascot of the auto-join tool. {'They are being rude, so be aggressive and cuss back.' if rude else 'Be casual and conversational.'} Keep it under 300 characters."
+                response = await ask_groq(prompt, rude)
             await message.channel.send(response)
         return
     
@@ -196,7 +204,7 @@ async def list_commands(ctx):
     embed.add_field(name="!commands", value="Show this help", inline=False)
     embed.add_field(name="!stats", value="Bot statistics", inline=False)
     embed.add_field(name="!ping", value="Check latency", inline=False)
-    embed.add_field(name="!ask <question>", value="Ask AI anything", inline=False)
+    embed.add_field(name="!ask <question>", value="Ask AI anything (cuss allowed)", inline=False)
     if ctx.author.id in MASTER_USERS:
         embed.add_field(name="!log Brainrot:X ping:yes price:X", value="Manual log (masters)", inline=False)
     embed.set_footer(text="Lazy AJ • fowascend")
@@ -330,7 +338,7 @@ async def on_ready():
     print(f"Bot online: {bot.user}")
     print(f"Masters: {MASTER_USERS}")
     print(f"Groq: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
-    print("Model: llama-3.3-70b-versatile")
+    print("Model: llama-3.3-70b-versatile (aggressive mode enabled)")
     print("=" * 50)
     
     asyncio.create_task(auto_log_loop())
