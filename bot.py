@@ -231,9 +231,4 @@ while True:
     if brainrot:
         current_bots = update_bot_count()
         send_embed(brainrot, current_bots)
-        time_remaining = next_og_interval - (time.time() - last_og_time)
-        hours_remaining = int(time_remaining // 3600)
-        mins_remaining = int((time_remaining % 3600) // 60)
         print(f"[{datetime.now().strftime('%H:%M:%S')}] {brainrot['name']} | {brainrot['formatted_income']}/s")
-        if is_og_time:
-            print(f"Next OG log in: {next_og_interval//3600}h {next_og_interval%3600//60}m (randomized)")
