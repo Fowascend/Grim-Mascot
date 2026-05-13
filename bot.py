@@ -6,41 +6,43 @@ from datetime import datetime
 WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S2PW86-M5um5wQpRg6VMtYjhxFMizrVIAnXaUOB6UByJZBsbIUosyM0E2"
 
 BRAINROTS = [
-    {"name": "Strawberry Elephant", "income": 750, "rarity": "OG", "rarity_value": 4},
-    {"name": "Meowl", "income": 600, "rarity": "OG", "rarity_value": 4},
-    {"name": "Headless Horseman", "income": 550, "rarity": "OG", "rarity_value": 4},
-    {"name": "Skibidi Toilet", "income": 450, "rarity": "OG", "rarity_value": 4},
-    {"name": "John Pork", "income": 500, "rarity": "OG", "rarity_value": 4},
-    {"name": "Griffin", "income": 400, "rarity": "OG", "rarity_value": 4},
-    {"name": "Hydra Dragon Cannelloni", "income": 300, "rarity": "Secret", "rarity_value": 3},
-    {"name": "Dragon Gingerini", "income": 350, "rarity": "Secret", "rarity_value": 3},
-    {"name": "Dragon Cannelloni", "income": 250, "rarity": "Secret", "rarity_value": 3},
-    {"name": "Burguro And Fryuro", "income": 150, "rarity": "Secret", "rarity_value": 3},
-    {"name": "Cooki and Milki", "income": 155, "rarity": "Secret", "rarity_value": 3},
-    {"name": "Capitano Moby", "income": 160, "rarity": "Secret", "rarity_value": 3},
-    {"name": "Love Love Bear", "income": 225, "rarity": "Secret", "rarity_value": 3},
-    {"name": "Cerberus", "income": 175, "rarity": "Secret", "rarity_value": 3},
-    {"name": "Celestial Pegasus", "income": 175, "rarity": "Secret", "rarity_value": 3},
-    {"name": "Fragrama and Chocrama", "income": 100, "rarity": "Secret", "rarity_value": 2},
-    {"name": "La Casa Boo", "income": 100, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Cash or Card", "income": 100, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Garama and Madundung", "income": 50, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Ketchuru and Masturu", "income": 42.5, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Spaghetti Tualetti", "income": 60, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Esok Sekolah", "income": 30, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Los Bros", "income": 24, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Ketupat Kepat", "income": 35, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Los Combinasionas", "income": 15, "rarity": "Secret", "rarity_value": 1},
-    {"name": "Los Hotspotsitos", "income": 20, "rarity": "Secret", "rarity_value": 1},
-    {"name": "Money Money Puggy", "income": 21, "rarity": "Secret", "rarity_value": 1},
-    {"name": "Los Puggies", "income": 30, "rarity": "Secret", "rarity_value": 1},
-    {"name": "Nuclearo Dinosauro", "income": 15, "rarity": "Secret", "rarity_value": 1},
-    {"name": "Tang Tang Keletang", "income": 33.5, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Tictac Sahur", "income": 37.5, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Foxini Lanternini", "income": 115, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Rosey and Teddy", "income": 165, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Tralaledon", "income": 27.5, "rarity": "Secret", "rarity_value": 2},
-    {"name": "Spooky and Pumpky", "income": 80, "rarity": "Secret", "rarity_value": 2},
+    {"name": "Strawberry Elephant", "income": 750, "rarity": "OG", "rarity_value": 4, "image": "https://static.wikia.nocookie.net/stealabr/images/0/0a/Strawberry_Elephant.png"},
+    {"name": "Meowl", "income": 600, "rarity": "OG", "rarity_value": 4, "image": "https://static.wikia.nocookie.net/stealabr/images/8/8a/Meowl.png"},
+    {"name": "Headless Horseman", "income": 550, "rarity": "OG", "rarity_value": 4, "image": "https://static.wikia.nocookie.net/stealabr/images/9/9b/Headless_Horseman.png"},
+    {"name": "Skibidi Toilet", "income": 450, "rarity": "OG", "rarity_value": 4, "image": "https://static.wikia.nocookie.net/stealabr/images/3/34/Skibidi_toilet.png"},
+    {"name": "John Pork", "income": 500, "rarity": "OG", "rarity_value": 4, "image": "https://static.wikia.nocookie.net/stealabr/images/4/44/John_Pork.png"},
+    {"name": "Griffin", "income": 400, "rarity": "OG", "rarity_value": 4, "image": "https://static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png"},
+    {"name": "Hydra Dragon Cannelloni", "income": 300, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/b/b7/Dragon_Cannelloni.png"},
+    {"name": "Dragon Gingerini", "income": 350, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/3/3c/Dragon_Gingerini.png"},
+    {"name": "Dragon Cannelloni", "income": 250, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/b/b7/Dragon_Cannelloni.png"},
+    {"name": "Burguro And Fryuro", "income": 150, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/9/94/Burguro_And_Fryuro.png"},
+    {"name": "Cooki and Milki", "income": 155, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/f/f4/Cooki_and_Milki.png"},
+    {"name": "Capitano Moby", "income": 160, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/e/ef/Moby.png"},
+    {"name": "Love Love Bear", "income": 225, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/b/bf/Love_Love_Bear.png"},
+    {"name": "Cerberus", "income": 175, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/4/44/Cerberus.png"},
+    {"name": "Celestial Pegasus", "income": 175, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/3/3c/Celestial_Pegasus.png"},
+    {"name": "La Supreme Combinasion", "income": 200, "rarity": "Secret", "rarity_value": 3, "image": "https://static.wikia.nocookie.net/stealabr/images/5/52/SupremeCombinasion.png"},
+    {"name": "Fragrama and Chocrama", "income": 100, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/5/56/Fragrama.png"},
+    {"name": "La Casa Boo", "income": 100, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/d/de/Casa_Booo.png"},
+    {"name": "Cash or Card", "income": 100, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/2/21/Cash_or_Card.png"},
+    {"name": "Garama and Madundung", "income": 50, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/e/ee/Garamadundung.png"},
+    {"name": "Ketchuru and Masturu", "income": 42.5, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/5/5a/Ketchuru_and_Masturu.png"},
+    {"name": "Spaghetti Tualetti", "income": 60, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/a/a8/Spaghetti_Tualetti.png"},
+    {"name": "Esok Sekolah", "income": 30, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/3/32/Esok_Sekolah.png"},
+    {"name": "Los Bros", "income": 24, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/4/4d/Ketupat_Bros.png"},
+    {"name": "Ketupat Kepat", "income": 35, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/4/4d/Ketupat_Bros.png"},
+    {"name": "Tang Tang Keletang", "income": 33.5, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/8/88/Tang_Tang_Keletang.png"},
+    {"name": "Tictac Sahur", "income": 37.5, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/b/b6/Tictac_Sahur.png"},
+    {"name": "Foxini Lanternini", "income": 115, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/4/41/Foxini_Lanternini.png"},
+    {"name": "Rosey and Teddy", "income": 165, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/9/9b/Rosey_and_Teddy.png"},
+    {"name": "Tralaledon", "income": 27.5, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/7/79/Brr_Brr_Patapem.png"},
+    {"name": "Spooky and Pumpky", "income": 80, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/d/d6/Spookypumpky.png"},
+    {"name": "La Extinct Grande", "income": 23.5, "rarity": "Secret", "rarity_value": 2, "image": "https://static.wikia.nocookie.net/stealabr/images/1/1f/La_Extinct_Grande.png"},
+    {"name": "Los Combinasionas", "income": 15, "rarity": "Secret", "rarity_value": 1, "image": "https://static.wikia.nocookie.net/stealabr/images/1/13/Los_Combinasionas.png"},
+    {"name": "Los Hotspotsitos", "income": 20, "rarity": "Secret", "rarity_value": 1, "image": "https://static.wikia.nocookie.net/stealabr/images/3/33/Los_Hotspotsitos.png"},
+    {"name": "Money Money Puggy", "income": 21, "rarity": "Secret", "rarity_value": 1, "image": "https://static.wikia.nocookie.net/stealabr/images/6/67/Money_Money_Puggy.png"},
+    {"name": "Los Puggies", "income": 30, "rarity": "Secret", "rarity_value": 1, "image": "https://static.wikia.nocookie.net/stealabr/images/c/c8/LosPuggies2.png"},
+    {"name": "Nuclearo Dinosauro", "income": 15, "rarity": "Secret", "rarity_value": 1, "image": "https://static.wikia.nocookie.net/stealabr/images/b/b5/Nuclearo_Dinossauro.png"},
 ]
 
 MUTATIONS = [
@@ -107,9 +109,7 @@ def get_color(value):
 def calculate_income(base_income, mutation, trait):
     if mutation["name"] == "Normal" and trait["name"] == "None":
         return base_income
-    final = base_income * (1 + mutation["mod"] + trait["mod"])
-    variance = 0.9 + random.random() * 0.2
-    return final * variance
+    return base_income * (1 + mutation["mod"] + trait["mod"])
 
 def get_random_brainrot():
     brainrot = random.choice(BRAINROTS)
@@ -130,7 +130,7 @@ def get_random_brainrot():
     
     display_name = brainrot["name"]
     if mutation["name"] != "Normal":
-        display_name = f"[{mutation['name']}] {display_name}"
+        display_name = f"{mutation['name']} {display_name}"
     if trait["name"] != "None":
         display_name = f"{display_name} ({trait['name']})"
     
@@ -145,6 +145,7 @@ def get_random_brainrot():
         "trait": trait["name"],
         "rarity": brainrot["rarity"],
         "rarity_value": brainrot["rarity_value"],
+        "image": brainrot["image"],
         "timestamp": datetime.now().isoformat(),
     }
 
@@ -154,6 +155,7 @@ def send_embed(brainrot, bot_count):
         "description": f"**{brainrot['name']}** has been detected!",
         "color": brainrot["color"],
         "timestamp": brainrot["timestamp"],
+        "thumbnail": {"url": brainrot["image"]},
         "fields": [
             {"name": "🧬 Mutation", "value": brainrot["mutation"], "inline": True},
             {"name": "✨ Trait", "value": brainrot["trait"], "inline": True},
@@ -173,7 +175,6 @@ def send_embed(brainrot, bot_count):
 
 bot_count = random.randint(11000, 17000)
 last_og_time = time.time()
-last_brainrot_time = {}
 
 def update_bot_count():
     global bot_count
@@ -189,7 +190,9 @@ print("=" * 50)
 print("LAZY AJ BOT - STARTING")
 print("=" * 50)
 print(f"Monitoring {len(BRAINROTS)} brainrots")
-print("Logs every 30-60 seconds | OG every 4 hours")
+print("Logs every 30-60 seconds")
+print("OG brainrots every 4 hours")
+print("With images from wiki")
 print("=" * 50)
 
 while True:
@@ -221,6 +224,7 @@ while True:
                 "trait": "None",
                 "rarity": selected["rarity"],
                 "rarity_value": selected["rarity_value"],
+                "image": selected["image"],
                 "timestamp": datetime.now().isoformat(),
             }
     else:
