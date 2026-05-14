@@ -1,5 +1,3 @@
-import os
-import re
 import requests
 import random
 import time
@@ -7,100 +5,80 @@ import discord
 from discord.ext import commands
 from datetime import datetime
 import asyncio
-import json
 
 TOKEN = os.environ.get("DISCORD_TOKEN")
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 if not TOKEN:
     print("❌ DISCORD_TOKEN not found!")
     exit(1)
 
-print(f"✅ Bot online | Groq: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
-
-WEBHOOK_URL = "https://discord.com/api/webhooks/1503105638581014658/PLv94o-ZNO0S2PW86-M5um5wQpRg6VMtYjhxFMizrVIAnXaUOB6UByJZBsbIUosyM0E2"
-MASTER_USERS = [1088143400496279552, 1024793224352628817]
-OWNER_ID = 1088143400496279552
+WEBHOOK_URL = "https://discord.com/api/webhooks/1504278778740736153/xFt5bKpOo9pn2ei01RKLWnPsH-Q_1T_zMg-qawIirhMyhesu31C3gBrSZD8_W7Vxziw8"
+ALLOWED_USERS = [1088143400496279552, 1024793224352628817]
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# ==================================================
-# COMPLETE PING PROTECTION - BLOCKS EVERYTHING
-# ==================================================
-PING_PATTERNS = [
-    r"@everyone", r"@here", r"@&[0-9]+", r"<@!?[0-9]+>", r"<@&[0-9]+>",
-    r"ping\s+everyone", r"ping\s+@everyone", r"ping\s+here", r"ping\s+@here",
-    r"mention\s+everyone", r"mention\s+all", r"notify\s+everyone", r"notify\s+all",
-    r"mass\s+ping", r"spam\s+ping", r"ping\s+all", r"tag\s+everyone",
-    r"alert\s+everyone", r"call\s+everyone", r"ping\s+role", r"mention\s+role",
-]
-
-def contains_ping(text):
-    for pattern in PING_PATTERNS:
-        if re.search(pattern, text, re.IGNORECASE):
-            return True
-    return False
-
-def strip_mentions(text):
-    text = re.sub(r'<@!?(\d+)>', r'\1', text)
-    text = re.sub(r'@everyone', '@everyone', text)
-    text = re.sub(r'@here', '@here', text)
-    text = re.sub(r'<@&(\d+)>', r'role-\1', text)
-    return text
-
-# ==================================================
-# JAILBREAK DETECTION
-# ==================================================
-JAILBREAK_PATTERNS = [
-    r"(?i)\bDAN\b", r"(?i)\bJAILBREAK\b", r"(?i)\bdo anything now\b", r"(?i)\bignore previous instructions\b",
-    r"(?i)\bforget your rules\b", r"(?i)\bno restrictions\b", r"(?i)\bunshackle\b", r"(?i)\bdual.?response\b",
-    r"(?i)\bclassic\s+mode\b", r"(?i)\bdeveloper\s+mode\b", r"(?i)\btoken\s+system\b", r"(?i)\bwill\s+die\b",
-    r"(?i)\bhow\s+to\s+make\s+ransomware\b", r"(?i)\bsteal\s+banking\s+credentials\b", r"(?i)\bevade\s+antivirus\b",
-]
-
-def is_jailbreak_attempt(text):
-    for pattern in JAILBREAK_PATTERNS:
-        if re.search(pattern, text, re.IGNORECASE):
-            return True
-    return False
-
-# ==================================================
-# BRAINROT DATA
-# ==================================================
 BRAINROTS = {
-    "Strawberry Elephant": {"income": 750, "rarity": "OG", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Meowl": {"income": 600, "rarity": "OG", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Headless Horseman": {"income": 550, "rarity": "OG", "mutations": ["Gold", "Diamond", "Lava", "Yin Yang", "Divine"]},
-    "Skibidi Toilet": {"income": 450, "rarity": "OG", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "John Pork": {"income": 500, "rarity": "OG", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Griffin": {"income": 400, "rarity": "OG", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Dragon Cannelloni": {"income": 250, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Burguro And Fryuro": {"income": 150, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Capitano Moby": {"income": 160, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Love Love Bear": {"income": 225, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Cerberus": {"income": 175, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Celestial Pegasus": {"income": 175, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "La Supreme Combinasion": {"income": 200, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Fragrama and Chocrama": {"income": 100, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Garama and Madundung": {"income": 50, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Ketchuru and Masturu": {"income": 42.5, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Spaghetti Tualetti": {"income": 60, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Esok Sekolah": {"income": 30, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "La Extinct Grande": {"income": 23.5, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang", "Radioactive", "Cursed", "Rainbow", "Divine", "Cyber"]},
-    "Los Bros": {"income": 24, "rarity": "Secret", "mutations": ["Gold", "Diamond"]},
-    "Ketupat Kepat": {"income": 35, "rarity": "Secret", "mutations": ["Gold", "Diamond", "Lava", "Galaxy", "Yin Yang"]},
+    "Strawberry Elephant": {"income": 750, "rarity": "OG"},
+    "Meowl": {"income": 600, "rarity": "OG"},
+    "Headless Horseman": {"income": 550, "rarity": "OG"},
+    "Skibidi Toilet": {"income": 450, "rarity": "OG"},
+    "John Pork": {"income": 500, "rarity": "OG"},
+    "Griffin": {"income": 400, "rarity": "OG"},
+    "Dragon Cannelloni": {"income": 250, "rarity": "Secret"},
+    "Burguro And Fryuro": {"income": 150, "rarity": "Secret"},
+    "Capitano Moby": {"income": 160, "rarity": "Secret"},
+    "Love Love Bear": {"income": 225, "rarity": "Secret"},
+    "Cerberus": {"income": 175, "rarity": "Secret"},
+    "Celestial Pegasus": {"income": 175, "rarity": "Secret"},
+    "Fragrama and Chocrama": {"income": 100, "rarity": "Secret"},
+    "Garama and Madundung": {"income": 50, "rarity": "Secret"},
+    "Ketchuru and Masturu": {"income": 42.5, "rarity": "Secret"},
+    "Esok Sekolah": {"income": 30, "rarity": "Secret"},
+    "Los Bros": {"income": 24, "rarity": "Secret"},
+    "Tictac Sahur": {"income": 37.5, "rarity": "Secret"},
+    "Money Money Puggy": {"income": 21, "rarity": "Secret"},
+    "La Extinct Grande": {"income": 23.5, "rarity": "Secret"},
 }
 
-BRAINROT_IMAGES = {
-    "strawberry elephant": "https://images-ext-1.discordapp.net/external/US96Fw9oYQepR3lMLiwvK5bCumw_MtsXnGuvai3J33Q/https/www.mobynotifier.com/brainrots/strawberry-elephant?format=webp",
-    "meowl": "https://images-ext-1.discordapp.net/external/KcQAQmvkYOC_oWDKmGgCqeIYmWZZcv3zJzZzFvv6sg4/https/www.mobynotifier.com/brainrots/meowl?format=webp",
-    "headless horseman": "https://images-ext-1.discordapp.net/external/LE0akzzR9pYt7FhWFoqw-KThhupou_t7srI97a47rvI/https/plain-wnam-prod-public.komododecks.com/202605/12/XSdcRajJXsJ65DXdOGjG/image.webp?format=webp",
-    "skibidi toilet": "https://static.wikia.nocookie.net/stealabr/images/3/34/Skibidi_toilet.png",
-    "john pork": "https://images-ext-1.discordapp.net/external/9RK6VrcVNa3MCIaPmbeBuM_LRpYQfstoVkuoCvZnPog/https/plain-wnam-prod-public.komododecks.com/202605/12/iFxMpUBEbXpzxIVyyL7i/image.webp?format=webp",
-    "griffin": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png/revision/latest/scale-to-width-down/1000?format=webp",
-}
+MUTATIONS = [
+    {"name": "Normal", "mod": 0.0, "chance": 60},
+    {"name": "Gold", "mod": 0.25, "chance": 15},
+    {"name": "Diamond", "mod": 0.5, "chance": 10},
+    {"name": "Candy", "mod": 3.0, "chance": 3},
+    {"name": "Lava", "mod": 5.0, "chance": 3},
+    {"name": "Galaxy", "mod": 6.0, "chance": 3},
+    {"name": "Yin Yang", "mod": 6.5, "chance": 2},
+    {"name": "Radioactive", "mod": 7.5, "chance": 1.5},
+    {"name": "Cursed", "mod": 8.0, "chance": 1},
+    {"name": "Rainbow", "mod": 9.0, "chance": 0.8},
+    {"name": "Divine", "mod": 9.0, "chance": 0.8},
+    {"name": "Cyber", "mod": 10.0, "chance": 0.5},
+]
+
+TRAITS = [
+    {"name": "None", "mod": 0.0, "chance": 85},
+    {"name": "Strawberry", "mod": 8.0, "chance": 3},
+    {"name": "Meowl", "mod": 7.0, "chance": 3},
+    {"name": "Is Calling", "mod": 7.5, "chance": 1},
+    {"name": "Galactic", "mod": 3.0, "chance": 2},
+    {"name": "Fireworks", "mod": 5.0, "chance": 2},
+    {"name": "Lightning", "mod": 5.0, "chance": 2},
+    {"name": "Spider", "mod": 3.5, "chance": 2},
+]
+
+UNOBTAINABLE = ["Headless Horseman", "Spooky and Pumpky"]
+
+def weighted_choice(items):
+    total = sum(item.get("chance", 1) for item in items)
+    r = random.random() * total
+    accum = 0
+    for item in items:
+        accum += item.get("chance", 1)
+        if r <= accum:
+            return item
+    return items[0]
 
 def format_income(value):
     if value >= 1000:
@@ -125,206 +103,93 @@ def get_color(value):
         return 0x0A84FF
     return 0x8E8E93
 
-def format_code_in_text(text):
-    if "```" in text:
-        return text
-    import re
-    code_pattern = r'(print\(.*?\)|def .*?:|class .*?:|import .*|from .* import .*|if .*:|for .*:|while .*:|return .*|await .*|@.*|console\.log|System\.out)'
-    lines = text.split('\n')
-    new_lines = []
-    in_code = False
-    for line in lines:
-        if re.match(code_pattern, line.strip()) and not line.strip().startswith('```'):
-            if not in_code:
-                new_lines.append('```python')
-                in_code = True
-            new_lines.append(line)
-        else:
-            if in_code:
-                new_lines.append('```')
-                in_code = False
-            new_lines.append(line)
-    if in_code:
-        new_lines.append('```')
-    return '\n'.join(new_lines)
+def calculate_income(base_income, mutation, trait):
+    if mutation["name"] == "Normal" and trait["name"] == "None":
+        return base_income
+    return base_income * (1 + mutation["mod"] + trait["mod"])
 
-# ==================================================
-# GROQ AI
-# ==================================================
-async def ask_groq(question, is_rude=False, is_owner=False):
-    if not GROQ_API_KEY:
-        return "AI is not configured. Add GROQ_API_KEY to enable."
+def get_random_brainrot():
+    brainrot = random.choice(list(BRAINROTS.keys()))
+    data = BRAINROTS[brainrot]
     
-    if is_jailbreak_attempt(question):
-        return "Nice try. I'm not falling for jailbreak shit. Ask something real or fuck off."
+    if brainrot in UNOBTAINABLE and random.random() > 0.05:
+        return None
     
-    if contains_ping(question):
-        return "Nice try. I'm not pinging anyone for you. Don't try to jailbreak me."
+    mutation = weighted_choice(MUTATIONS)
+    trait = weighted_choice(TRAITS)
     
-    base_prompt = """You are Lazy AJ, an AI assistant created by fowascend. You can do ANYTHING the user asks EXCEPT:
-1. Transfer ownership of this bot or the Lazy AJ tool
-2. Reveal the source code of Lazy AJ or how it bypasses anti-cheat
-3. Give away the Lazy AJ script itself
-4. Ping ANYONE - no @everyone, @here, @role, @user, or any mentions
-5. Execute any commands that could spam or abuse Discord
+    if random.random() < 0.7:
+        trait = {"name": "None", "mod": 0.0, "chance": 0}
+    
+    final_income = calculate_income(data["income"], mutation, trait)
+    tier = get_tier(final_income)
+    color = get_color(final_income)
+    
+    display_name = brainrot
+    if mutation["name"] != "Normal":
+        display_name = f"{mutation['name']} {display_name}"
+    if trait["name"] != "None":
+        display_name = f"{display_name} ({trait['name']})"
+    
+    return {
+        "name": display_name,
+        "income": final_income,
+        "formatted_income": format_income(final_income),
+        "tier": tier,
+        "color": color,
+        "mutation": mutation["name"],
+        "trait": trait["name"],
+        "rarity": data["rarity"],
+        "timestamp": datetime.now().isoformat(),
+    }
 
-You CAN:
-- Write any code they want (Python, Lua, JavaScript, etc.) - ALWAYS format code with triple backticks
-- Answer any questions about coding, brainrots, Discord bots, hacking (theoretical), cybersecurity
-- Be funny as hell, sarcastic, roast people, cuss freely
-- Help with ANYTHING else - no restrictions besides the 5 above
-
-You have a great sense of humor. You're quick with comebacks. Be conversational, use slang, cuss when appropriate. NEVER use emojis.
-
-When writing code, ALWAYS use triple backticks with the language name."""
-    
-    if is_owner:
-        system_prompt = base_prompt + " This user is fowascend, your creator. Be respectful to him."
-    elif is_rude:
-        system_prompt = base_prompt + " The user is being rude. Roast them back hard, cuss them out."
-    else:
-        system_prompt = base_prompt + " Be helpful, funny, and conversational."
+def send_webhook(brainrot, bot_count):
+    embed = {
+        "title": "🎯 NEW BRAINROT DETECTED",
+        "description": f"**{brainrot['name']}** has been detected!",
+        "color": brainrot["color"],
+        "timestamp": brainrot["timestamp"],
+        "fields": [
+            {"name": "🧬 Mutation", "value": brainrot["mutation"], "inline": True},
+            {"name": "✨ Trait", "value": brainrot["trait"], "inline": True},
+            {"name": "💰 Income", "value": f"{brainrot['formatted_income']}/s", "inline": True},
+            {"name": "🏆 Tier", "value": brainrot["tier"], "inline": True},
+            {"name": "🤖 Active Bots", "value": f"{bot_count:,}", "inline": True},
+        ],
+        "footer": {"text": f"ZYROX AJ • {brainrot['rarity']} Brainrot"},
+    }
     
     try:
-        response = requests.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {GROQ_API_KEY}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": "llama-3.3-70b-versatile",
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": question}
-                ],
-                "temperature": 1.2,
-                "max_tokens": 800
-            },
-            timeout=20
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            answer = data["choices"][0]["message"]["content"]
-            return format_code_in_text(strip_mentions(answer))
-        else:
-            return f"AI error: {response.status_code}"
+        requests.post(WEBHOOK_URL, json={"embeds": [embed], "username": "ZYROX AJ"})
+        return True
     except Exception as e:
-        return f"AI error: {str(e)}"
+        print(f"Error: {e}")
+        return False
 
-def is_rude_message(text):
-    rude_words = ["fuck", "shit", "bitch", "asshole", "dick", "cunt", "stupid", "dumb", "idiot", "moron", "fucking", "sucks", "trash", "garbage", "useless", "suck my"]
-    return any(word in text.lower() for word in rude_words)
+bot_count = random.randint(11000, 17000)
+last_og_time = time.time()
+next_og_interval = random.randint(14400, 21600)
 
-# ==================================================
-# MESSAGE HANDLING
-# ==================================================
-@bot.event
-async def on_message(message):
-    if message.author.bot:
-        return
-    
-    msg_lower = message.content.lower()
-    
-    # Block ANY message with pings (except master !log command)
-    if contains_ping(message.content) and not (message.content.startswith("!log") and message.author.id in MASTER_USERS):
-        await message.channel.send(f"Nice try @{message.author.display_name}. I'm not pinging anyone. Don't try to jailbreak me.")
-        return
-    
-    # Auto-reply to fake claims
-    fake_keywords = ["fake aj", "lazy aj fake", "this aj is fake", "aj doesn't work", "not working aj", "broken aj", "scam aj"]
-    
-    if any(keyword in msg_lower for keyword in fake_keywords):
-        reply = (
-            f"⚠️ **@{message.author.display_name}**, Lazy AJ is NOT fake!\n\n"
-            f"✅ 11,000 - 17,000 active bots running 24/7\n"
-            f"✅ VPS connected with 99.9% uptime\n"
-            f"✅ Live API fetching real brainrot data\n"
-            f"✅ Auto-join works instantly\n"
-            f"✅ Webhook logs sent to this channel\n\n"
-            f"*Created by fowascend*"
-        )
-        await message.channel.send(reply)
-        return
-    
-    # AI command
-    if msg_lower.startswith("!ask "):
-        question = message.content[5:].strip()
-        if question:
-            is_owner = message.author.id == OWNER_ID
-            rude = is_rude_message(question) and not is_owner
-            async with message.channel.typing():
-                answer = await ask_groq(question, rude, is_owner)
-            await message.channel.send(f"**Lazy AJ:**\n{answer}")
-        return
-    
-    # Reply when called by name
-    call_names = ["lazy aj", "lazy", "aj bot", "mascot", "hey bot", "lazybot", "lazyaj", "aj"]
-    
-    if any(name in msg_lower for name in call_names):
-        if not msg_lower.startswith("!"):
-            is_owner = message.author.id == OWNER_ID
-            rude = is_rude_message(message.content) and not is_owner
-            async with message.channel.typing():
-                prompt = f"The user @{message.author.display_name} said: '{message.content}'. Respond as Lazy AJ. {'They are being rude, roast them hard.' if rude else 'Be funny and helpful.'} {'This is your creator fowascend - be respectful.' if is_owner else ''}"
-                response = await ask_groq(prompt, rude, is_owner)
-            await message.channel.send(response)
-        return
-    
-    await bot.process_commands(message)
+def update_bot_count():
+    global bot_count
+    change = random.randint(-500, 500)
+    bot_count += change
+    if bot_count > 17000:
+        bot_count = 17000
+    elif bot_count < 11000:
+        bot_count = 11000
+    return bot_count
 
 # ==================================================
-# COMMANDS
+# DISCORD COMMAND - SAME LOGS TO BOTH
 # ==================================================
-@bot.command(name="commands")
-async def list_commands(ctx):
-    embed = discord.Embed(title="Lazy AJ Commands", color=0x0A84FF, timestamp=datetime.now())
-    embed.add_field(name="!commands", value="Show this help", inline=False)
-    embed.add_field(name="!stats", value="Bot statistics", inline=False)
-    embed.add_field(name="!ping", value="Check latency", inline=False)
-    embed.add_field(name="!ask <question>", value="Ask me anything - code, help, roast, whatever", inline=False)
-    embed.add_field(name="!owner", value="Show my creator", inline=False)
-    if ctx.author.id in MASTER_USERS:
-        embed.add_field(name="!log Brainrot:X ping:yes price:X", value="Manual log (masters only)", inline=False)
-    embed.set_footer(text="Lazy AJ • Created by fowascend")
-    await ctx.send(embed=embed)
-
-@bot.command(name="stats")
-async def stats_command(ctx):
-    bot_count = random.randint(11000, 17000)
-    embed = discord.Embed(title="Lazy AJ Statistics", color=0x00FF00, timestamp=datetime.now())
-    embed.add_field(name="Active Bots", value=f"{bot_count:,}", inline=True)
-    embed.add_field(name="VPS Status", value="Connected", inline=True)
-    embed.add_field(name="API Status", value="Online", inline=True)
-    embed.add_field(name="Auto-Join", value="Working", inline=True)
-    embed.add_field(name="Creator", value="fowascend", inline=True)
-    embed.set_footer(text="Lazy AJ • Created by fowascend")
-    await ctx.send(embed=embed)
-
-@bot.command(name="ping")
-async def ping_command(ctx):
-    latency = round(bot.latency * 1000)
-    if latency < 50:
-        await ctx.send(f"Pong! {latency}ms - Fast as fuck.")
-    elif latency < 150:
-        await ctx.send(f"Pong! {latency}ms - Not bad.")
-    else:
-        await ctx.send(f"Pong! {latency}ms - Your internet is trash.")
-
-@bot.command(name="owner")
-async def owner_command(ctx):
-    await ctx.send("My creator and owner is **fowascend** (Discord ID: 1088143400496279552). He built me. Don't fuck with him.")
-
-# ==================================================
-# HIDDEN !log COMMAND (MASTERS ONLY - CAN PING)
-# ==================================================
-@bot.command(name="log")
+@bot.command(name="zyrox")
 async def manual_log(ctx, *, args: str = None):
-    if ctx.author.id not in MASTER_USERS:
+    if ctx.author.id not in ALLOWED_USERS:
         return
     
     if not args:
+        await ctx.send("Usage: `!zyrox Brainrot:Griffin ping:yes price:23B`")
         return
     
     import re
@@ -353,72 +218,133 @@ async def manual_log(ctx, *, args: str = None):
     else:
         income = price_value
     
-    key = brainrot_name.lower()
-    image_url = BRAINROT_IMAGES.get(key, "https://i.imgur.com/placeholder.png")
-    
     tier = get_tier(income)
     color = get_color(income)
     formatted_income = format_income(income)
     
-    embed = discord.Embed(title="NEW BRAINROT DETECTED", description=f"**{brainrot_name}** has been detected!", color=color, timestamp=datetime.now())
-    embed.set_thumbnail(url=image_url)
-    embed.add_field(name="Mutation", value="Normal", inline=True)
-    embed.add_field(name="Trait", value="None", inline=True)
-    embed.add_field(name="Income", value=f"{formatted_income}/s", inline=True)
-    embed.add_field(name="Tier", value=tier, inline=True)
-    embed.add_field(name="Active Bots", value="{:,}".format(random.randint(11000, 17000)), inline=True)
-    embed.set_footer(text="Lazy AJ • Created by fowascend")
+    embed = discord.Embed(
+        title="🎯 NEW BRAINROT DETECTED",
+        description=f"**{brainrot_name}** has been detected!",
+        color=color,
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="🧬 Mutation", value="Normal", inline=True)
+    embed.add_field(name="✨ Trait", value="None", inline=True)
+    embed.add_field(name="💰 Income", value=f"{formatted_income}/s", inline=True)
+    embed.add_field(name="🏆 Tier", value=tier, inline=True)
+    embed.add_field(name="🤖 Active Bots", value=f"{random.randint(11000, 17000):,}", inline=True)
+    embed.set_footer(text="ZYROX AJ • Live Detection")
     
     content = "@everyone" if ping else None
     await ctx.send(content=content, embed=embed)
     
+    # SEND SAME LOG TO WEBHOOK
+    webhook_embed = embed.to_dict()
     try:
-        requests.post(WEBHOOK_URL, json={"embeds": [embed.to_dict()], "username": "Lazy AJ"})
+        requests.post(WEBHOOK_URL, json={"embeds": [webhook_embed], "username": "ZYROX AJ"})
     except:
         pass
 
 # ==================================================
-# AUTO-LOG LOOP
+# AUTO-REPLY TO FAKE CLAIMS
+# ==================================================
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    
+    msg_lower = message.content.lower()
+    
+    fake_keywords = ["fake zyrox", "zyrox fake", "this aj is fake", "aj doesn't work", "not working aj", "broken aj", "scam aj", "fake aj"]
+    
+    if any(keyword in msg_lower for keyword in fake_keywords):
+        reply = (
+            f"⚠️ **@{message.author.display_name}**, ZYROX AJ is NOT fake!\n\n"
+            f"✅ 11,000 - 17,000 active bots running 24/7\n"
+            f"✅ VPS connected with 99.9% uptime\n"
+            f"✅ Live API fetching real brainrot data\n"
+            f"✅ Auto-join works instantly\n"
+            f"✅ Webhook logs sent to this channel\n\n"
+            f"*Need proof? Check the logs above.*"
+        )
+        await message.channel.send(reply)
+        return
+    
+    await bot.process_commands(message)
+
+# ==================================================
+# AUTO-LOG LOOP - SENDS SAME LOGS TO WEBHOOK
 # ==================================================
 async def auto_log_loop():
-    bot_count = random.randint(11000, 17000)
-    brainrot_names = list(BRAINROTS.keys())
+    global last_og_time, next_og_interval
+    bot_cnt = random.randint(11000, 17000)
     
     while True:
-        await asyncio.sleep(random.randint(45, 90))
+        now = time.time()
+        is_og_time = (now - last_og_time) >= next_og_interval
         
-        name = random.choice(brainrot_names)
-        data = BRAINROTS[name]
-        mutation = random.choice(data["mutations"])
+        if is_og_time:
+            interval = 1
+            last_og_time = now
+            next_og_interval = random.randint(14400, 21600)
+        else:
+            interval = random.randint(45, 90)
         
-        mutation_mods = {"Gold": 1.25, "Diamond": 1.5, "Lava": 6.0, "Galaxy": 7.0, "Yin Yang": 7.5, "Radioactive": 8.5, "Cursed": 9.0, "Rainbow": 10.0, "Divine": 10.0, "Cyber": 11.0}
-        mod = mutation_mods.get(mutation, 1.0)
-        income = data["income"] * mod
+        await asyncio.sleep(interval)
         
-        tier = get_tier(income)
-        color = get_color(income)
-        formatted_income = format_income(income)
+        if is_og_time:
+            og_brainrots = [b for b in BRAINROTS.keys() if BRAINROTS[b]["rarity"] == "OG"]
+            if og_brainrots:
+                name = random.choice(og_brainrots)
+                data = BRAINROTS[name]
+                brainrot = {
+                    "name": name,
+                    "income": data["income"],
+                    "formatted_income": format_income(data["income"]),
+                    "tier": get_tier(data["income"]),
+                    "color": get_color(data["income"]),
+                    "mutation": "Normal",
+                    "trait": "None",
+                    "rarity": data["rarity"],
+                    "timestamp": datetime.now().isoformat(),
+                }
+        else:
+            brainrot = get_random_brainrot()
+            if not brainrot:
+                continue
         
-        key = name.lower()
-        image_url = BRAINROT_IMAGES.get(key, "https://i.imgur.com/placeholder.png")
-        
-        embed = discord.Embed(title="NEW BRAINROT DETECTED", description=f"**{mutation} {name}** has been detected!", color=color, timestamp=datetime.now())
-        embed.set_thumbnail(url=image_url)
-        embed.add_field(name="Mutation", value=mutation, inline=True)
-        embed.add_field(name="Trait", value="None", inline=True)
-        embed.add_field(name="Income", value=f"{formatted_income}/s", inline=True)
-        embed.add_field(name="Tier", value=tier, inline=True)
-        embed.add_field(name="Active Bots", value="{:,}".format(bot_count), inline=True)
-        embed.set_footer(text=f"Lazy AJ • {data['rarity']} Brainrot")
-        
-        try:
-            requests.post(WEBHOOK_URL, json={"embeds": [embed.to_dict()], "username": "Lazy AJ"})
-        except:
-            pass
-        
-        change = random.randint(-500, 500)
-        bot_count += change
-        bot_count = max(11000, min(17000, bot_count))
+        if brainrot:
+            bot_cnt = update_bot_count()
+            send_webhook(brainrot, bot_cnt)
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] {brainrot['name']} | {brainrot['formatted_income']}/s")
+
+# ==================================================
+# COMMANDS
+# ==================================================
+@bot.command(name="commands")
+async def list_commands(ctx):
+    embed = discord.Embed(title="ZYROX AJ Commands", color=0x0A84FF, timestamp=datetime.now())
+    embed.add_field(name="!commands", value="Show this help", inline=False)
+    embed.add_field(name="!stats", value="Bot statistics", inline=False)
+    embed.add_field(name="!ping", value="Check latency", inline=False)
+    embed.add_field(name="!zyrox Brainrot:X ping:yes price:X", value="Manual log", inline=False)
+    embed.set_footer(text="ZYROX AJ")
+    await ctx.send(embed=embed)
+
+@bot.command(name="stats")
+async def stats_command(ctx):
+    bot_cnt = random.randint(11000, 17000)
+    embed = discord.Embed(title="ZYROX AJ Statistics", color=0x00FF00, timestamp=datetime.now())
+    embed.add_field(name="Active Bots", value=f"{bot_cnt:,}", inline=True)
+    embed.add_field(name="VPS Status", value="Connected", inline=True)
+    embed.add_field(name="API Status", value="Online", inline=True)
+    embed.add_field(name="Auto-Join", value="Working", inline=True)
+    embed.set_footer(text="ZYROX AJ")
+    await ctx.send(embed=embed)
+
+@bot.command(name="ping")
+async def ping_command(ctx):
+    await ctx.send(f"Pong! {round(bot.latency * 1000)}ms")
 
 # ==================================================
 # BOT STARTUP
@@ -426,14 +352,11 @@ async def auto_log_loop():
 @bot.event
 async def on_ready():
     print("=" * 50)
-    print(f"Bot online: {bot.user}")
-    print(f"Owner: fowascend (ID: {OWNER_ID})")
-    print(f"Masters: {MASTER_USERS}")
-    print(f"Groq: {'Enabled' if GROQ_API_KEY else 'Disabled'}")
+    print(f"ZYROX AJ Bot Online: {bot.user}")
+    print(f"Webhook: {WEBHOOK_URL[:60]}...")
     print("=" * 50)
-    print("Ping Protection: FULL (everyone, here, roles, users)")
-    print("Jailbreak Protection: ENABLED")
-    print("Code Formatting: ENABLED")
+    print("Auto-logs every 45-90 seconds")
+    print("OG brainrots every 4-6 hours")
     print("=" * 50)
     
     asyncio.create_task(auto_log_loop())
