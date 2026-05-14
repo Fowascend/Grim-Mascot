@@ -38,7 +38,6 @@ BRAINROT_IMAGES = {
     "Esok Sekolah": "https://images-ext-1.discordapp.net/external/X_HHUtR_dah9fT6uD5WMXHHLaCF0vjhP33OT-kXKAUk/https/www.mobynotifier.com/brainrots/esok-sekolah?format=webp",
     "Celestial Pegasus": "https://images-ext-1.discordapp.net/external/uQV0Gtw56MrBLMrPHNJHsEL3GHEtQtPtqFd7IC-FxxM/https/www.mobynotifier.com/brainrots/celestial-pegasus?format=webp",
     "Dragon Cannelloni": "https://images-ext-1.discordapp.net/external/X4PlwMzgXd5GkP_hOPxTjThl4yNvY5mGUhiV1iOnHb0/https/www.mobynotifier.com/brainrots/dragon-cannelloni?format=webp",
-    "Los Hotspotsitos": "https://images-ext-1.discordapp.net/external/MsbU8Cx2x5x0Uqz0KiKgYQXeugojQ7SQBjg0uY8Doh0/%3Fcb%3D20251226204212/https/static.wikia.nocookie.net/stealabr/images/6/69/Loshotspotsitos.png",
     "Love Love Bear": "https://static.wikia.nocookie.net/stealabr/images/b/bf/Love_Love_Bear.png",
     "Rosey and Teddy": "https://static.wikia.nocookie.net/stealabr/images/9/9b/Rosey_and_Teddy.png",
     "Ginger Great": "https://static.wikia.nocookie.net/stealabr/images/e/e7/Ginger_Ketupat_Kepat.png",
@@ -52,10 +51,14 @@ BRAINROT_IMAGES = {
     "Skibidi Toilet": "https://static.wikia.nocookie.net/stealabr/images/3/34/Skibidi_toilet.png",
     "John Pork": "https://images-ext-1.discordapp.net/external/9RK6VrcVNa3MCIaPmbeBuM_LRpYQfstoVkuoCvZnPog/https/plain-wnam-prod-public.komododecks.com/202605/12/iFxMpUBEbXpzxIVyyL7i/image.webp?format=webp",
     "Griffin": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png",
+    "Chillin Chili": "https://static.wikia.nocookie.net/stealabr/images/f/f8/Chillin_Chili.png",
+    "Los Chillis": "https://static.wikia.nocookie.net/stealabr/images/d/db/Los_Chillis.png",
+    "Reinito Sleighito": "https://www.mobynotifier.com/brainrots/reinito-sleighito",
+    "Fragola La La La": "https://static.wikia.nocookie.net/stealabr/images/3/3c/Fragola_La_La_La.png",
 }
 
 BRAINROTS = {
-    # COMMON - Under 160M base (spawn every 6 minutes)
+    # Common - Under 160M base
     "La Taco Combinasion": {"income": 35, "rarity": "Secret", "tier": "Common"},
     "Garama and Madundung": {"income": 50, "rarity": "Secret", "tier": "Common"},
     "Lavadorito Spinito": {"income": 45, "rarity": "Secret", "tier": "Common"},
@@ -69,23 +72,26 @@ BRAINROTS = {
     "Money Money Puggy": {"income": 21, "rarity": "Secret", "tier": "Common"},
     "Cigno Fulgoro": {"income": 20, "rarity": "Secret", "tier": "Common"},
     "Esok Sekolah": {"income": 30, "rarity": "Secret", "tier": "Common"},
-    "Los Hotspotsitos": {"income": 20, "rarity": "Secret", "tier": "Common"},
     "Burguro And Fryuro": {"income": 150, "rarity": "Secret", "tier": "Common"},
+    "Chillin Chili": {"income": 50, "rarity": "Secret", "tier": "Common"},
+    "Fragola La La La": {"income": 450, "rarity": "Secret", "tier": "Rare"},
     
-    # RARE - 160M - 224M base (spawn every 1 hour)
+    # Rare - 160M - 224M base
     "Celestial Pegasus": {"income": 175, "rarity": "Secret", "tier": "Rare"},
     "Fragrama and Chocrama": {"income": 100, "rarity": "Secret", "tier": "Rare"},
     "Rosey and Teddy": {"income": 165, "rarity": "Secret", "tier": "Rare"},
     "Ginger Great": {"income": 75, "rarity": "Secret", "tier": "Rare"},
     "Hydra Bunny": {"income": 185, "rarity": "Secret", "tier": "Rare"},
     "Dragon Cannelloni": {"income": 250, "rarity": "Secret", "tier": "Rare"},
+    "Los Chillis": {"income": 200, "rarity": "Secret", "tier": "Rare"},
+    "Reinito Sleighito": {"income": 140, "rarity": "Secret", "tier": "Rare"},
     
-    # SUPER RARE - 225M+ base (spawn every 2-3 hours)
+    # Super Rare - 225M+ base
     "Love Love Bear": {"income": 225, "rarity": "Secret", "tier": "SuperRare"},
     "Hydra Dragon Cannelloni": {"income": 300, "rarity": "Secret", "tier": "SuperRare"},
     "Dragon Gingerini": {"income": 350, "rarity": "Secret", "tier": "SuperRare"},
     
-    # OG - 400M+ base (spawn every 7 hours)
+    # OG - 400M+ base
     "Griffin": {"income": 400, "rarity": "OG", "tier": "OG"},
     "Skibidi Toilet": {"income": 450, "rarity": "OG", "tier": "OG"},
     "John Pork": {"income": 500, "rarity": "OG", "tier": "OG"},
@@ -120,6 +126,16 @@ TRAITS = [
     {"name": "Spider", "mod": 3.5, "chance": 0.2},
 ]
 
+def weighted_choice(items):
+    total = sum(item.get("chance", 1) for item in items)
+    r = random.random() * total
+    accum = 0
+    for item in items:
+        accum += item.get("chance", 1)
+        if r <= accum:
+            return item
+    return items[0]
+
 def format_income(value):
     if value >= 1000:
         return f"{value/1000:.2f}B"
@@ -148,110 +164,141 @@ def calculate_income(base_income, mutation, trait):
         return base_income
     return base_income * (1 + mutation["mod"] + trait["mod"])
 
+def generate_brainrot_entry(name, data):
+    mutation = weighted_choice(MUTATIONS)
+    trait = weighted_choice(TRAITS)
+    if random.random() < 0.97:
+        trait = {"name": "None", "mod": 0.0}
+    
+    final_income = calculate_income(data["income"], mutation, trait)
+    
+    display_name = name
+    if mutation["name"] != "Normal":
+        display_name = f"{mutation['name']} {display_name}"
+    if trait["name"] != "None":
+        display_name = f"{display_name} ({trait['name']})"
+    
+    return {
+        "name": display_name,
+        "income": final_income,
+        "formatted_income": format_income(final_income),
+        "mutation": mutation["name"],
+        "trait": trait["name"],
+    }
+
 def get_random_brainrot_by_tier(target_tier):
     filtered = [b for b in BRAINROTS.items() if b[1]["tier"] == target_tier]
     if not filtered:
         return None, None
-    name, data = random.choice(filtered)
-    return name, data
+    return random.choice(filtered)
 
 async def auto_log_loop():
     bot_cnt = random.randint(11000, 17000)
     
-    # Timer variables
     last_common_time = time.time()
     last_rare_time = time.time()
     last_superrare_time = time.time()
     last_og_time = time.time()
     
-    common_interval = 360  # 6 minutes
-    rare_interval = 3600   # 1 hour
-    superrare_interval = 7200  # 2 hours
-    og_interval = 25200    # 7 hours
+    common_interval = 360
+    rare_interval = 3600
+    superrare_interval = 7200
+    og_interval = 25200
+    
+    # Store recent brainrots for multi-log display
+    recent_brainrots = []
     
     while True:
         now = time.time()
+        new_brainrot = None
+        tier_name = None
         
-        # Determine which tier to spawn
         if (now - last_og_time) >= og_interval:
             name, data = get_random_brainrot_by_tier("OG")
             if name:
                 last_og_time = now
                 tier_name = "OG"
+                new_brainrot = generate_brainrot_entry(name, data)
+                new_brainrot["rarity"] = "OG"
+                new_brainrot["image"] = BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png")
                 print(f"🎯 OG SPAWN: {name}")
         elif (now - last_superrare_time) >= superrare_interval:
             name, data = get_random_brainrot_by_tier("SuperRare")
             if name:
                 last_superrare_time = now
                 tier_name = "SuperRare"
+                new_brainrot = generate_brainrot_entry(name, data)
+                new_brainrot["rarity"] = "Secret"
+                new_brainrot["image"] = BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png")
                 print(f"⭐ SUPER RARE SPAWN: {name}")
         elif (now - last_rare_time) >= rare_interval:
             name, data = get_random_brainrot_by_tier("Rare")
             if name:
                 last_rare_time = now
                 tier_name = "Rare"
+                new_brainrot = generate_brainrot_entry(name, data)
+                new_brainrot["rarity"] = "Secret"
+                new_brainrot["image"] = BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png")
                 print(f"✨ RARE SPAWN: {name}")
         else:
-            # If common timer passed or no rare/og ready, spawn common
             if (now - last_common_time) >= common_interval:
                 last_common_time = now
             name, data = get_random_brainrot_by_tier("Common")
-            if not name:
-                name, data = random.choice(list(BRAINROTS.items()))
-            tier_name = "Common"
+            if name:
+                tier_name = "Common"
+                new_brainrot = generate_brot_entry(name, data)
+                new_brainrot["rarity"] = "Secret"
+                new_brainrot["image"] = BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png")
         
-        if not name:
-            name, data = random.choice(list(BRAINROTS.items()))
+        if new_brainrot:
+            recent_brainrots.append(new_brainrot)
+            recent_brainrots.sort(key=lambda x: x["income"], reverse=True)
+            recent_brainrots = recent_brainrots[:15]
+            
+            bot_cnt = update_bot_count()
+            send_multi_embed(recent_brainrots, bot_cnt)
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] Added: {new_brainrot['name']} | {new_brainrot['formatted_income']}/s")
         
-        # Generate mutation and trait (very low chance for rare ones)
-        if data["tier"] == "OG":
-            mutation = {"name": "Normal", "mod": 0.0}
-            trait = {"name": "None", "mod": 0.0}
-        else:
-            mutation = weighted_choice(MUTATIONS)
-            trait = weighted_choice(TRAITS)
-            if random.random() < 0.97:
-                trait = {"name": "None", "mod": 0.0}
-        
-        final_income = calculate_income(data["income"], mutation, trait)
-        tier_display = get_tier_display(final_income)
-        color = get_color(final_income)
-        
-        display_name = name
-        if mutation["name"] != "Normal":
-            display_name = f"{mutation['name']} {display_name}"
-        if trait["name"] != "None":
-            display_name = f"{display_name} ({trait['name']})"
-        
-        brainrot = {
-            "name": display_name,
-            "income": final_income,
-            "formatted_income": format_income(final_income),
-            "tier": tier_display,
-            "color": color,
-            "mutation": mutation["name"],
-            "trait": trait["name"],
-            "rarity": data["rarity"],
-            "image": BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png"),
-            "timestamp": datetime.now().isoformat(),
-        }
-        
-        bot_cnt = update_bot_count()
-        send_webhook(brainrot, bot_cnt)
-        print(f"[{datetime.now().strftime('%H:%M:%S')}] [{tier_name}] {brainrot['name']} | {brainrot['formatted_income']}/s")
-        
-        # Wait 30-60 seconds before next check
         await asyncio.sleep(random.randint(30, 60))
 
-def weighted_choice(items):
-    total = sum(item.get("chance", 1) for item in items)
-    r = random.random() * total
-    accum = 0
-    for item in items:
-        accum += item.get("chance", 1)
-        if r <= accum:
-            return item
-    return items[0]
+def send_multi_embed(brainrots, bot_count):
+    if not brainrots:
+        return
+    
+    highest = brainrots[0]
+    highest_tier = get_tier_display(highest["income"])
+    highest_color = get_color(highest["income"])
+    
+    players = random.randint(1, 8)
+    
+    embed = discord.Embed(
+        title="🧠 Brainrot Notify",
+        color=highest_color,
+        timestamp=datetime.now()
+    )
+    
+    embed.add_field(
+        name="📊 Top Brainrot",
+        value=f"**{highest['name']}**\n💰 {highest['formatted_income']}/s\n👥 {players}/8 players",
+        inline=False
+    )
+    
+    all_brainrots_text = ""
+    for i, br in enumerate(brainrots[:12], 1):
+        all_brainrots_text += f"**{i}.** {br['name']} | {br['formatted_income']}/s\n"
+    
+    embed.add_field(
+        name="📋 All Brainrots (>5M/s)",
+        value=all_brainrots_text if all_brainrots_text else "No recent brainrots",
+        inline=False
+    )
+    
+    embed.set_footer(text=f"ZYROX AJ • {len(brainrots)} active • {bot_count:,} bots")
+    
+    try:
+        requests.post(WEBHOOK_URL, json={"embeds": [embed.to_dict()], "username": "ZYROX AJ"})
+    except Exception as e:
+        print(f"Error: {e}")
 
 def update_bot_count():
     global bot_count
@@ -262,30 +309,6 @@ def update_bot_count():
     elif bot_count < 11000:
         bot_count = 11000
     return bot_count
-
-def send_webhook(brainrot, bot_count):
-    embed = {
-        "title": "🎯 NEW BRAINROT DETECTED",
-        "description": f"**{brainrot['name']}** has been detected!",
-        "color": brainrot["color"],
-        "timestamp": brainrot["timestamp"],
-        "thumbnail": {"url": brainrot["image"]},
-        "fields": [
-            {"name": "🧬 Mutation", "value": brainrot["mutation"], "inline": True},
-            {"name": "✨ Trait", "value": brainrot["trait"], "inline": True},
-            {"name": "💰 Income", "value": f"{brainrot['formatted_income']}/s", "inline": True},
-            {"name": "🏆 Tier", "value": brainrot["tier"], "inline": True},
-            {"name": "🤖 Active Bots", "value": f"{bot_count:,}", "inline": True},
-        ],
-        "footer": {"text": f"ZYROX AJ • {brainrot['rarity']} Brainrot"},
-    }
-    
-    try:
-        requests.post(WEBHOOK_URL, json={"embeds": [embed], "username": "ZYROX AJ"})
-        return True
-    except Exception as e:
-        print(f"Error: {e}")
-        return False
 
 bot_count = random.randint(11000, 17000)
 
@@ -327,20 +350,15 @@ async def manual_log(ctx, *, args: str = None):
     color = get_color(income)
     formatted_income = format_income(income)
     image_url = BRAINROT_IMAGES.get(brainrot_name, "https://i.imgur.com/placeholder.png")
+    players = random.randint(1, 8)
     
     embed = discord.Embed(
-        title="🎯 NEW BRAINROT DETECTED",
-        description=f"**{brainrot_name}** has been detected!",
+        title="🧠 Brainrot Notify",
+        description=f"**{brainrot_name}**\n💰 {formatted_income}/s\n👥 {players}/8 players",
         color=color,
         timestamp=datetime.now()
     )
-    embed.set_thumbnail(url=image_url)
-    embed.add_field(name="🧬 Mutation", value="Normal", inline=True)
-    embed.add_field(name="✨ Trait", value="None", inline=True)
-    embed.add_field(name="💰 Income", value=f"{formatted_income}/s", inline=True)
-    embed.add_field(name="🏆 Tier", value=tier, inline=True)
-    embed.add_field(name="🤖 Active Bots", value=f"{random.randint(11000, 17000):,}", inline=True)
-    embed.set_footer(text="ZYROX AJ • Live Detection")
+    embed.set_footer(text=f"ZYROX AJ • {random.randint(11000, 17000):,} bots")
     
     content = "@everyone" if ping else None
     await ctx.send(content=content, embed=embed)
@@ -412,8 +430,8 @@ async def on_ready():
     print("  🟣 Super Rare (225M+ base): Every 2 hours")
     print("  🔴 OG (400M+ base): Every 7 hours")
     print("=" * 60)
+    print("EMBED FORMAT: Multi-brainrot (Moby Notifier style)")
     print(f"Total brainrots: {len(BRAINROTS)}")
-    print(f"Images loaded: {len(BRAINROT_IMAGES)}")
     print("=" * 60)
     
     asyncio.create_task(auto_log_loop())
