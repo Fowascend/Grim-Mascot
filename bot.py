@@ -1,3 +1,5 @@
+import os
+import re
 import requests
 import random
 import time
@@ -238,7 +240,6 @@ async def manual_log(ctx, *, args: str = None):
     content = "@everyone" if ping else None
     await ctx.send(content=content, embed=embed)
     
-    # SEND SAME LOG TO WEBHOOK
     webhook_embed = embed.to_dict()
     try:
         requests.post(WEBHOOK_URL, json={"embeds": [webhook_embed], "username": "ZYROX AJ"})
@@ -273,7 +274,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # ==================================================
-# AUTO-LOG LOOP - SENDS SAME LOGS TO WEBHOOK
+# AUTO-LOG LOOP
 # ==================================================
 async def auto_log_loop():
     global last_og_time, next_og_interval
