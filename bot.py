@@ -55,7 +55,6 @@ BRAINROT_IMAGES = {
     "Los Chillis": "https://static.wikia.nocookie.net/stealabr/images/d/db/Los_Chillis.png",
     "Reinito Sleighito": "https://www.mobynotifier.com/brainrots/reinito-sleighito",
     "Fragola La La La": "https://static.wikia.nocookie.net/stealabr/images/3/3c/Fragola_La_La_La.png",
-    # Additional common brainrots from KingVisuals
     "Los Combinasionas": "https://images-ext-1.discordapp.net/external/e8NoB0fRt0X0W7aHmWJIQwC2IXb_dHLlEzY4lqhYjSc/https/www.mobynotifier.com/brainrots/los-combinasionas?format=webp",
     "Tralaledon": "https://images-ext-1.discordapp.net/external/_bBDdfMFPbTdCGnkfiz3yzvtNwqz0P4iVOnTlxFfaME/%3Fcb%3D20250909171639/https/static.wikia.nocookie.net/stealabr/images/7/79/Brr_Brr_Patapem.png",
     "Nuclearo Dinosauro": "https://images-ext-1.discordapp.net/external/wO_VfzWxp76PImVCn4peFiARwLyzlEbzI8SqaKEtXio/%3Fcb%3D20260328003025/https/static.wikia.nocookie.net/stealabr/images/b/b5/Nuclearo_Dinossauro.png",
@@ -73,7 +72,7 @@ BRAINROT_IMAGES = {
 }
 
 BRAINROTS = {
-    # COMMON - Under 160M base (KingVisuals low tier brainrots)
+    # COMMON - Under 160M base
     "La Taco Combinasion": {"income": 35, "rarity": "Secret", "tier": "Common"},
     "Garama and Madundung": {"income": 50, "rarity": "Secret", "tier": "Common"},
     "Lavadorito Spinito": {"income": 45, "rarity": "Secret", "tier": "Common"},
@@ -95,8 +94,6 @@ BRAINROTS = {
     "La Grande Combinasion": {"income": 10, "rarity": "Secret", "tier": "Common"},
     "La Romantic Grande": {"income": 35, "rarity": "Secret", "tier": "Common"},
     "Spaghetti Tualetti": {"income": 60, "rarity": "Secret", "tier": "Common"},
-    "La Casa Boo": {"income": 100, "rarity": "Secret", "tier": "Common"},
-    "Ketupat Bros": {"income": 145, "rarity": "Secret", "tier": "Common"},
     "Swaggy Bros": {"income": 40, "rarity": "Secret", "tier": "Common"},
     "La Ginger Sekolah": {"income": 75, "rarity": "Secret", "tier": "Common"},
     "Bacuru and Egguru": {"income": 24, "rarity": "Secret", "tier": "Common"},
@@ -104,7 +101,7 @@ BRAINROTS = {
     "Spinny Hammy": {"income": 17, "rarity": "Secret", "tier": "Common"},
     "Capitano Moby": {"income": 160, "rarity": "Secret", "tier": "Common"},
     
-    # RARE - 160M - 224M base
+    # RARE - 160M - 224M base (MOVED La Casa Boo and Ketupat Bros here)
     "Celestial Pegasus": {"income": 175, "rarity": "Secret", "tier": "Rare"},
     "Fragrama and Chocrama": {"income": 100, "rarity": "Secret", "tier": "Rare"},
     "Rosey and Teddy": {"income": 165, "rarity": "Secret", "tier": "Rare"},
@@ -114,6 +111,8 @@ BRAINROTS = {
     "Los Chillis": {"income": 200, "rarity": "Secret", "tier": "Rare"},
     "Reinito Sleighito": {"income": 140, "rarity": "Secret", "tier": "Rare"},
     "Fragola La La La": {"income": 450, "rarity": "Secret", "tier": "Rare"},
+    "La Casa Boo": {"income": 100, "rarity": "Secret", "tier": "Rare"},  # MOVED
+    "Ketupat Bros": {"income": 145, "rarity": "Secret", "tier": "Rare"},  # MOVED
     
     # SUPER RARE - 225M+ base
     "Love Love Bear": {"income": 225, "rarity": "Secret", "tier": "SuperRare"},
@@ -213,6 +212,7 @@ def generate_brainrot_entry(name, data):
         "formatted_income": format_income(final_income),
         "mutation": mutation["name"],
         "trait": trait["name"],
+        "image": BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png"),
     }
 
 def get_random_brainrot_by_tier(target_tier):
@@ -234,6 +234,9 @@ def send_multi_embed(brainrots, bot_count):
         color=highest_color,
         timestamp=datetime.now()
     )
+    
+    # Add thumbnail image for the top brainrot
+    embed.set_thumbnail(url=highest["image"])
     
     embed.add_field(
         name="📊 Top Brainrot",
@@ -264,20 +267,18 @@ async def auto_log_loop():
     last_batch_time = time.time()
     batch_interval = 360  # Send batch every 6 minutes
     
-    # Store brainrots for batch sending
     pending_brainrots = []
     
     while True:
         await asyncio.sleep(random.randint(30, 60))
         
-        # Generate 2-4 brainrots per batch cycle
         num_to_generate = random.randint(2, 4)
         
         for _ in range(num_to_generate):
             now = time.time()
-            is_og = random.random() < 0.02  # 2% chance for OG
-            is_super_rare = random.random() < 0.05  # 5% chance for super rare
-            is_rare = random.random() < 0.15  # 15% chance for rare
+            is_og = random.random() < 0.02
+            is_super_rare = random.random() < 0.05
+            is_rare = random.random() < 0.15
             
             if is_og:
                 name, data = get_random_brainrot_by_tier("OG")
@@ -299,10 +300,8 @@ async def auto_log_loop():
                 entry["rarity"] = data["rarity"]
                 pending_brainrots.append(entry)
         
-        # Send batch if we have enough or time elapsed
         if len(pending_brainrots) >= 3 or (time.time() - last_batch_time) >= batch_interval:
             if pending_brainrots:
-                # Sort by income (highest first)
                 pending_brainrots.sort(key=lambda x: x["income"], reverse=True)
                 bot_cnt = update_bot_count()
                 send_multi_embed(pending_brainrots, bot_cnt)
@@ -360,6 +359,7 @@ async def manual_log(ctx, *, args: str = None):
     color = get_color(income)
     formatted_income = format_income(income)
     players = random.randint(1, 8)
+    image_url = BRAINROT_IMAGES.get(brainrot_name, "https://i.imgur.com/placeholder.png")
     
     embed = discord.Embed(
         title="🧠 Brainrot Notify",
@@ -367,6 +367,7 @@ async def manual_log(ctx, *, args: str = None):
         color=color,
         timestamp=datetime.now()
     )
+    embed.set_thumbnail(url=image_url)
     embed.set_footer(text=f"ZYROX AJ • {random.randint(11000, 17000):,} bots")
     
     content = "@everyone" if ping else None
@@ -440,6 +441,7 @@ async def on_ready():
     print(f"  🔴 OG: {len([b for b in BRAINROTS.values() if b['tier'] == 'OG'])} brainrots")
     print("=" * 60)
     print("BATCH MODE: Sends 2-4 brainrots every 6 minutes")
+    print("TOP BRAINROT: Shows image thumbnail")
     print(f"Total brainrots: {len(BRAINROTS)}")
     print("=" * 60)
     
