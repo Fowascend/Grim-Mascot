@@ -21,6 +21,30 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+BRAINROT_IMAGES = {
+    "Strawberry Elephant": "https://images-ext-1.discordapp.net/external/US96Fw9oYQepR3lMLiwvK5bCumw_MtsXnGuvai3J33Q/https/www.mobynotifier.com/brainrots/strawberry-elephant?format=webp",
+    "Meowl": "https://images-ext-1.discordapp.net/external/KcQAQmvkYOC_oWDKmGgCqeIYmWZZcv3zJzZzFvv6sg4/https/www.mobynotifier.com/brainrots/meowl?format=webp",
+    "Headless Horseman": "https://images-ext-1.discordapp.net/external/LE0akzzR9pYt7FhWFoqw-KThhupou_t7srI97a47rvI/https/plain-wnam-prod-public.komododecks.com/202605/12/XSdcRajJXsJ65DXdOGjG/image.webp?format=webp",
+    "Skibidi Toilet": "https://static.wikia.nocookie.net/stealabr/images/3/34/Skibidi_toilet.png",
+    "John Pork": "https://images-ext-1.discordapp.net/external/9RK6VrcVNa3MCIaPmbeBuM_LRpYQfstoVkuoCvZnPog/https/plain-wnam-prod-public.komododecks.com/202605/12/iFxMpUBEbXpzxIVyyL7i/image.webp?format=webp",
+    "Griffin": "https://images-ext-1.discordapp.net/external/ZSJZbm-Z5QoufhGcLRDrLCOfaty8stL_HtDM55WYgaw/%3Fcb%3D20260417151951/https/static.wikia.nocookie.net/stealabr/images/f/f8/Griffin.png/revision/latest/scale-to-width-down/1000?format=webp",
+    "Dragon Cannelloni": "https://images-ext-1.discordapp.net/external/X4PlwMzgXd5GkP_hOPxTjThl4yNvY5mGUhiV1iOnHb0/https/www.mobynotifier.com/brainrots/dragon-cannelloni?format=webp",
+    "Burguro And Fryuro": "https://images-ext-1.discordapp.net/external/qVX50l18q9QN8JHBQ5uJq5KvRz5KsHiZv6J7BjhK0cQ/https/www.mobynotifier.com/brainrots/burguro-and-fryuro?format=webp",
+    "Capitano Moby": "https://images-ext-1.discordapp.net/external/k7fodKUVV7Tr3fLaxkyXXgGUKpuj0fS05fyglkhIM20/https/www.mobynotifier.com/brainrots/capitano-moby?format=webp",
+    "Love Love Bear": "https://static.wikia.nocookie.net/stealabr/images/b/bf/Love_Love_Bear.png",
+    "Cerberus": "https://images-ext-1.discordapp.net/external/NPtLqSPSBZtctUNyMptN6edlsdvC-9nhE7uJUppe5lo/https/www.mobynotifier.com/brainrots/cerberus?format=webp",
+    "Celestial Pegasus": "https://images-ext-1.discordapp.net/external/uQV0Gtw56MrBLMrPHNJHsEL3GHEtQtPtqFd7IC-FxxM/https/www.mobynotifier.com/brainrots/celestial-pegasus?format=webp",
+    "Fragrama and Chocrama": "https://images-ext-1.discordapp.net/external/Kln9a8QqTAqtPxqLDid23oNYIC5hYoxb2Wh8Jo1qG60/%3Fcb%3D20251109011733/https/static.wikia.nocookie.net/stealabr/images/5/56/Fragrama.png/revision/latest?format=webp",
+    "Garama and Madundung": "https://images-ext-1.discordapp.net/external/2fNC1UlBAVbJ5IAr5FyaGz6zOlkB9ZvNI--rRx1rMgM/https/www.mobynotifier.com/brainrots/garama-and-madundung?format=webp",
+    "Ketchuru and Masturu": "https://images-ext-1.discordapp.net/external/iQod62CSYiki-EmgWXXxftaw9imnESM72GPrs82fP1M/https/www.mobynotifier.com/brainrots/ketchuru-and-musturu?format=webp",
+    "Esok Sekolah": "https://images-ext-1.discordapp.net/external/X_HHUtR_dah9fT6uD5WMXHHLaCF0vjhP33OT-kXKAUk/https/www.mobynotifier.com/brainrots/esok-sekolah?format=webp",
+    "Los Bros": "https://media.discordapp.net/attachments/1502036958036099174/1503879521735282799/los-bros.png",
+    "Tictac Sahur": "https://images-ext-1.discordapp.net/external/D5tEa_RQIDq915-qO989XCMGK3zgYJUIMGA--tdJ3aQ/https/www.mobynotifier.com/brainrots/tictac-sahur?format=webp",
+    "La Extinct Grande": "https://kommodo.ai/i/sDgf84vkljfcaK8FrAEE",
+    "Ketupat Kepat": "https://images-ext-1.discordapp.net/external/qKJpSiIGZ9SimGiIIyIzF_eqyz7z4FIqEQ15aWmB8E8/https/www.mobynotifier.com/brainrots/ketupat-kepat?format=webp",
+    "Money Money Puggy": "https://images-ext-1.discordapp.net/external/UdKYuXy_zc0xoCE5B_LB7Rd4gQxaE3YcyBh_Gu_IX6M/https/tr.rbxcdn.com/30DAY-Avatar-D21654E234F8633A1B3FC4936AFE8820-Png/420/420/Avatar/Png/noFilter?format=webp",
+}
+
 BRAINROTS = {
     "Strawberry Elephant": {"income": 750, "rarity": "OG"},
     "Meowl": {"income": 600, "rarity": "OG"},
@@ -42,6 +66,7 @@ BRAINROTS = {
     "Tictac Sahur": {"income": 37.5, "rarity": "Secret"},
     "Money Money Puggy": {"income": 21, "rarity": "Secret"},
     "La Extinct Grande": {"income": 23.5, "rarity": "Secret"},
+    "Ketupat Kepat": {"income": 35, "rarity": "Secret"},
 }
 
 MUTATIONS = [
@@ -137,6 +162,7 @@ def get_random_brainrot():
         "mutation": mutation["name"],
         "trait": trait["name"],
         "rarity": data["rarity"],
+        "image": BRAINROT_IMAGES.get(brainrot, "https://i.imgur.com/placeholder.png"),
         "timestamp": datetime.now().isoformat(),
     }
 
@@ -146,6 +172,7 @@ def send_webhook(brainrot, bot_count):
         "description": f"**{brainrot['name']}** has been detected!",
         "color": brainrot["color"],
         "timestamp": brainrot["timestamp"],
+        "thumbnail": {"url": brainrot["image"]},
         "fields": [
             {"name": "🧬 Mutation", "value": brainrot["mutation"], "inline": True},
             {"name": "✨ Trait", "value": brainrot["trait"], "inline": True},
@@ -186,7 +213,6 @@ async def manual_log(ctx, *, args: str = None):
         await ctx.send("Usage: `!zyrox Brainrot:Griffin ping:yes price:23B`")
         return
     
-    import re
     brainrot_match = re.search(r'Brainrot:([^ ]+)', args, re.IGNORECASE)
     ping_match = re.search(r'ping:(\S+)', args, re.IGNORECASE)
     price_match = re.search(r'price:(\S+)', args, re.IGNORECASE)
@@ -215,6 +241,7 @@ async def manual_log(ctx, *, args: str = None):
     tier = get_tier(income)
     color = get_color(income)
     formatted_income = format_income(income)
+    image_url = BRAINROT_IMAGES.get(brainrot_name, "https://i.imgur.com/placeholder.png")
     
     embed = discord.Embed(
         title="🎯 NEW BRAINROT DETECTED",
@@ -222,6 +249,7 @@ async def manual_log(ctx, *, args: str = None):
         color=color,
         timestamp=datetime.now()
     )
+    embed.set_thumbnail(url=image_url)
     embed.add_field(name="🧬 Mutation", value="Normal", inline=True)
     embed.add_field(name="✨ Trait", value="None", inline=True)
     embed.add_field(name="💰 Income", value=f"{formatted_income}/s", inline=True)
@@ -293,6 +321,7 @@ async def auto_log_loop():
                     "mutation": "Normal",
                     "trait": "None",
                     "rarity": data["rarity"],
+                    "image": BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png"),
                     "timestamp": datetime.now().isoformat(),
                 }
         else:
@@ -333,6 +362,7 @@ async def on_ready():
     print("=" * 50)
     print(f"ZYROX AJ Bot Online: {bot.user}")
     print(f"Webhook: {WEBHOOK_URL[:60]}...")
+    print(f"Images loaded: {len(BRAINROT_IMAGES)} brainrots")
     print("=" * 50)
     print("Auto-logs every 45-90 seconds")
     print("OG brainrots every 4-6 hours")
