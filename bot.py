@@ -55,10 +55,25 @@ BRAINROT_IMAGES = {
     "Los Chillis": "https://static.wikia.nocookie.net/stealabr/images/d/db/Los_Chillis.png",
     "Reinito Sleighito": "https://www.mobynotifier.com/brainrots/reinito-sleighito",
     "Fragola La La La": "https://static.wikia.nocookie.net/stealabr/images/3/3c/Fragola_La_La_La.png",
+    # Additional common brainrots from KingVisuals
+    "Los Combinasionas": "https://images-ext-1.discordapp.net/external/e8NoB0fRt0X0W7aHmWJIQwC2IXb_dHLlEzY4lqhYjSc/https/www.mobynotifier.com/brainrots/los-combinasionas?format=webp",
+    "Tralaledon": "https://images-ext-1.discordapp.net/external/_bBDdfMFPbTdCGnkfiz3yzvtNwqz0P4iVOnTlxFfaME/%3Fcb%3D20250909171639/https/static.wikia.nocookie.net/stealabr/images/7/79/Brr_Brr_Patapem.png",
+    "Nuclearo Dinosauro": "https://images-ext-1.discordapp.net/external/wO_VfzWxp76PImVCn4peFiARwLyzlEbzI8SqaKEtXio/%3Fcb%3D20260328003025/https/static.wikia.nocookie.net/stealabr/images/b/b5/Nuclearo_Dinossauro.png",
+    "La Grande Combinasion": "https://images-ext-1.discordapp.net/external/l-HH_TrxOC9-VzpqWi-oTxrXNsdH7jIVxAuZI0diczo/https/www.mobynotifier.com/brainrots/la-grande-combinasion?format=webp",
+    "La Romantic Grande": "https://static.wikia.nocookie.net/stealabr/images/6/69/La_Romantic_Grande2.png",
+    "Spaghetti Tualetti": "https://images-ext-1.discordapp.net/external/yoOCxZMRDwqYzFcsYPY5GX2WY2wK4FvGgqB72P1VCV8/https/www.mobynotifier.com/brainrots/spaghetti-tualetti?format=webp",
+    "La Casa Boo": "https://images-ext-1.discordapp.net/external/quqyy1a6ddzWi8EeljigfhNgezGLFYhD2LpWiSRMu4g/%3Fcb%3D20260505011532/https/static.wikia.nocookie.net/stealabr/images/d/de/Casa_Booo.png",
+    "Ketupat Bros": "https://static.wikia.nocookie.net/stealabr/images/4/4d/Ketupat_Bros.png",
+    "Swaggy Bros": "https://static.wikia.nocookie.net/stealabr/images/8/85/Swaggy_Bros.png",
+    "La Ginger Sekolah": "https://static.wikia.nocookie.net/stealabr/images/f/f4/La_ginger_Sekolah.webp",
+    "Capitano Moby": "https://images-ext-1.discordapp.net/external/k7fodKUVV7Tr3fLaxkyXXgGUKpuj0fS05fyglkhIM20/https/www.mobynotifier.com/brainrots/capitano-moby?format=webp",
+    "Bacuru and Egguru": "https://images-ext-1.discordapp.net/external/flzi1jBXX-CAptIqAJjRlYEiRZabV6i7l6YJSZrY2LA/https/www.mobynotifier.com/brainrots/bacuru-and-egguru?format=webp",
+    "Mieteteira Bicicleteira": "https://images-ext-1.discordapp.net/external/vAAWVq--XN7-z7-XSdiqyaCW5QGpLqa9tr_NNHpt_Yk/https/www.mobynotifier.com/brainrots/mieteteira-bicicleteira?format=webp",
+    "Spinny Hammy": "https://images-ext-1.discordapp.net/external/BoWX4KUkY2KLFTf2mUHpMH1tDNo2PRIq19ICSrGuRo8/https/www.mobynotifier.com/brainrots/spinny-hammy?format=webp",
 }
 
 BRAINROTS = {
-    # Common - Under 160M base
+    # COMMON - Under 160M base (KingVisuals low tier brainrots)
     "La Taco Combinasion": {"income": 35, "rarity": "Secret", "tier": "Common"},
     "Garama and Madundung": {"income": 50, "rarity": "Secret", "tier": "Common"},
     "Lavadorito Spinito": {"income": 45, "rarity": "Secret", "tier": "Common"},
@@ -74,9 +89,22 @@ BRAINROTS = {
     "Esok Sekolah": {"income": 30, "rarity": "Secret", "tier": "Common"},
     "Burguro And Fryuro": {"income": 150, "rarity": "Secret", "tier": "Common"},
     "Chillin Chili": {"income": 50, "rarity": "Secret", "tier": "Common"},
-    "Fragola La La La": {"income": 450, "rarity": "Secret", "tier": "Rare"},
+    "Los Combinasionas": {"income": 15, "rarity": "Secret", "tier": "Common"},
+    "Tralaledon": {"income": 27.5, "rarity": "Secret", "tier": "Common"},
+    "Nuclearo Dinosauro": {"income": 15, "rarity": "Secret", "tier": "Common"},
+    "La Grande Combinasion": {"income": 10, "rarity": "Secret", "tier": "Common"},
+    "La Romantic Grande": {"income": 35, "rarity": "Secret", "tier": "Common"},
+    "Spaghetti Tualetti": {"income": 60, "rarity": "Secret", "tier": "Common"},
+    "La Casa Boo": {"income": 100, "rarity": "Secret", "tier": "Common"},
+    "Ketupat Bros": {"income": 145, "rarity": "Secret", "tier": "Common"},
+    "Swaggy Bros": {"income": 40, "rarity": "Secret", "tier": "Common"},
+    "La Ginger Sekolah": {"income": 75, "rarity": "Secret", "tier": "Common"},
+    "Bacuru and Egguru": {"income": 24, "rarity": "Secret", "tier": "Common"},
+    "Mieteteira Bicicleteira": {"income": 26, "rarity": "Secret", "tier": "Common"},
+    "Spinny Hammy": {"income": 17, "rarity": "Secret", "tier": "Common"},
+    "Capitano Moby": {"income": 160, "rarity": "Secret", "tier": "Common"},
     
-    # Rare - 160M - 224M base
+    # RARE - 160M - 224M base
     "Celestial Pegasus": {"income": 175, "rarity": "Secret", "tier": "Rare"},
     "Fragrama and Chocrama": {"income": 100, "rarity": "Secret", "tier": "Rare"},
     "Rosey and Teddy": {"income": 165, "rarity": "Secret", "tier": "Rare"},
@@ -85,8 +113,9 @@ BRAINROTS = {
     "Dragon Cannelloni": {"income": 250, "rarity": "Secret", "tier": "Rare"},
     "Los Chillis": {"income": 200, "rarity": "Secret", "tier": "Rare"},
     "Reinito Sleighito": {"income": 140, "rarity": "Secret", "tier": "Rare"},
+    "Fragola La La La": {"income": 450, "rarity": "Secret", "tier": "Rare"},
     
-    # Super Rare - 225M+ base
+    # SUPER RARE - 225M+ base
     "Love Love Bear": {"income": 225, "rarity": "Secret", "tier": "SuperRare"},
     "Hydra Dragon Cannelloni": {"income": 300, "rarity": "Secret", "tier": "SuperRare"},
     "Dragon Gingerini": {"income": 350, "rarity": "Secret", "tier": "SuperRare"},
@@ -192,83 +221,12 @@ def get_random_brainrot_by_tier(target_tier):
         return None, None
     return random.choice(filtered)
 
-async def auto_log_loop():
-    bot_cnt = random.randint(11000, 17000)
-    
-    last_common_time = time.time()
-    last_rare_time = time.time()
-    last_superrare_time = time.time()
-    last_og_time = time.time()
-    
-    common_interval = 360
-    rare_interval = 3600
-    superrare_interval = 7200
-    og_interval = 25200
-    
-    # Store recent brainrots for multi-log display
-    recent_brainrots = []
-    
-    while True:
-        now = time.time()
-        new_brainrot = None
-        tier_name = None
-        
-        if (now - last_og_time) >= og_interval:
-            name, data = get_random_brainrot_by_tier("OG")
-            if name:
-                last_og_time = now
-                tier_name = "OG"
-                new_brainrot = generate_brainrot_entry(name, data)
-                new_brainrot["rarity"] = "OG"
-                new_brainrot["image"] = BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png")
-                print(f"🎯 OG SPAWN: {name}")
-        elif (now - last_superrare_time) >= superrare_interval:
-            name, data = get_random_brainrot_by_tier("SuperRare")
-            if name:
-                last_superrare_time = now
-                tier_name = "SuperRare"
-                new_brainrot = generate_brainrot_entry(name, data)
-                new_brainrot["rarity"] = "Secret"
-                new_brainrot["image"] = BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png")
-                print(f"⭐ SUPER RARE SPAWN: {name}")
-        elif (now - last_rare_time) >= rare_interval:
-            name, data = get_random_brainrot_by_tier("Rare")
-            if name:
-                last_rare_time = now
-                tier_name = "Rare"
-                new_brainrot = generate_brainrot_entry(name, data)
-                new_brainrot["rarity"] = "Secret"
-                new_brainrot["image"] = BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png")
-                print(f"✨ RARE SPAWN: {name}")
-        else:
-            if (now - last_common_time) >= common_interval:
-                last_common_time = now
-            name, data = get_random_brainrot_by_tier("Common")
-            if name:
-                tier_name = "Common"
-                new_brainrot = generate_brot_entry(name, data)
-                new_brainrot["rarity"] = "Secret"
-                new_brainrot["image"] = BRAINROT_IMAGES.get(name, "https://i.imgur.com/placeholder.png")
-        
-        if new_brainrot:
-            recent_brainrots.append(new_brainrot)
-            recent_brainrots.sort(key=lambda x: x["income"], reverse=True)
-            recent_brainrots = recent_brainrots[:15]
-            
-            bot_cnt = update_bot_count()
-            send_multi_embed(recent_brainrots, bot_cnt)
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Added: {new_brainrot['name']} | {new_brainrot['formatted_income']}/s")
-        
-        await asyncio.sleep(random.randint(30, 60))
-
 def send_multi_embed(brainrots, bot_count):
     if not brainrots:
         return
     
     highest = brainrots[0]
-    highest_tier = get_tier_display(highest["income"])
     highest_color = get_color(highest["income"])
-    
     players = random.randint(1, 8)
     
     embed = discord.Embed(
@@ -284,7 +242,7 @@ def send_multi_embed(brainrots, bot_count):
     )
     
     all_brainrots_text = ""
-    for i, br in enumerate(brainrots[:12], 1):
+    for i, br in enumerate(brainrots[:15], 1):
         all_brainrots_text += f"**{i}.** {br['name']} | {br['formatted_income']}/s\n"
     
     embed.add_field(
@@ -299,6 +257,58 @@ def send_multi_embed(brainrots, bot_count):
         requests.post(WEBHOOK_URL, json={"embeds": [embed.to_dict()], "username": "ZYROX AJ"})
     except Exception as e:
         print(f"Error: {e}")
+
+async def auto_log_loop():
+    bot_cnt = random.randint(11000, 17000)
+    
+    last_batch_time = time.time()
+    batch_interval = 360  # Send batch every 6 minutes
+    
+    # Store brainrots for batch sending
+    pending_brainrots = []
+    
+    while True:
+        await asyncio.sleep(random.randint(30, 60))
+        
+        # Generate 2-4 brainrots per batch cycle
+        num_to_generate = random.randint(2, 4)
+        
+        for _ in range(num_to_generate):
+            now = time.time()
+            is_og = random.random() < 0.02  # 2% chance for OG
+            is_super_rare = random.random() < 0.05  # 5% chance for super rare
+            is_rare = random.random() < 0.15  # 15% chance for rare
+            
+            if is_og:
+                name, data = get_random_brainrot_by_tier("OG")
+                if not name:
+                    name, data = get_random_brainrot_by_tier("Common")
+            elif is_super_rare:
+                name, data = get_random_brainrot_by_tier("SuperRare")
+                if not name:
+                    name, data = get_random_brainrot_by_tier("Common")
+            elif is_rare:
+                name, data = get_random_brainrot_by_tier("Rare")
+                if not name:
+                    name, data = get_random_brainrot_by_tier("Common")
+            else:
+                name, data = get_random_brainrot_by_tier("Common")
+            
+            if name and data:
+                entry = generate_brainrot_entry(name, data)
+                entry["rarity"] = data["rarity"]
+                pending_brainrots.append(entry)
+        
+        # Send batch if we have enough or time elapsed
+        if len(pending_brainrots) >= 3 or (time.time() - last_batch_time) >= batch_interval:
+            if pending_brainrots:
+                # Sort by income (highest first)
+                pending_brainrots.sort(key=lambda x: x["income"], reverse=True)
+                bot_cnt = update_bot_count()
+                send_multi_embed(pending_brainrots, bot_cnt)
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] Sent batch of {len(pending_brainrots)} brainrots")
+                pending_brainrots = []
+                last_batch_time = time.time()
 
 def update_bot_count():
     global bot_count
@@ -349,7 +359,6 @@ async def manual_log(ctx, *, args: str = None):
     tier = get_tier_display(income)
     color = get_color(income)
     formatted_income = format_income(income)
-    image_url = BRAINROT_IMAGES.get(brainrot_name, "https://i.imgur.com/placeholder.png")
     players = random.randint(1, 8)
     
     embed = discord.Embed(
@@ -425,12 +434,12 @@ async def on_ready():
     print(f"Webhook: {WEBHOOK_URL[:60]}...")
     print("=" * 60)
     print("SPAWN RATES:")
-    print("  🟢 Common (under 160M base): Every 6 minutes")
-    print("  🔵 Rare (160M - 224M base): Every 1 hour")
-    print("  🟣 Super Rare (225M+ base): Every 2 hours")
-    print("  🔴 OG (400M+ base): Every 7 hours")
+    print(f"  🟢 Common: {len([b for b in BRAINROTS.values() if b['tier'] == 'Common'])} brainrots")
+    print(f"  🔵 Rare: {len([b for b in BRAINROTS.values() if b['tier'] == 'Rare'])} brainrots")
+    print(f"  🟣 Super Rare: {len([b for b in BRAINROTS.values() if b['tier'] == 'SuperRare'])} brainrots")
+    print(f"  🔴 OG: {len([b for b in BRAINROTS.values() if b['tier'] == 'OG'])} brainrots")
     print("=" * 60)
-    print("EMBED FORMAT: Multi-brainrot (Moby Notifier style)")
+    print("BATCH MODE: Sends 2-4 brainrots every 6 minutes")
     print(f"Total brainrots: {len(BRAINROTS)}")
     print("=" * 60)
     
