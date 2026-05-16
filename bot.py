@@ -61,4 +61,4 @@ async def setmessage(ctx, *, new_message):
     celebration_message = new_message
     await ctx.send(f"✅ Message updated to: `{celebration_message}`")
 
-bot.run("YOUR_BOT_TOKEN_HERE")  # Replace with your real token
+bot.run("MTQ5NjYyNDc5OTgyNzM2NjEzMA.GyA7YN.kRxPRsnrJ57Gl0b2sjzSVr9UMuvJ_OW022ljn4")  # Replace with your real token
