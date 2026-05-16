@@ -1,1 +1,7 @@
 discord.py
+flask
+flask-cors
+requests
+python-dotenv
+sqlite3
+secrets
