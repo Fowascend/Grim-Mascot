@@ -1,64 +1,127 @@
-import discord
-from discord.ext import commands
+from flask import Flask, request, jsonify
+import sqlite3
+import time
+import hmac
+import hashlib
+import base64
 
-intents = discord.Intents.default()
-intents.message_content = True
+app = Flask(__name__)
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+conn = sqlite3.connect('grimpot.db', check_same_thread=False)
+c = conn.cursor()
 
-# 👇 CHANGE THIS TO YOUR MESSAGE 👇
-celebration_message = "@everyone Fowascend said hi"
+# Your actual script content (obfuscated/minified)
+# This will be served when key is valid
+PROTECTED_SCRIPT = """
+--[[ GrimPot Protected Script ]]
+-- Loaded successfully!
 
-# 👇 THE USER ID THAT IS ALLOWED TO USE THE COMMAND 👇
-ALLOWED_USER_ID = 1039230074525863998
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
 
-@bot.event
-async def on_ready():
-    print(f'{bot.user} is ready!')
-    print(f'Celebration message: {celebration_message}')
-    print(f'Allowed user: {ALLOWED_USER_ID}')
+print("✅ GrimPot Script Loaded!")
 
-@bot.command()
-async def celebrate(ctx):
-    """Only allowed user can send celebration to every channel"""
+-- Your full AJ script goes here
+-- This is the protected content
+
+loadstring([[
+    -- Paste your actual Lazy AJ / ZYROX AJ script here
+    print("ZYROX AJ - Fully Loaded")
+]])()
+"""
+
+@app.route('/api/validate', methods=['POST'])
+def validate_key():
+    data = request.json
+    key = data.get('key')
+    hwid = data.get('hwid')
     
-    # 🔽 CHECK IF THE COMMAND USER IS THE ALLOWED USER 🔽
-    if ctx.author.id != ALLOWED_USER_ID:
-        await ctx.send(f"Sorry {ctx.author.mention}, only <@{ALLOWED_USER_ID}> can use this command.")
-        return
-
-    # Confirmation
-    await ctx.send(f"Send `{celebration_message}` to ALL channels? Type `YES`")
+    if not key:
+        return jsonify({'code': 'INVALID_KEY', 'message': 'No key provided'})
     
-    def check(m):
-        return m.author.id == ALLOWED_USER_ID and m.content == "YES" and m.channel == ctx.channel
-
-    try:
-        await bot.wait_for('message', timeout=10.0, check=check)
-    except:
-        await ctx.send("Cancelled.")
-        return
-
-    # Send to every text channel
-    count = 0
-    for channel in ctx.guild.text_channels:
-        try:
-            await channel.send(celebration_message)
-            count += 1
-        except:
-            print(f"Failed: #{channel.name}")
-
-    await ctx.send(f"✅ Celebration sent to {count} channels! 🎉")
-
-@bot.command()
-async def setmessage(ctx, *, new_message):
-    """Update the celebration message (allowed user only)"""
-    if ctx.author.id != ALLOWED_USER_ID:
-        await ctx.send(f"Only <@{ALLOWED_USER_ID}> can update the message.")
-        return
+    c.execute("SELECT id, project_id, redeemed_by, is_lifetime, expires_at FROM keys WHERE key_code = ?", (key,))
+    key_data = c.fetchone()
     
-    global celebration_message
-    celebration_message = new_message
-    await ctx.send(f"✅ Message updated to: `{celebration_message}`")
+    if not key_data:
+        return jsonify({'code': 'INVALID_KEY', 'message': 'Key does not exist'})
+    
+    key_id, project_id, redeemed_by, is_lifetime, expires_at = key_data
+    
+    # Check if expired
+    if not is_lifetime and expires_at and expires_at < int(time.time()):
+        return jsonify({'code': 'KEY_EXPIRED', 'message': 'Key has expired'})
+    
+    # Check if HWID locked
+    if redeemed_by:
+        c.execute("SELECT hwid FROM executions WHERE key_code = ? ORDER BY id DESC LIMIT 1", (key,))
+        hwid_data = c.fetchone()
+        if hwid_data and hwid_data[0] and hwid_data[0] != hwid:
+            return jsonify({'code': 'HWID_MISMATCH', 'message': 'Key locked to different HWID'})
+    
+    # Log execution
+    c.execute("INSERT INTO executions (key_code, hwid, executed_at, ip) VALUES (?, ?, ?, ?)",
+              (key, hwid, int(time.time()), request.remote_addr))
+    conn.commit()
+    
+    return jsonify({
+        'code': 'VALID',
+        'message': 'Key is valid',
+        'script': PROTECTED_SCRIPT,
+        'expires_at': expires_at,
+        'is_lifetime': is_lifetime
+    })
 
-bot.run("MTQ5NjYyNDc5OTgyNzM2NjEzMA.GyA7YN.kRxPRsnrJ57Gl0b2sjzSVr9UMuvJ_OW022ljn4")  # Replace with your real token
+@app.route('/api/load', methods=['GET'])
+def load_script():
+    key = request.args.get('key')
+    hwid = request.args.get('hwid')
+    
+    if not key:
+        return "Invalid key", 403
+    
+    c.execute("SELECT id, is_lifetime, expires_at FROM keys WHERE key_code = ?", (key,))
+    key_data = c.fetchone()
+    
+    if not key_data:
+        return "Invalid key", 403
+    
+    key_id, is_lifetime, expires_at = key_data
+    
+    if not is_lifetime and expires_at and expires_at < int(time.time()):
+        return "Key expired", 403
+    
+    # Return obfuscated script that can't be viewed in browser
+    import zlib
+    import base64
+    
+    compressed = zlib.compress(PROTECTED_SCRIPT.encode())
+    encoded = base64.b64encode(compressed).decode()
+    
+    loadstring_code = f'loadstring(game:HttpGet("https://YOUR_API_URL/api/execute?key={key}&hwid={hwid}"))()'
+    
+    return loadstring_code
+
+@app.route('/api/execute', methods=['GET'])
+def execute_script():
+    key = request.args.get('key')
+    hwid = request.args.get('hwid')
+    
+    if not key:
+        return "Invalid key", 403
+    
+    c.execute("SELECT id, is_lifetime, expires_at FROM keys WHERE key_code = ?", (key,))
+    key_data = c.fetchone()
+    
+    if not key_data:
+        return "Invalid key", 403
+    
+    key_id, is_lifetime, expires_at = key_data
+    
+    if not is_lifetime and expires_at and expires_at < int(time.time()):
+        return "Key expired", 403
+    
+    # Return the actual script
+    return PROTECTED_SCRIPT
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
