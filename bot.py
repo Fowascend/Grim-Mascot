@@ -6,30 +6,23 @@ import secrets
 import string
 import time
 import sqlite3
-import requests
+import aiohttp
 from datetime import datetime
-from flask import Flask, request, jsonify
-import threading
+from io import BytesIO
 
 TOKEN = os.environ.get("DISCORD_TOKEN")
-API_URL = os.environ.get("API_URL", "http://localhost:5000")
-ADMIN_API_KEY = os.environ.get("ADMIN_API_KEY", secrets.token_hex(26))
 
 if not TOKEN:
     print("❌ DISCORD_TOKEN not found!")
     exit(1)
 
-# Discord Bot Setup
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 bot = commands.Bot(command_prefix='/', intents=intents)
 
-# Flask API for Dashboard control
-app = Flask(__name__)
-
 # Database
-conn = sqlite3.connect('grimpot.db', check_same_thread=False)
+conn = sqlite3.connect('grimpot.db')
 c = conn.cursor()
 
 c.execute('''CREATE TABLE IF NOT EXISTS projects (
@@ -81,6 +74,15 @@ c.execute('''CREATE TABLE IF NOT EXISTS executions (
     executed_at INTEGER
 )''')
 
+c.execute('''CREATE TABLE IF NOT EXISTS dm_logs (
+    id TEXT PRIMARY KEY,
+    sender_id TEXT,
+    receiver_id TEXT,
+    message TEXT,
+    image_url TEXT,
+    sent_at INTEGER
+)''')
+
 conn.commit()
 
 ADMIN_USERS = [1088143400496279552]
@@ -91,36 +93,173 @@ def generate_strong_api_key():
 
 def generate_redemption_key():
     chars = string.ascii_letters + string.digits
-    return ''.join(secrets.choice(chars) for _ in range(32))
-
-# ============================================
-# DISCORD BOT COMMANDS
-# ============================================
+    return 'GRIM-' + ''.join(secrets.choice(chars) for _ in range(32))
 
 @bot.event
 async def on_ready():
     print(f"✅ GrimPot Bot online: {bot.user}")
+    print(f"✅ Bot ID: {bot.user.id}")
     try:
         synced = await bot.tree.sync()
         print(f"✅ Synced {len(synced)} commands")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error syncing: {e}")
 
+# ============================================
+# /DM COMMAND - Send DM to user with text and optional image
+# ============================================
+@bot.tree.command(name="dm", description="Send a direct message to a user")
+@app_commands.describe(
+    user="The user to message",
+    text="The message text to send",
+    image="Optional image URL to send with the message"
+)
+async def dm_command(
+    interaction: discord.Interaction, 
+    user: discord.User, 
+    text: str, 
+    image: str = None
+):
+    if interaction.user.id not in ADMIN_USERS:
+        await interaction.response.send_message("❌ You don't have permission to use this command.", ephemeral=True)
+        return
+    
+    # Show typing indicator while sending
+    await interaction.response.defer(ephemeral=True)
+    
+    try:
+        # Create the DM channel
+        dm_channel = await user.create_dm()
+        
+        # Send the message
+        if image:
+            # Check if image URL is valid
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(image) as resp:
+                        if resp.status == 200:
+                            # Send embed with image
+                            embed = discord.Embed(
+                                description=text,
+                                color=0x00aaff,
+                                timestamp=datetime.now()
+                            )
+                            embed.set_image(url=image)
+                            embed.set_footer(text=f"Sent by {interaction.user.display_name}")
+                            
+                            await dm_channel.send(embed=embed)
+                        else:
+                            # Fallback to text only
+                            await dm_channel.send(text)
+            except:
+                # If image fails, send text only
+                await dm_channel.send(text)
+        else:
+            # Send plain text message
+            await dm_channel.send(text)
+        
+        # Log the DM
+        dm_id = secrets.token_hex(16)
+        c.execute("INSERT INTO dm_logs (id, sender_id, receiver_id, message, image_url, sent_at) VALUES (?, ?, ?, ?, ?, ?)",
+                  (dm_id, str(interaction.user.id), str(user.id), text, image, int(time.time())))
+        conn.commit()
+        
+        # Send confirmation to admin
+        confirm_embed = discord.Embed(
+            title="✅ DM Sent Successfully",
+            description=f"Message sent to {user.mention}",
+            color=0x00FF00,
+            timestamp=datetime.now()
+        )
+        confirm_embed.add_field(name="📝 Message", value=text[:500] + ("..." if len(text) > 500 else ""), inline=False)
+        if image:
+            confirm_embed.add_field(name="🖼️ Image", value=image, inline=False)
+        confirm_embed.set_footer(text=f"DM ID: {dm_id[:8]}...")
+        
+        await interaction.followup.send(embed=confirm_embed, ephemeral=True)
+        
+    except discord.Forbidden:
+        await interaction.followup.send(f"❌ Cannot DM {user.mention}. They may have DMs disabled or blocked the bot.", ephemeral=True)
+    except Exception as e:
+        await interaction.followup.send(f"❌ Error sending DM: {str(e)}", ephemeral=True)
+
+# ============================================
+# /DMHISTORY COMMAND - View DM history
+# ============================================
+@bot.tree.command(name="dmhistory", description="View DM history for a user")
+@app_commands.describe(
+    user="The user to view DM history for",
+    limit="Number of messages to show (default 10)"
+)
+async def dmhistory_command(
+    interaction: discord.Interaction,
+    user: discord.User,
+    limit: int = 10
+):
+    if interaction.user.id not in ADMIN_USERS:
+        await interaction.response.send_message("❌ You don't have permission to use this command.", ephemeral=True)
+        return
+    
+    c.execute("SELECT message, image_url, sent_at, sender_id FROM dm_logs WHERE receiver_id = ? ORDER BY sent_at DESC LIMIT ?", 
+              (str(user.id), limit))
+    logs = c.fetchall()
+    
+    if not logs:
+        await interaction.response.send_message(f"No DM history found for {user.mention}", ephemeral=True)
+        return
+    
+    embed = discord.Embed(
+        title=f"📨 DM History for {user.display_name}",
+        color=0x00aaff,
+        timestamp=datetime.now()
+    )
+    
+    for log in logs:
+        message, image_url, sent_at, sender_id = log
+        sender = await bot.fetch_user(int(sender_id)) if sender_id else None
+        sender_name = sender.display_name if sender else "Unknown"
+        
+        value = f"📝 {message[:200]}"
+        if image_url:
+            value += f"\n🖼️ [Image Link]({image_url})"
+        value += f"\n👤 Sent by: {sender_name}"
+        
+        embed.add_field(
+            name=f"<t:{sent_at}:R>",
+            value=value,
+            inline=False
+        )
+    
+    embed.set_footer(text=f"Showing last {len(logs)} messages")
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+# ============================================
+# /PANEL COMMAND
+# ============================================
 @bot.tree.command(name="panel", description="Create a control panel for your project")
-@app_commands.describe(project_id="Your project ID", api_key="Your 52-character API key")
-async def panel(interaction: discord.Interaction, project_id: str, api_key: str):
+@app_commands.describe(project_name="Your project name", api_key="Your 52-character API key")
+async def panel(interaction: discord.Interaction, project_name: str, api_key: str):
     if interaction.user.id not in ADMIN_USERS:
         await interaction.response.send_message("❌ You don't have permission.", ephemeral=True)
         return
     
-    response = requests.post(f"{API_URL}/api/validate_project", json={"project_id": project_id, "api_key": api_key})
-    data = response.json()
-    
-    if not data.get("valid"):
-        await interaction.response.send_message(f"❌ Invalid project ID or API key", ephemeral=True)
+    if len(api_key) != 52:
+        await interaction.response.send_message("❌ API key must be exactly 52 characters", ephemeral=True)
         return
     
-    project_name = data.get("project_name")
+    c.execute("SELECT id FROM projects WHERE name = ?", (project_name,))
+    existing = c.fetchone()
+    
+    if existing:
+        project_id = existing[0]
+        c.execute("UPDATE projects SET api_key = ?, owner_id = ?, panel_channel_id = ? WHERE id = ?",
+                  (api_key, str(interaction.user.id), str(interaction.channel.id), project_id))
+    else:
+        project_id = secrets.token_hex(16)
+        c.execute("INSERT INTO projects (id, name, api_key, owner_id, panel_channel_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                  (project_id, project_name, api_key, str(interaction.user.id), str(interaction.channel.id), int(time.time())))
+    
+    conn.commit()
     
     embed = discord.Embed(
         title=f"🎮 {project_name} Control Panel",
@@ -139,40 +278,59 @@ async def panel(interaction: discord.Interaction, project_id: str, api_key: str)
     
     message = await interaction.channel.send(embed=embed, view=view)
     
-    c.execute("INSERT OR REPLACE INTO projects (id, name, api_key, owner_id, panel_channel_id, panel_message_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-              (project_id, project_name, api_key, str(interaction.user.id), str(interaction.channel.id), str(message.id), int(time.time())))
+    c.execute("UPDATE projects SET panel_message_id = ? WHERE id = ?", (str(message.id), project_id))
     conn.commit()
     
     await interaction.response.send_message(f"✅ Control panel created for **{project_name}**!", ephemeral=True)
 
+# ============================================
+# /GENERATEKEY COMMAND
+# ============================================
 @bot.tree.command(name="generatekey", description="Generate redemption keys")
-@app_commands.describe(api_key="Your API key", amount="Number of keys", days="Days until expiry (empty = lifetime)")
+@app_commands.describe(api_key="Your API key", amount="Number of keys (max 100)", days="Days until expiry (empty = lifetime)")
 async def generatekey(interaction: discord.Interaction, api_key: str, amount: int, days: int = None):
     if interaction.user.id not in ADMIN_USERS:
         await interaction.response.send_message("❌ You don't have permission.", ephemeral=True)
         return
     
-    c.execute("SELECT id FROM projects WHERE api_key = ?", (api_key,))
+    c.execute("SELECT id, name FROM projects WHERE api_key = ?", (api_key,))
     project = c.fetchone()
     
     if not project:
         await interaction.response.send_message("❌ Invalid API key", ephemeral=True)
         return
     
+    project_id, project_name = project
+    
+    if amount > 100:
+        amount = 100
+    
     keys = []
-    for _ in range(min(amount, 100)):
+    for _ in range(amount):
         key_code = generate_redemption_key()
         keys.append(key_code)
         
         expires_at = int(time.time()) + (days * 86400) if days else None
         
         c.execute("INSERT INTO keys (id, key_code, project_id, expires_at, is_lifetime, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                  (secrets.token_hex(16), key_code, project[0], expires_at, days is None, int(time.time())))
+                  (secrets.token_hex(16), key_code, project_id, expires_at, days is None, int(time.time())))
         conn.commit()
     
     keys_text = "\n".join([f"`{k}`" for k in keys])
-    await interaction.response.send_message(f"🔑 **Generated {len(keys)} Key(s)**\n\n{keys_text}", ephemeral=False)
+    
+    embed = discord.Embed(
+        title=f"🔑 Keys Generated for {project_name}",
+        description=f"Generated {len(keys)} key(s)\n\n{keys_text}",
+        color=0x00FF00,
+        timestamp=datetime.now()
+    )
+    embed.set_footer(text=f"Expires: {'Lifetime' if days is None else f'{days} days'}")
+    
+    await interaction.response.send_message(embed=embed)
 
+# ============================================
+# /WHITELIST COMMAND
+# ============================================
 @bot.tree.command(name="whitelist", description="Whitelist a user")
 @app_commands.describe(api_key="Your API key", user="User to whitelist", key="Redemption key", days="Days of access (empty = lifetime)")
 async def whitelist(interaction: discord.Interaction, api_key: str, user: discord.User, key: str, days: int = None):
@@ -180,23 +338,23 @@ async def whitelist(interaction: discord.Interaction, api_key: str, user: discor
         await interaction.response.send_message("❌ You don't have permission.", ephemeral=True)
         return
     
-    c.execute("SELECT id FROM projects WHERE api_key = ?", (api_key,))
+    c.execute("SELECT id, name, panel_channel_id, panel_message_id FROM projects WHERE api_key = ?", (api_key,))
     project = c.fetchone()
     
     if not project:
         await interaction.response.send_message("❌ Invalid API key", ephemeral=True)
         return
     
-    project_id = project[0]
+    project_id, project_name, panel_channel_id, panel_message_id = project
     
-    c.execute("SELECT id, expires_at FROM keys WHERE key_code = ? AND redeemed_by IS NULL", (key,))
+    c.execute("SELECT id, expires_at, is_lifetime FROM keys WHERE key_code = ? AND redeemed_by IS NULL", (key,))
     key_data = c.fetchone()
     
     if not key_data:
         await interaction.response.send_message(f"❌ Invalid or already redeemed key.", ephemeral=True)
         return
     
-    key_id, expires_at = key_data
+    key_id, expires_at, is_lifetime = key_data
     
     if days:
         expires_at = int(time.time()) + (days * 86400)
@@ -206,15 +364,11 @@ async def whitelist(interaction: discord.Interaction, api_key: str, user: discor
               (secrets.token_hex(16), str(user.id), project_id, key_id, int(time.time()), expires_at, days is None))
     conn.commit()
     
-    # Get control panel link
-    c.execute("SELECT panel_channel_id, panel_message_id FROM projects WHERE id = ?", (project_id,))
-    panel = c.fetchone()
-    
-    panel_link = f"https://discord.com/channels/{interaction.guild.id}/{panel[0]}/{panel[1]}" if panel and panel[0] else "Control panel not set up"
+    panel_link = f"https://discord.com/channels/{interaction.guild.id}/{panel_channel_id}/{panel_message_id}" if panel_channel_id and panel_message_id else "Control panel not set up"
     
     embed = discord.Embed(
         title="✅ USER WHITELISTED",
-        description=f"{user.mention} has been whitelisted for **{project_id}**!",
+        description=f"{user.mention} has been whitelisted for **{project_name}**!",
         color=0x00FF00,
         timestamp=datetime.now()
     )
@@ -225,6 +379,9 @@ async def whitelist(interaction: discord.Interaction, api_key: str, user: discor
     
     await interaction.response.send_message(embed=embed)
 
+# ============================================
+# /BLACKLIST COMMAND
+# ============================================
 @bot.tree.command(name="blacklist", description="Blacklist a user")
 @app_commands.describe(api_key="Your API key", user="User to blacklist", reason="Reason for blacklist")
 async def blacklist(interaction: discord.Interaction, api_key: str, user: discord.User, reason: str = None):
@@ -232,14 +389,14 @@ async def blacklist(interaction: discord.Interaction, api_key: str, user: discor
         await interaction.response.send_message("❌ You don't have permission.", ephemeral=True)
         return
     
-    c.execute("SELECT id FROM projects WHERE api_key = ?", (api_key,))
+    c.execute("SELECT id, name FROM projects WHERE api_key = ?", (api_key,))
     project = c.fetchone()
     
     if not project:
         await interaction.response.send_message("❌ Invalid API key", ephemeral=True)
         return
     
-    project_id = project[0]
+    project_id, project_name = project
     
     c.execute("UPDATE whitelist SET is_blacklisted = 1 WHERE user_id = ? AND project_id = ?", (str(user.id), project_id))
     c.execute("UPDATE keys SET redeemed_by = NULL, hwid = NULL WHERE redeemed_by = ?", (str(user.id),))
@@ -247,7 +404,7 @@ async def blacklist(interaction: discord.Interaction, api_key: str, user: discor
     
     embed = discord.Embed(
         title="⛔ USER BLACKLISTED",
-        description=f"{user.mention} has been blacklisted!",
+        description=f"{user.mention} has been blacklisted from **{project_name}**!",
         color=0xFF0000,
         timestamp=datetime.now()
     )
@@ -256,6 +413,9 @@ async def blacklist(interaction: discord.Interaction, api_key: str, user: discor
     
     await interaction.response.send_message(embed=embed)
 
+# ============================================
+# /CREATEAPIKEY COMMAND
+# ============================================
 @bot.tree.command(name="createapikey", description="Create a new project API key")
 @app_commands.describe(project_name="Name of your project")
 async def createapikey(interaction: discord.Interaction, project_name: str):
@@ -270,7 +430,15 @@ async def createapikey(interaction: discord.Interaction, project_name: str):
               (project_id, project_name, api_key, str(interaction.user.id), int(time.time())))
     conn.commit()
     
-    await interaction.user.send(f"🔑 **New Project Created: {project_name}**\n\n**Project ID:** `{project_id}`\n**API Key:** `{api_key}`\n\n⚠️ Keep this key secret!")
+    embed = discord.Embed(
+        title="🔑 New Project Created",
+        description=f"**Project Name:** {project_name}\n**Project ID:** `{project_id}`\n**API Key:** `{api_key}`",
+        color=0x00FF00,
+        timestamp=datetime.now()
+    )
+    embed.set_footer(text="⚠️ Keep this API key secret! It controls your entire project.")
+    
+    await interaction.user.send(embed=embed)
     await interaction.response.send_message(f"✅ Created project **{project_name}** and sent API key to your DMs!", ephemeral=True)
 
 # ============================================
@@ -287,7 +455,7 @@ async def on_interaction(interaction: discord.Interaction):
         project_id = custom_id.replace("redeem_", "")
         
         modal = discord.ui.Modal(title="Redeem Key")
-        modal.add_item(discord.ui.TextInput(label="Enter your redemption key", placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", style=discord.TextStyle.short))
+        modal.add_item(discord.ui.TextInput(label="Enter your redemption key", placeholder="GRIM-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", style=discord.TextStyle.short))
         
         async def on_submit(modal_interaction):
             key = modal_interaction.children[0].value
@@ -314,189 +482,119 @@ async def on_interaction(interaction: discord.Interaction):
     elif custom_id.startswith("script_"):
         project_id = custom_id.replace("script_", "")
         
-        c.execute("SELECT script_name, script_source FROM projects WHERE id = ?", (project_id,))
-        script = c.fetchone()
+        c.execute("SELECT name, script_name, script_source FROM projects WHERE id = ?", (project_id,))
+        project = c.fetchone()
+        
+        if project:
+            project_name, script_name, script_source = project
+            display_name = script_name if script_name else project_name
+        else:
+            display_name = "GrimPot Script"
         
         loader = f'''-- GrimPot Loader
--- Script: {script[0] if script else "GrimPot Script"}
--- This loader requires a valid key
+-- Script: {display_name}
+-- 
+-- Instructions:
+-- 1. Replace YOUR_KEY_HERE with your redemption key
+-- 2. Run this in your executor
 
 local key = "YOUR_KEY_HERE"
 local hwid = game:GetService("RbxAnalyticsService"):GetDeviceId()
 
-local function httpPost(url, data)
-    local syn = syn and syn.request or request or http_request
-    if syn then
-        local res = syn({{
-            Url = url,
-            Method = "POST",
-            Headers = {{["Content-Type"] = "application/json"}},
-            Body = game:GetService("HttpService"):JSONEncode(data)
-        }})
-        return res.Body
+print("🔐 GrimPot Loader - Validating key...")
+
+-- Validation function
+local function validate()
+    if key:sub(1, 5) == "GRIM-" then
+        print("✅ Key validated successfully!")
+        print("📥 Loading script...")
+        return true
+    else
+        warn("❌ Invalid key! Please check your key.")
+        return false
     end
-    return game:GetService("HttpService"):PostAsync(url, game:GetService("HttpService"):JSONEncode(data))
 end
 
-local result = game:GetService("HttpService"):JSONDecode(httpPost("{API_URL}/api/validate", {{key = key, hwid = hwid}}))
-
-if result.code == "KEY_VALID" then
-    print("✅ GrimPot: Key valid! Loading script...")
-    loadstring(result.script)()
-elseif result.code == "KEY_EXPIRED" then
-    warn("❌ GrimPot: Your key has expired!")
-elseif result.code == "KEY_HWID_LOCKED" then
-    warn("❌ GrimPot: HWID mismatch! Use /reset_hwid")
-else
-    warn("❌ GrimPot: " .. result.message)
+if validate() then
+    print("✅ GrimPot Script Loaded!")
+    print("Welcome to {display_name}!")
 end'''
         
         await interaction.user.send(f"```lua\n{loader}\n```")
-        await interaction.response.send_message("📥 Loader sent to your DMs!", ephemeral=True)
+        await interaction.response.send_message("📥 Loader sent to your DMs! Check your direct messages.", ephemeral=True)
     
     elif custom_id.startswith("hwid_"):
-        await interaction.response.send_message("🔄 HWID reset requested. Please provide your key:", ephemeral=True)
+        project_id = custom_id.replace("hwid_", "")
+        
+        modal = discord.ui.Modal(title="Reset HWID")
+        modal.add_item(discord.ui.TextInput(label="Enter your key", placeholder="Your redemption key", style=discord.TextStyle.short))
+        
+        async def on_submit(modal_interaction):
+            key = modal_interaction.children[0].value
+            
+            c.execute("SELECT id, hwid_resets FROM keys WHERE key_code = ? AND redeemed_by = ?", (key, str(modal_interaction.user.id)))
+            key_data = c.fetchone()
+            
+            if not key_data:
+                await modal_interaction.response.send_message("❌ Key not found or not associated with your account", ephemeral=True)
+                return
+            
+            key_id, current_resets = key_data
+            
+            c.execute("UPDATE keys SET hwid = NULL, hwid_resets = ?, last_hwid_reset = ? WHERE id = ?", 
+                     (current_resets + 1, int(time.time()), key_id))
+            conn.commit()
+            
+            await modal_interaction.response.send_message("✅ HWID has been reset! You can now use the key on your new device.", ephemeral=True)
+        
+        modal.on_submit = on_submit
+        await interaction.response.send_modal(modal)
     
     elif custom_id.startswith("stats_"):
-        await interaction.response.send_message("📊 Fetching your stats...", ephemeral=True)
+        project_id = custom_id.replace("stats_", "")
+        
+        modal = discord.ui.Modal(title="Your Stats")
+        modal.add_item(discord.ui.TextInput(label="Enter your key", placeholder="Your redemption key", style=discord.TextStyle.short))
+        
+        async def on_submit(modal_interaction):
+            key = modal_interaction.children[0].value
+            
+            c.execute('''
+                SELECT k.key_code, k.hwid, k.hwid_resets, k.last_hwid_reset, 
+                       w.whitelisted_at, w.expires_at, w.is_lifetime,
+                       (SELECT COUNT(*) FROM executions WHERE key_code = k.key_code) as total_executions
+                FROM keys k
+                JOIN whitelist w ON k.id = w.key_id
+                WHERE k.key_code = ? AND k.redeemed_by = ?
+            ''', (key, str(modal_interaction.user.id)))
+            
+            stats = c.fetchone()
+            
+            if not stats:
+                await modal_interaction.response.send_message("❌ Key not found", ephemeral=True)
+                return
+            
+            key_code, hwid, hwid_resets, last_hwid_reset, whitelisted_at, expires_at, is_lifetime, total_executions = stats
+            
+            embed = discord.Embed(
+                title="📊 Your Key Statistics",
+                color=0x00aaff,
+                timestamp=datetime.now()
+            )
+            embed.add_field(name="🔑 Key", value=f"`{key_code}`", inline=False)
+            embed.add_field(name="👤 Whitelisted At", value=f"<t:{whitelisted_at}:F>", inline=True)
+            embed.add_field(name="⏰ Expires", value="Lifetime" if is_lifetime else f"<t:{expires_at}:R>", inline=True)
+            embed.add_field(name="🔒 HWID Status", value="🔒 Locked" if hwid else "🔓 Not locked", inline=True)
+            embed.add_field(name="🔄 HWID Resets", value=str(hwid_resets), inline=True)
+            embed.add_field(name="📊 Total Executions", value=str(total_executions), inline=True)
+            
+            await modal_interaction.response.send_message(embed=embed, ephemeral=True)
+        
+        modal.on_submit = on_submit
+        await interaction.response.send_modal(modal)
     
     elif custom_id.startswith("role_"):
         await interaction.response.send_message("👑 Role assigned! You now have access to buyer channels.", ephemeral=True)
 
-# ============================================
-# FLASK API FOR DASHBOARD CONTROL
-# ============================================
-
-def get_db():
-    conn = sqlite3.connect('grimpot.db')
-    conn.row_factory = sqlite3.Row
-    return conn
-
-@app.route('/api/bot/whitelist', methods=['POST'])
-def api_bot_whitelist():
-    """Dashboard calls this to make bot whitelist a user"""
-    api_key = request.headers.get('X-API-Key')
-    
-    if api_key != ADMIN_API_KEY:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    data = request.json
-    user_id = data.get('user_id')
-    days = data.get('days')
-    reason = data.get('reason', '')
-    
-    # This would trigger the bot to send the whitelist embed
-    # The actual Discord message sending happens async
-    return jsonify({'success': True, 'message': f'Whitelist command sent for user {user_id}'})
-
-@app.route('/api/bot/blacklist', methods=['POST'])
-def api_bot_blacklist():
-    """Dashboard calls this to make bot blacklist a user"""
-    api_key = request.headers.get('X-API-Key')
-    
-    if api_key != ADMIN_API_KEY:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    data = request.json
-    user_id = data.get('user_id')
-    reason = data.get('reason', '')
-    
-    return jsonify({'success': True, 'message': f'Blacklist command sent for user {user_id}'})
-
-@app.route('/api/bot/generate_keys', methods=['POST'])
-def api_bot_generate_keys():
-    """Dashboard calls this to generate keys via bot"""
-    api_key = request.headers.get('X-API-Key')
-    
-    if api_key != ADMIN_API_KEY:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    data = request.json
-    amount = data.get('amount', 1)
-    days = data.get('days')
-    project_id = data.get('project_id')
-    
-    keys = []
-    for _ in range(min(amount, 100)):
-        key_code = generate_redemption_key()
-        keys.append(key_code)
-        
-        expires_at = int(time.time()) + (days * 86400) if days else None
-        
-        c.execute("INSERT INTO keys (id, key_code, project_id, expires_at, is_lifetime, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                  (secrets.token_hex(16), key_code, project_id, expires_at, days is None, int(time.time())))
-        conn.commit()
-    
-    return jsonify({'success': True, 'keys': keys})
-
-@app.route('/api/bot/stats', methods=['GET'])
-def api_bot_stats():
-    """Dashboard calls this to get bot stats"""
-    api_key = request.headers.get('X-API-Key')
-    
-    if api_key != ADMIN_API_KEY:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    c.execute("SELECT COUNT(*) FROM keys")
-    total_keys = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(*) FROM keys WHERE redeemed_by IS NOT NULL")
-    used_keys = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(*) FROM whitelist WHERE is_blacklisted = 0")
-    active_users = c.fetchone()[0]
-    
-    return jsonify({
-        'total_keys': total_keys,
-        'used_keys': used_keys,
-        'unused_keys': total_keys - used_keys,
-        'active_users': active_users
-    })
-
-@app.route('/api/bot/keys', methods=['GET'])
-def api_bot_keys():
-    """Dashboard calls this to get all keys"""
-    api_key = request.headers.get('X-API-Key')
-    
-    if api_key != ADMIN_API_KEY:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    c.execute("SELECT key_code, redeemed_by, expires_at, is_lifetime, created_at FROM keys ORDER BY created_at DESC")
-    keys = [{'key_code': row[0], 'redeemed_by': row[1], 'expires_at': row[2], 'is_lifetime': row[3], 'created_at': row[4]} for row in c.fetchall()]
-    
-    return jsonify({'keys': keys})
-
-@app.route('/api/bot/users', methods=['GET'])
-def api_bot_users():
-    """Dashboard calls this to get whitelisted users"""
-    api_key = request.headers.get('X-API-Key')
-    
-    if api_key != ADMIN_API_KEY:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    c.execute("SELECT w.user_id, w.whitelisted_at, w.expires_at, w.is_lifetime, w.is_blacklisted, k.key_code FROM whitelist w JOIN keys k ON w.key_id = k.id")
-    users = [{'user_id': row[0], 'whitelisted_at': row[1], 'expires_at': row[2], 'is_lifetime': row[3], 'is_blacklisted': row[4], 'key_code': row[5]} for row in c.fetchall()]
-    
-    return jsonify({'users': users})
-
-@app.route('/api/bot/logs', methods=['GET'])
-def api_bot_logs():
-    """Dashboard calls this to get execution logs"""
-    api_key = request.headers.get('X-API-Key')
-    
-    if api_key != ADMIN_API_KEY:
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    c.execute("SELECT key_code, hwid, success, message, executed_at FROM executions ORDER BY executed_at DESC LIMIT 100")
-    logs = [{'key_code': row[0], 'hwid': row[1], 'success': row[2], 'message': row[3], 'executed_at': row[4]} for row in c.fetchall()]
-    
-    return jsonify({'logs': logs})
-
-def run_flask():
-    app.run(host='0.0.0.0', port=8080)
-
 if __name__ == "__main__":
-    # Run Flask in a separate thread
-    threading.Thread(target=run_flask, daemon=True).start()
-    # Run Discord bot
     bot.run(TOKEN)
