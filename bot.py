@@ -6,35 +6,32 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# 🔽 THIS IS THE VARIABLE YOU CAN UPDATE 🔽
+# 👇 CHANGE THIS TO YOUR MESSAGE 👇
 celebration_message = "@everyone Fowascend said hi"
+
+# 👇 THE USER ID THAT IS ALLOWED TO USE THE COMMAND 👇
+ALLOWED_USER_ID = 1039230074525863998
 
 @bot.event
 async def on_ready():
-    print(f'{bot.user} is ready to celebrate!')
-    print(f'Current message: {celebration_message}')
-
-@bot.command()
-async def update(ctx, *, new_message):
-    """Update the celebration message (e.g., !update @everyone NEW MESSAGE HERE)"""
-    global celebration_message
-    if not ctx.author.guild_permissions.administrator:
-        await ctx.send("Only admins can update the message.")
-        return
-    celebration_message = new_message
-    await ctx.send(f"✅ Celebration message updated to:\n`{celebration_message}`")
+    print(f'{bot.user} is ready!')
+    print(f'Celebration message: {celebration_message}')
+    print(f'Allowed user: {ALLOWED_USER_ID}')
 
 @bot.command()
 async def celebrate(ctx):
-    """Send the current celebration message to every channel"""
-    if not ctx.author.guild_permissions.administrator:
-        await ctx.send("Only admins can run this.")
+    """Only allowed user can send celebration to every channel"""
+    
+    # 🔽 CHECK IF THE COMMAND USER IS THE ALLOWED USER 🔽
+    if ctx.author.id != ALLOWED_USER_ID:
+        await ctx.send(f"Sorry {ctx.author.mention}, only <@{ALLOWED_USER_ID}> can use this command.")
         return
 
-    await ctx.send(f"Send `{celebration_message}` to ALL channels? Type `YES` to confirm.")
+    # Confirmation
+    await ctx.send(f"Send `{celebration_message}` to ALL channels? Type `YES`")
     
     def check(m):
-        return m.author == ctx.author and m.content == "YES" and m.channel == ctx.channel
+        return m.author.id == ALLOWED_USER_ID and m.content == "YES" and m.channel == ctx.channel
 
     try:
         await bot.wait_for('message', timeout=10.0, check=check)
@@ -42,12 +39,26 @@ async def celebrate(ctx):
         await ctx.send("Cancelled.")
         return
 
+    # Send to every text channel
+    count = 0
     for channel in ctx.guild.text_channels:
         try:
             await channel.send(celebration_message)
+            count += 1
         except:
-            print(f"Couldn't send to #{channel.name}")
+            print(f"Failed: #{channel.name}")
 
-    await ctx.send("Done! 🎉")
+    await ctx.send(f"✅ Celebration sent to {count} channels! 🎉")
 
-bot.run("YOUR_BOT_TOKEN_HERE")
+@bot.command()
+async def setmessage(ctx, *, new_message):
+    """Update the celebration message (allowed user only)"""
+    if ctx.author.id != ALLOWED_USER_ID:
+        await ctx.send(f"Only <@{ALLOWED_USER_ID}> can update the message.")
+        return
+    
+    global celebration_message
+    celebration_message = new_message
+    await ctx.send(f"✅ Message updated to: `{celebration_message}`")
+
+bot.run("YOUR_BOT_TOKEN_HERE")  # Replace with your real token
