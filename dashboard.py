@@ -1,188 +1,89 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+# dashboard.py - ADD THESE LINES TO YOUR EXISTING FILE
+
+# Add these imports at the top (if not already there)
 import sqlite3
 import secrets
 import time
-from datetime import datetime
+import os
 
-app = Flask(__name__)
-app.secret_key = secrets.token_hex(32)
+# Add these routes to your existing Flask app
 
-# Database connection
-def get_db():
+@app.route('/api/validate', methods=['POST'])
+def api_validate():
+    """API endpoint for Lua loader to validate keys"""
+    data = request.json
+    key = data.get('key')
+    hwid = data.get('hwid')
+    
+    if not key:
+        return jsonify({'code': 'INVALID_KEY', 'message': 'No key provided'})
+    
     conn = sqlite3.connect('grimpot.db')
-    conn.row_factory = sqlite3.Row
-    return conn
-
-# Home page - Login
-@app.route('/')
-def index():
-    if 'logged_in' in session:
-        return redirect(url_for('dashboard'))
-    return render_template('login.html')
-
-@app.route('/login', methods=['POST'])
-def login():
-    api_key = request.form.get('api_key')
+    c = conn.cursor()
     
-    conn = get_db()
-    project = conn.execute("SELECT * FROM projects WHERE api_key = ?", (api_key,)).fetchone()
-    conn.close()
+    c.execute("SELECT * FROM keys WHERE key_code = ?", (key,))
+    key_data = c.fetchone()
     
-    if project:
-        session['logged_in'] = True
-        session['project_id'] = project['id']
-        session['project_name'] = project['name']
-        session['api_key'] = api_key
-        return redirect(url_for('dashboard'))
-    else:
-        return render_template('login.html', error="Invalid API Key")
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
-
-# Main Dashboard
-@app.route('/dashboard')
-def dashboard():
-    if not session.get('logged_in'):
-        return redirect(url_for('index'))
-    
-    conn = get_db()
-    project_id = session['project_id']
-    
-    # Get project info
-    project = conn.execute("SELECT * FROM projects WHERE id = ?", (project_id,)).fetchone()
-    
-    # Get stats
-    total_keys = conn.execute("SELECT COUNT(*) FROM keys WHERE project_id = ?", (project_id,)).fetchone()[0]
-    used_keys = conn.execute("SELECT COUNT(*) FROM keys WHERE project_id = ? AND redeemed_by IS NOT NULL", (project_id,)).fetchone()[0]
-    unused_keys = total_keys - used_keys
-    total_users = conn.execute("SELECT COUNT(*) FROM whitelist WHERE project_id = ?", (project_id,)).fetchone()[0]
-    
-    conn.close()
-    
-    return render_template('dashboard.html', 
-                          project=project,
-                          total_keys=total_keys,
-                          used_keys=used_keys,
-                          unused_keys=unused_keys,
-                          total_users=total_users)
-
-# Keys Management Page
-@app.route('/keys')
-def keys_page():
-    if not session.get('logged_in'):
-        return redirect(url_for('index'))
-    
-    conn = get_db()
-    project_id = session['project_id']
-    
-    keys = conn.execute("""
-        SELECT k.*, u.name as user_name, u.id as user_discord_id 
-        FROM keys k
-        LEFT JOIN whitelist w ON k.id = w.key_id
-        LEFT JOIN users u ON w.user_id = u.id
-        WHERE k.project_id = ?
-        ORDER BY k.created_at DESC
-    """, (project_id,)).fetchall()
-    
-    conn.close()
-    
-    return render_template('keys.html', keys=keys)
-
-# Users Management Page
-@app.route('/users')
-def users_page():
-    if not session.get('logged_in'):
-        return redirect(url_for('index'))
-    
-    conn = get_db()
-    project_id = session['project_id']
-    
-    users = conn.execute("""
-        SELECT w.*, k.key_code 
-        FROM whitelist w
-        JOIN keys k ON w.key_id = k.id
-        WHERE w.project_id = ?
-        ORDER BY w.whitelisted_at DESC
-    """, (project_id,)).fetchall()
-    
-    conn.close()
-    
-    return render_template('users.html', users=users)
-
-# Generate new keys (AJAX)
-@app.route('/api/generate_keys', methods=['POST'])
-def generate_keys():
-    if not session.get('logged_in'):
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    data = request.json
-    amount = int(data.get('amount', 1))
-    days = data.get('days')
-    project_id = session['project_id']
-    
-    is_lifetime = days is None or days == ""
-    expires_at = int(time.time()) + (int(days) * 86400) if days and not is_lifetime else None
-    
-    keys = []
-    for _ in range(amount):
-        key_code = secrets.token_hex(16)
-        conn = get_db()
-        conn.execute("INSERT INTO keys (key_code, project_id, is_lifetime, expires_at, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                    (key_code, project_id, is_lifetime, expires_at, session.get('user_id', 0), int(time.time())))
-        conn.commit()
+    if not key_data:
         conn.close()
-        keys.append(key_code)
+        return jsonify({'code': 'INVALID_KEY', 'message': 'Key does not exist'})
     
-    return jsonify({'keys': keys})
+    # Check expiration
+    if key_data[4] and key_data[4] < int(time.time()):  # expires_at column
+        conn.close()
+        return jsonify({'code': 'KEY_EXPIRED', 'message': 'Key has expired'})
+    
+    # Log execution
+    c.execute('''INSERT INTO executions (id, key_code, hwid, ip, success, executed_at) 
+                 VALUES (?, ?, ?, ?, ?, ?)''',
+              (secrets.token_hex(16), key, hwid, request.remote_addr, True, int(time.time())))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        'code': 'VALID',
+        'message': 'Key is valid',
+        'script': 'print("✅ GrimPot Loaded!")'
+    })
 
-# Blacklist user (AJAX)
-@app.route('/api/blacklist_user', methods=['POST'])
-def blacklist_user():
-    if not session.get('logged_in'):
-        return jsonify({'error': 'Not logged in'}), 401
+@app.route('/api/generate', methods=['POST'])
+def api_generate():
+    """Generate a new key (admin only)"""
+    auth = request.headers.get('Authorization')
+    if auth != os.environ.get('ADMIN_KEY', 'admin123'):
+        return jsonify({'error': 'Unauthorized'}), 401
     
     data = request.json
-    user_id = data.get('user_id')
-    project_id = session['project_id']
+    days = data.get('days')
     
-    conn = get_db()
+    key_code = secrets.token_hex(16).upper()
+    expires_at = int(time.time()) + (days * 86400) if days else None
     
-    # Get key_id before deleting
-    key_data = conn.execute("SELECT key_id FROM whitelist WHERE user_id = ? AND project_id = ?", (user_id, project_id)).fetchone()
+    conn = sqlite3.connect('grimpot.db')
+    c = conn.cursor()
+    c.execute("INSERT INTO keys (id, key_code, created_at, expires_at) VALUES (?, ?, ?, ?)",
+              (secrets.token_hex(16), key_code, int(time.time()), expires_at))
+    conn.commit()
+    conn.close()
     
-    if key_data:
-        key_id = key_data[0]
-        # Delete from whitelist
-        conn.execute("DELETE FROM whitelist WHERE user_id = ? AND project_id = ?", (user_id, project_id))
-        # Mark key as unused
-        conn.execute("UPDATE keys SET redeemed_by = NULL, redeemed_at = NULL WHERE id = ?", (key_id,))
-        conn.commit()
+    return jsonify({'key': key_code, 'expires_at': expires_at})
+
+@app.route('/api/stats', methods=['GET'])
+def api_stats():
+    """Get key statistics"""
+    conn = sqlite3.connect('grimpot.db')
+    c = conn.cursor()
+    
+    c.execute("SELECT COUNT(*) FROM keys")
+    total = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM keys WHERE redeemed_by IS NOT NULL")
+    used = c.fetchone()[0]
     
     conn.close()
     
-    return jsonify({'success': True})
-
-# Get key info (AJAX)
-@app.route('/api/key_info/<key_code>')
-def key_info(key_code):
-    if not session.get('logged_in'):
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    conn = get_db()
-    key = conn.execute("""
-        SELECT k.*, w.user_id, w.whitelisted_at, w.expires_at, w.is_lifetime
-        FROM keys k
-        LEFT JOIN whitelist w ON k.id = w.key_id
-        WHERE k.key_code = ? AND k.project_id = ?
-    """, (key_code, session['project_id'])).fetchone()
-    conn.close()
-    
-    if key:
-        return jsonify(dict(key))
-    return jsonify({'error': 'Key not found'}), 404
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    return jsonify({
+        'total_keys': total,
+        'used_keys': used,
+        'unused_keys': total - used
+    })
